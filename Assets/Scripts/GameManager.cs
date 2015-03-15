@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour {
 	public SmoothFollowCS CamFollow;
 
 	public GameObject CamFollowObject;
+	public GameObject PathPiece;
 
 	[Range (1,20)]
 	public float MinFollowDistance;
@@ -119,5 +121,60 @@ public class GameManager : MonoBehaviour {
 //
 //				MaxFollowDistance
 //		}
+	}
+
+	int i =1;
+	public void Update()
+	{
+		if(Vector3.SqrMagnitude(TheVehicle.transform.position - LatestPath.transform.position) < 500000)
+		{
+			i++;
+
+			LatestPath = GenerateGround(LatestPath.transform.position + new Vector3(0,0,500));
+			GenerateObstacles(LatestPath.transform.position,i,LatestPath);
+
+			LatestPath.name = LatestPath.name + i.ToString();
+
+			Debug.Log(listOfPieces[0].gameObject);
+			GameObject.Destroy(listOfPieces[0].gameObject);
+			//Debug.Log("des");
+
+			listOfPieces.Add(LatestPath);
+			listOfPieces.RemoveAt(0);
+		}
+	}
+
+
+	GameObject GenerateGround(Vector3 point)
+	{
+		return GameObject.Instantiate(Ground,point,Quaternion.identity) as GameObject;
+	}
+
+//	public GameObject Wall;
+//	void GenerateWalls(Vector3 point)
+//	{
+//		GameObject.Instantiate(Wall,point,Quaternion.identity);
+//	}
+
+	public GameObject obstaclePrefab;
+	public int numOfThing;
+	public float rangeOfRand;
+	void GenerateObstacles(Vector3 point, int additional=0, GameObject Parent =null)
+	{
+		//GameObject.Instantiate(Ground,point,Quaternion.identity);
+
+		for(int i=0; i <numOfThing + additional; i++)
+		{
+			Vector2 vec2 = Random.insideUnitCircle * rangeOfRand;
+
+			if(Parent)
+				(GameObject.Instantiate(obstaclePrefab,
+			                       new Vector3(vec2.x,0,vec2.y) + point,
+			                       obstaclePrefab.transform.rotation) as GameObject).transform.parent = Parent.transform;
+			else
+				GameObject.Instantiate(obstaclePrefab,
+				                       new Vector3(vec2.x,0,vec2.y) + point,
+				                       obstaclePrefab.transform.rotation);
+		}
 	}
 }
