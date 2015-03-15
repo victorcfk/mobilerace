@@ -23,6 +23,8 @@ public class ApplyPhysics : MonoBehaviour {
     public float normalizedVal = 0;
 
 	public ApplyPhysics otherApplyPhysics;
+	[Range (0,0.5f)]
+	public float LeftAndRightInputStickiness = 0.025f;
 
 	[HideInInspector, System.NonSerialized]
 	public bool usingTouch;
@@ -37,7 +39,7 @@ public class ApplyPhysics : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 
-		if(otherApplyPhysics && Mathf.Abs(otherApplyPhysics.normalizedVal-normalizedVal)<0.05f )
+		if(otherApplyPhysics && Mathf.Abs(otherApplyPhysics.normalizedVal-normalizedVal)<LeftAndRightInputStickiness )
 		{
 			otherApplyPhysics.normalizedVal = normalizedVal = (otherApplyPhysics.normalizedVal+normalizedVal)/2;
 		}

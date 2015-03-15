@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void LateUpdate () 
 	{
-		if(Input.GetKeyDown(KeyCode.Escape))
+		if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Space))
 		{
 			Application.LoadLevel(0);
 		}
