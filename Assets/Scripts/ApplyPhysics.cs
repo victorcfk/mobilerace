@@ -16,25 +16,22 @@ public class ApplyPhysics : MonoBehaviour {
     public TrailRenderer trail;
 
     public float accVal = 75;
-    public float normalizedVal = 1;
+    public float normalizedVal = 0;
 
 //    public float rotaVal = 10f;
 //	// Use this for initialization
-//	void Start () {
-//	
-//	}
+	void Start () {
+		normalizedVal =0;
+	}
 //	
 	// Update is called once per frame
 	void FixedUpdate () {
 	
-        if(Accelerate || Input.GetKey(FwdAccCode))//(Input.GetKey(FwdAccCode))
+		if(normalizedVal>0 || Input.GetKey(FwdAccCode))//(Input.GetKey(FwdAccCode))
         {
-            if(Input.GetKey(FwdAccCode))
-            {
-                normalizedVal =1;
-            }
-            if(psys)
-                psys.emissionRate = 15;
+            if(Input.GetKey(FwdAccCode))	normalizedVal =1;
+
+            if(psys)	psys.emissionRate = 15;
 
             if(trail)
             {
@@ -42,14 +39,7 @@ public class ApplyPhysics : MonoBehaviour {
                 trail.endWidth = 0.5f;
             }
 
-            //Track.rigidbody.AddForceAtPosition(Track.transform.forward,Track.transform.position);
-            //rigidbody.AddRelativeForce(Track.transform.forward*100,Track.transform.position);
-
-            //thingToAccelerate.rigidbody.AddForceAtPosition(Track.transform.forward*0.1f,thingToAccelerate.transform.position,ForceMode.Impulse);
-            thingToAccelerate.rigidbody.AddForceAtPosition(Track.transform.forward*accVal * normalizedVal,Track.transform.position);
-
-//            thingToAccelerate.rigidbody.velocity = Quaternion.AngleAxis(rotaVal*Time.fixedDeltaTime,Vector3.up) *thingToAccelerate.rigidbody.velocity;
-            //Track.rigidbody.AddForceAtPosition(Track.transform.forward,Track.transform.position);
+            thingToAccelerate.rigidbody.AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
         }
         else
         {
