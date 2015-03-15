@@ -36,15 +36,22 @@ public class GameManager : MonoBehaviour {
 	void Awake()
 	{
 		_instance = this;
+
+		Screen.orientation = ScreenOrientation.Landscape;
 	}
 
 	// Use this for initialization
 	void Start () {
-	
+
 	}
-	
+
 	// Update is called once per frame
-	void LateUpdate () {
+	void LateUpdate () 
+	{
+		if(Input.GetKeyDown(KeyCode.Escape))
+		{
+			Application.LoadLevel(0);
+		}
 
 		float t = (TheVehicle.rigidbody.velocity.sqrMagnitude - TheVehicle.MinVelocity*TheVehicle.MinVelocity) /  (TheVehicle.MaxVelocity*TheVehicle.MaxVelocity - TheVehicle.MinVelocity*TheVehicle.MinVelocity);
 

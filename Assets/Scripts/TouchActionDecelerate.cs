@@ -7,12 +7,9 @@ public class TouchActionDecelerate : TouchAction {
     
     float accAmt;
     
-    void Update()
-    {
-    }
     public override void onAction(float thing= 0)
     {
-        apply.Accelerate = false;
+        //apply.Accelerate = false;
         apply.normalizedVal = 0;
     }
 }

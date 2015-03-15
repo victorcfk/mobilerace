@@ -14,10 +14,6 @@ public class DrivingScript : MonoBehaviour {
 
     public float rotaVal = 3;
 
-	// Use this for initialization
-	void Start () {
-		Screen.orientation = ScreenOrientation.Landscape;
-	}
 	void LateUpdate()
 	{
 		velocityWeWant = Vector3.SmoothDamp(rigidbody.velocity,Mathf.Clamp(rigidbody.velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward,ref tempo,Time.deltaTime*rotaVal);

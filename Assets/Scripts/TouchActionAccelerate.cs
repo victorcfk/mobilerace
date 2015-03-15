@@ -9,8 +9,10 @@ public class TouchActionAccelerate : TouchAction
     
     void Update()
     {
-        accAmt -= Time.deltaTime;
+        //accAmt -= Time.deltaTime;
         //accAmt = Mathf.Clamp(accAmt,0f,1f);
+
+
     }
 
 
@@ -20,14 +22,16 @@ public class TouchActionAccelerate : TouchAction
 		//Thing refers to the screen normalized x. We want to make it easier to accelrate and decelerate
 
 
-        apply.Accelerate = true;
+    //    apply.Accelerate = true;
+//
+//		if(thing > 0.5f) thing += 0.15f;
+//		else
+		thing *= 1.5f;
+		thing -= 0.3f;
 
-		if(thing > 0.5f) thing *= 1.3f;
-		else
-			thing /= 1.3f;
+//		accAmt = thing;
 
-
-        apply.normalizedVal = Mathf.Clamp(thing,0f,1f);
+		apply.normalizedVal = Mathf.Clamp(thing,0f,1f);
     }
 
 }
