@@ -67,7 +67,7 @@ public class HoldReceiver : MonoBehaviour {
         var tap = sender as PressGesture;
         
         foreach(TouchAction tAction in listOfTouchActionsPressed)
-            tAction.onAction(tap.NormalizedScreenPosition.y);
+			tAction.onAction(tap.NormalizedScreenPosition.y);
     }
 
     private void releasedHandler(object sender, EventArgs eventArgs)
@@ -75,7 +75,7 @@ public class HoldReceiver : MonoBehaviour {
         var tap = sender as ReleaseGesture;
         
         foreach(TouchAction tAction in listOfTouchActionsReleased)
-            tAction.onAction(tap.NormalizedScreenPosition.y);
+			tAction.onAction(tap.NormalizedScreenPosition.y);
     }
 
 
@@ -84,7 +84,7 @@ public class HoldReceiver : MonoBehaviour {
         var tap = sender as PanGesture;
 
         foreach(TouchAction tAction in listOfTouchActionsPanStart)
-            tAction.onAction(tap.NormalizedScreenPosition.y);
+			tAction.onAction(tap.NormalizedScreenPosition.y);
     }
 
     private void pannedHandler(object sender, EventArgs eventArgs)
@@ -92,7 +92,7 @@ public class HoldReceiver : MonoBehaviour {
         var tap = sender as PanGesture;
         
         foreach(TouchAction tAction in listOfTouchActionsPanContinue)
-            tAction.onAction(tap.NormalizedScreenPosition.y);
+			tAction.onAction(tap.NormalizedScreenPosition.y);
     }
 
     private void panCompletedHandler(object sender, EventArgs eventArgs)

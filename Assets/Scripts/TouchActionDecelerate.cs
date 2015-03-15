@@ -9,8 +9,6 @@ public class TouchActionDecelerate : TouchAction {
     
     void Update()
     {
-        accAmt -= Time.deltaTime;
-        accAmt = Mathf.Clamp(accAmt,0f,1f);
     }
     public override void onAction(float thing= 0)
     {

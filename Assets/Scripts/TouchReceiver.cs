@@ -39,6 +39,7 @@ public class TouchReceiver : MonoBehaviour {
 				tAction.onAction();
 			break;
 
+		default:
 			break;
 		}
 	}
