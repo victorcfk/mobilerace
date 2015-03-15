@@ -33,6 +33,16 @@ public class GameManager : MonoBehaviour {
 	[Range (1,20)]
 	public float MaxFollowHeight;
 
+//	public BezierCurve b;
+	public Vector3 startPoint;
+
+	public List<GameObject> listOfPieces;
+
+	public GameObject Ground;
+
+	public GameObject LatestPath;
+	public GameObject EarliestPath;
+
 	void Awake()
 	{
 		_instance = this;
@@ -43,6 +53,51 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+		//LatestPath = GenerateGround(LatestPath.transform.position + new Vector3(0,0,500));
+
+		//BezierCurve b = new BezierCurve();
+
+//		b.AddPointAt(new Vector3(0,0,0)*40);
+//		b.AddPointAt(new Vector3(1,0,1)*40);
+//
+//		b.AddPointAt(new Vector3(4,0,4)*40);
+//		b.AddPointAt(new Vector3(6,0,6)*40);
+//
+//		b.AddPointAt(new Vector3(7,0,7)*40);
+//		b.AddPointAt(new Vector3(7,0,10)*40);
+//
+//		b.AddPointAt(new Vector3(8,0,15)*40);
+//		b.AddPointAt(new Vector3(15,0,8)*40);
+//
+//		for(int i=0; i<b.pointCount; i++)
+//		{
+//			BezierPoint g = b[i];
+//
+//			g.handle1 =  new Vector3(-10,0,0);
+//
+//			g.handle2 =  new Vector3(10,0,0);
+//			//g.position + 
+//		}
+//
+//		b.SetDirty();
+
+//		float h=0;
+//		do
+//		{
+//			GameObject.Instantiate(PathPiece,
+//			                       b.GetPointAt(h),Quaternion.identity);
+//			h+= 0.01f;
+//
+//		}while(h<=1);
+//
+//		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
+//		                       b.GetPointAt(0),Quaternion.identity);
+//
+//		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
+//		                       b.GetPointAt(0.5f),Quaternion.identity);
+//
+//		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
+//		                       b.GetPointAt(1),Quaternion.identity);
 	}
 
 	// Update is called once per frame
