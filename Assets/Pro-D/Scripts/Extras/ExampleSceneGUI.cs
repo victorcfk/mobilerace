@@ -859,7 +859,7 @@ namespace ProD
 
 			//here we choose which camera movement script should be active
 			//we disable the default camera, because the Player3D comes with his own first person camera.
-			cameraGO.camera.enabled = playerType != PlayerType.Player3D;
+			cameraGO.GetComponent<Camera>().enabled = playerType != PlayerType.Player3D;
 			cameraGO.GetComponent<CameraObjectTracker>().enabled = playerType == PlayerType.Player2D && useFollowCam;
 
 			switch (playerType)

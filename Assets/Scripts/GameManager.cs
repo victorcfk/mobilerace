@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour {
 			Application.LoadLevel(0);
 		}
 
-		float t = (TheVehicle.rigidbody.velocity.sqrMagnitude - TheVehicle.MinVelocity*TheVehicle.MinVelocity) /  (TheVehicle.MaxVelocity*TheVehicle.MaxVelocity - TheVehicle.MinVelocity*TheVehicle.MinVelocity);
+		float t = (TheVehicle.GetComponent<Rigidbody>().velocity.sqrMagnitude - TheVehicle.MinVelocity*TheVehicle.MinVelocity) /  (TheVehicle.MaxVelocity*TheVehicle.MaxVelocity - TheVehicle.MinVelocity*TheVehicle.MinVelocity);
 
 		CamFollow.distance =	Mathf.Lerp(MinFollowDistance, MaxFollowDistance, t);
 		CamFollow.height   = 	Mathf.Lerp(MinFollowHeight, MaxFollowHeight, t);

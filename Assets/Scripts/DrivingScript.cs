@@ -16,7 +16,7 @@ public class DrivingScript : MonoBehaviour {
 
 	void LateUpdate()
 	{
-		velocityWeWant = Vector3.SmoothDamp(rigidbody.velocity,Mathf.Clamp(rigidbody.velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward,ref tempo,Time.deltaTime*rotaVal);
+		velocityWeWant = Vector3.SmoothDamp(GetComponent<Rigidbody>().velocity,Mathf.Clamp(GetComponent<Rigidbody>().velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward,ref tempo,Time.deltaTime*rotaVal);
 	}
 
 	// Update is called once per frame
@@ -28,7 +28,7 @@ public class DrivingScript : MonoBehaviour {
 //        if(Right.Accelerate && !Left.Accelerate)
 //            Right.thingToAccelerate.rigidbody.velocity = Quaternion.AngleAxis(-rotaVal*Time.fixedDeltaTime,Vector3.up) * Right.thingToAccelerate.rigidbody.velocity;
 
-		rigidbody.velocity = (velocityWeWant);
+		GetComponent<Rigidbody>().velocity = (velocityWeWant);
             //rigidbody.velocity = ;
 	}
 }

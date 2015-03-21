@@ -94,9 +94,9 @@ namespace ProD
 				pathPlane.transform.localScale = new Vector3(map.size_X, layer, map.size_Y);
 				pathPlane.transform.position = new Vector3(map.size_X / 2, map.size_Y / 2, -layer);
 			}
-			pathPlane.renderer.material.SetTexture("_MainTex", pathTexture);
+			pathPlane.GetComponent<Renderer>().material.SetTexture("_MainTex", pathTexture);
 
-			pathPlane.renderer.material.color = Color.white;
+			pathPlane.GetComponent<Renderer>().material.color = Color.white;
 
 			algorithm = new PathfindingAlgorithm(map);
 
@@ -153,7 +153,7 @@ namespace ProD
 				pathTexture.SetPixel(c.x, c.y, pathColor);
 
 			pathTexture.Apply();
-			pathPlane.renderer.material.SetTexture("_MainTex", pathTexture);
+			pathPlane.GetComponent<Renderer>().material.SetTexture("_MainTex", pathTexture);
 
 			lastPlayerPosition = playerPosition;
 

@@ -20,4 +20,5 @@ public abstract class TouchAction : MonoBehaviour
 //    }
 
     abstract public void onAction(float thing = 0);
+
 }

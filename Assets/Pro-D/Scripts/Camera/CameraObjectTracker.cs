@@ -25,7 +25,7 @@ namespace ProD
 		{
 			oldScreen = new Rect(0, 0, Screen.width, Screen.height);
 
-			sizeToDisplay = camera.orthographicSize;
+			sizeToDisplay = GetComponent<Camera>().orthographicSize;
 		}
 
 		/// <summary>
@@ -85,12 +85,12 @@ namespace ProD
 			if (enabled)
 				if (Screen.width >= Screen.height)
 				{
-					camera.orthographicSize = sizeToDisplay + additionalSize;
+					GetComponent<Camera>().orthographicSize = sizeToDisplay + additionalSize;
 				}
 				else
 				{
 					float aspect = (float)Screen.width / (float)Screen.height;
-					camera.orthographicSize = (sizeToDisplay + additionalSize) / aspect;
+					GetComponent<Camera>().orthographicSize = (sizeToDisplay + additionalSize) / aspect;
 				}
 		}
 

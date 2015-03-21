@@ -53,11 +53,11 @@ public class ApplyPhysics : MonoBehaviour {
 
 		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
         {
-			thingToAccelerate.rigidbody.AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
+			thingToAccelerate.GetComponent<Rigidbody>().AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
         }
         else
         {
-            thingToAccelerate.rigidbody.AddForceAtPosition(Track.transform.forward*5,Track.transform.position);
+            thingToAccelerate.GetComponent<Rigidbody>().AddForceAtPosition(Track.transform.forward*5,Track.transform.position);
         }
 
 		if(psys)	psys.emissionRate = normalizedVal*(pSysMaxEmission - pSysMinEmission) + pSysMinEmission;

@@ -1,9 +1,9 @@
 /* 
 * This code has been designed and developed by Gray Lake Studios.
-* You may only use this code if you’ve acquired the appropriate license.
+* You may only use this code if youï¿½ve acquired the appropriate license.
 * To acquire such licenses you may visit www.graylakestudios.com and/or Unity Asset Store
 * For all inquiries you may contact contact@graylakestudios.com
-* Copyright © 2012 Gray Lake Studios
+* Copyright ï¿½ 2012 Gray Lake Studios
 */
 
 using UnityEngine;
@@ -100,9 +100,9 @@ namespace ProD
 				fogOfWarPlane.transform.position = new Vector3(map.size_X / 2, map.size_Y / 2, -layer);
 			}
 
-			fogOfWarPlane.renderer.material.SetTexture("_MainTex", fogTexture);
+			fogOfWarPlane.GetComponent<Renderer>().material.SetTexture("_MainTex", fogTexture);
 
-			fogOfWarPlane.renderer.material.color = Color.white;
+			fogOfWarPlane.GetComponent<Renderer>().material.color = Color.white;
 		}
 
 		public void DestroyFoW()
@@ -173,7 +173,7 @@ namespace ProD
 			foreach (Address a in visibleCells)
 				fogTexture.SetPixel(a.x, a.y, visible);
 			fogTexture.Apply();
-			fogOfWarPlane.renderer.material.SetTexture("_MainTex", fogTexture);
+			fogOfWarPlane.GetComponent<Renderer>().material.SetTexture("_MainTex", fogTexture);
 
 		}
 
