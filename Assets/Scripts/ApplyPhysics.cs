@@ -27,25 +27,29 @@ public class ApplyPhysics : MonoBehaviour {
 	public float LeftAndRightInputStickiness = 0.025f;
 
 	[HideInInspector, System.NonSerialized]
-	public bool usingTouch;
+	public bool usingKey;
 
 //    public float rotaVal = 10f;
 //	// Use this for initialization
 	void Start () {
 		normalizedVal =0;
-		usingTouch = true;
+		usingKey = true;
 	}
 //	
 	// Update is called once per frame
 	void FixedUpdate () {
 
+		//Average out the input values.
+		//===========================================================================================
 		if(otherApplyPhysics && Mathf.Abs(otherApplyPhysics.normalizedVal-normalizedVal)<LeftAndRightInputStickiness )
 		{
 			otherApplyPhysics.normalizedVal = normalizedVal = (otherApplyPhysics.normalizedVal+normalizedVal)/2;
 		}
+		//===========================================================================================
 
-		if(Input.GetKey(FwdAccCode)) usingTouch = true;
-		if(usingTouch)
+		if(Input.GetKey(FwdAccCode)) usingKey = true;
+
+		if(usingKey)
 		{
 			if(Input.GetKey(FwdAccCode))	normalizedVal =1;
 			else normalizedVal =0;
@@ -60,6 +64,9 @@ public class ApplyPhysics : MonoBehaviour {
             thingToAccelerate.GetComponent<Rigidbody>().AddForceAtPosition(Track.transform.forward*5,Track.transform.position);
         }
 
+
+		//Aesthetics
+		//==========================================================================================================
 		if(psys)	psys.emissionRate = normalizedVal*(pSysMaxEmission - pSysMinEmission) + pSysMinEmission;
 		
 		if(trail)
@@ -67,6 +74,7 @@ public class ApplyPhysics : MonoBehaviour {
 			trail.startWidth = normalizedVal*(trailMaxWidth - trailMinWidth) + trailMinWidth;
 			trail.endWidth = normalizedVal*(trailMaxWidth - trailMinWidth) + trailMinWidth;
 		}
+		//==========================================================================================================
 
 //        if(Input.GetKey(BckAccCode))
 //        {

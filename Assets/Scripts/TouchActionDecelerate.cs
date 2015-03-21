@@ -11,5 +11,6 @@ public class TouchActionDecelerate : TouchAction {
     {
         //apply.Accelerate = false;
         apply.normalizedVal = 0;
+		apply.usingKey = false;
     }
 }

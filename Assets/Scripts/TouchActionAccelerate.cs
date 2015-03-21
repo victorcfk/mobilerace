@@ -32,7 +32,7 @@ public class TouchActionAccelerate : TouchAction
 //		accAmt = thing;
 
 		apply.normalizedVal = Mathf.Clamp(thing,0f,1f);
-		apply.usingTouch = false;
+		apply.usingKey = false;
     }
 
 }
