@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour {
 	public SmoothFollowCS CamFollow;
 
 	public GameObject CamFollowObject;
-	public GameObject PathPiece;
 
 	[Range (1,20)]
 	public float MinFollowDistance;
@@ -52,56 +51,6 @@ public class GameManager : MonoBehaviour {
 		Screen.orientation = ScreenOrientation.Landscape;
 	}
 
-	// Use this for initialization
-	void Start () {
-
-		//LatestPath = GenerateGround(LatestPath.transform.position + new Vector3(0,0,500));
-
-		//BezierCurve b = new BezierCurve();
-
-//		b.AddPointAt(new Vector3(0,0,0)*40);
-//		b.AddPointAt(new Vector3(1,0,1)*40);
-//
-//		b.AddPointAt(new Vector3(4,0,4)*40);
-//		b.AddPointAt(new Vector3(6,0,6)*40);
-//
-//		b.AddPointAt(new Vector3(7,0,7)*40);
-//		b.AddPointAt(new Vector3(7,0,10)*40);
-//
-//		b.AddPointAt(new Vector3(8,0,15)*40);
-//		b.AddPointAt(new Vector3(15,0,8)*40);
-//
-//		for(int i=0; i<b.pointCount; i++)
-//		{
-//			BezierPoint g = b[i];
-//
-//			g.handle1 =  new Vector3(-10,0,0);
-//
-//			g.handle2 =  new Vector3(10,0,0);
-//			//g.position + 
-//		}
-//
-//		b.SetDirty();
-
-//		float h=0;
-//		do
-//		{
-//			GameObject.Instantiate(PathPiece,
-//			                       b.GetPointAt(h),Quaternion.identity);
-//			h+= 0.01f;
-//
-//		}while(h<=1);
-//
-//		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
-//		                       b.GetPointAt(0),Quaternion.identity);
-//
-//		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
-//		                       b.GetPointAt(0.5f),Quaternion.identity);
-//
-//		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
-//		                       b.GetPointAt(1),Quaternion.identity);
-	}
-
 	// Update is called once per frame
 	void LateUpdate () 
 	{
@@ -126,22 +75,24 @@ public class GameManager : MonoBehaviour {
 	int i =1;
 	public void Update()
 	{
-		if(Vector3.SqrMagnitude(TheVehicle.transform.position - LatestPath.transform.position) < 500000)
-		{
-			i++;
-
-			LatestPath = GenerateGround(LatestPath.transform.position + new Vector3(0,0,500));
-			GenerateObstacles(LatestPath.transform.position,i,LatestPath);
-
-			LatestPath.name = LatestPath.name + i.ToString();
-
-			Debug.Log(listOfPieces[0].gameObject);
-			GameObject.Destroy(listOfPieces[0].gameObject);
-			//Debug.Log("des");
-
-			listOfPieces.Add(LatestPath);
-			listOfPieces.RemoveAt(0);
-		}
+		///===============================================================
+//		if(Vector3.SqrMagnitude(TheVehicle.transform.position - LatestPath.transform.position) < 500000)
+//		{
+//			i++;
+//
+//			LatestPath = GenerateGround(LatestPath.transform.position + new Vector3(0,0,500));
+//			GenerateObstacles(LatestPath.transform.position,i,LatestPath);
+//
+//			LatestPath.name = LatestPath.name + i.ToString();
+//
+//			Debug.Log(listOfPieces[0].gameObject);
+//			GameObject.Destroy(listOfPieces[0].gameObject);
+//			//Debug.Log("des");
+//
+//			listOfPieces.Add(LatestPath);
+//			listOfPieces.RemoveAt(0);
+//		}
+		///===============================================================
 	}
 
 

@@ -16,7 +16,33 @@ public class DrivingScript : MonoBehaviour {
 
 	void LateUpdate()
 	{
-		velocityWeWant = Vector3.SmoothDamp(GetComponent<Rigidbody>().velocity,Mathf.Clamp(GetComponent<Rigidbody>().velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward,ref tempo,Time.deltaTime*rotaVal);
+		//We want the drifting to be constrained
+		velocityWeWant = Vector3.SmoothDamp(GetComponent<Rigidbody>().velocity,
+		                                    Mathf.Clamp(GetComponent<Rigidbody>().velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward,
+		                                    ref tempo,
+		                                    Time.deltaTime*rotaVal);
+
+		/*
+		 * Vector3 idealfwd = new Vector3(transform.forward.x,GetComponent<Rigidbody>().velocity.y,transform.forward.z).normalized;
+
+			velocityWeWant = Vector3.SmoothDamp(GetComponent<Rigidbody>().velocity,Mathf.Clamp(GetComponent<Rigidbody>().velocity.magnitude,MinVelocity,MaxVelocity) * idealfwd,ref tempo,Time.deltaTime*rotaVal);
+		*/
+
+		//make the vehicle go towards the plane
+		//=================================================
+		RaycastHit rch;
+		
+		Debug.DrawRay(transform.position,Vector3.down,Color.red,1);
+		
+		if(Physics.Raycast(transform.position,Vector3.down, out rch,5000))
+		{
+			transform.position = Vector3.MoveTowards(transform.position,
+			                                         new Vector3(transform.position.x, rch.point.y+5,transform.position.z),
+			                                         Time.deltaTime*5);
+			//transform.position = ;
+		}
+		//=================================================
+
 	}
 
 	// Update is called once per frame
@@ -30,5 +56,9 @@ public class DrivingScript : MonoBehaviour {
 
 		GetComponent<Rigidbody>().velocity = (velocityWeWant);
             //rigidbody.velocity = ;
+
+
 	}
+
+
 }
