@@ -633,13 +633,14 @@ public class TrackBuildRGenerator : MonoBehaviour
 
                         if (track.numberOfTextures > 0)
 						{
-							if(!Application.isPlaying)
+//							if(!Application.isPlaying || !Application.isMobilePlatform)
+//							{
+//								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+//							}
+//							else
 							{
-								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
-							}
-							else
-							{
-								newMeshHolder.AddComponent<MeshRenderer>().material =  new Material(Shader.Find("Specular"));//track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(GameManager.instance.trackMat);
+								//newMeshHolder.AddComponent<MeshRenderer>().material =  new Material(Shader.Find("Specular"));//track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
 							}
 
 
@@ -663,15 +664,18 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBoundaryMesh[m].mesh;
                         if (track.numberOfTextures > 0)
 						{
-							if(!Application.isPlaying)
+//							if(!Application.isPlaying || !Application.isMobilePlatform)
+//							{
+//								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+//							}
+//							else
 							{
-								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
-							}
-							else
-							{
-								Material mr = newMeshHolder.AddComponent<MeshRenderer>().material;
-								mr = new Material(Shader.Find("Specular"));
-								mr.color = Color.green;
+
+								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(GameManager.instance.borderMat);
+
+//								Material mr = newMeshHolder.AddComponent<MeshRenderer>().material;
+//								mr = new Material(Shader.Find("Specular"));
+//								mr.color = Color.green;
 
 							}
 
@@ -780,13 +784,15 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBumperMesh[m].mesh;
                         if (track.numberOfTextures > 0)
 						{
-							if(!Application.isPlaying)
+//							if(!Application.isPlaying || !Application.isMobilePlatform)
+//							{
+//								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bumperTextureStyleIndex).GetMaterial();// track.bumperTexture.material;
+//							}
+//							else
 							{
-								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bumperTextureStyleIndex).GetMaterial();// track.bumperTexture.material;
-							}
-							else
-							{
-								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Specular"));//track.Texture(curve.bumperTextureStyleIndex).GetMaterial();
+
+								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(GameManager.instance.trackMat);
+									//new Material(Shader.Find("Specular"));//track.Texture(curve.bumperTextureStyleIndex).GetMaterial();
 							}
 
 						}

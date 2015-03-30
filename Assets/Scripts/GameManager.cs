@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
 
 	public GameObject CamFollowObject;
 
+	public Material trackMat;
+	public Material borderMat;
+
 	[Range (1,20)]
 	public float
 		MinFollowDistance;
@@ -62,19 +65,21 @@ public class GameManager : MonoBehaviour
 		
 		for(int i =0; i <trackPointCount; i++)
 		{
-			
+			if(i== 0 || i == trackPointCount-1 || i== trackPointCount/2-1 || i == 3*trackPointCount/4  || i == 3*trackPointCount/4 - 1 )
+				continue;
+
 			if(i < trackPointCount/4)
 			{
 				Debug.DrawRay(new Vector3(i*20,0,0),Vector3.up*10,Color.green,20);
 			}
 			else
-				if(i >= trackPointCount/4 && i< trackPointCount/2)
+				if(i > trackPointCount/4 && i< trackPointCount/2)
 			{
 				int goingup = i - trackPointCount/4; 
 				Debug.DrawRay(new Vector3(trackPointCount/4* 20,0,goingup*20),Vector3.up*10,Color.green,20);
 			}
 			else
-				if(i >= trackPointCount/2 && i< 3*trackPointCount/4)
+				if(i > trackPointCount/2 && i< 3*trackPointCount/4)
 			{
 				int goingup = 3*trackPointCount/4 - i-1; 
 				Debug.DrawRay(new Vector3(goingup*20,0,trackPointCount/4*20),Vector3.up*10,Color.green,20);
@@ -84,6 +89,35 @@ public class GameManager : MonoBehaviour
 				int goingup = trackPointCount - i-1; 
 				Debug.DrawRay(new Vector3(0,0,goingup*20),Vector3.up*10,Color.green,20);
 			}
+		}
+
+
+		for(int i =0; i <trackPointCount; i++)
+		{
+//			float r =  50;
+//			float k = 0;
+//			float h = 0;
+//			float y;
+//			float x;
+//			
+//			if(i <= trackPointCount/2)
+//			{
+//				y = i *50;
+//				x = Mathf.Sqrt((r*r) - (y-k)*(y-k)) + h;
+//			}
+//			else
+//			{
+//				y = trackPointCount - i*50;
+//				x = -Mathf.Sqrt((r*r) - (y-k)*(y-k)) + h;
+//			}
+//		
+//			Debug.DrawRay(new Vector3(x,0,y),Vector3.up*10,Color.red,20);
+//
+			float x = 0 + 10 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180);
+			float y = 0 + 10 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180);
+
+			Debug.DrawRay(new Vector3(x,0,y),Vector3.up*30,Color.red,20);
+			//p0.position = new Vector3(x,0,y);
 		}
 
 		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) {
@@ -153,91 +187,56 @@ public class GameManager : MonoBehaviour
 		} 
 		else 
 		{
-			int trackPointCount = 20;
-			
+			int trackPointCount = 30;
+
+			float lastknowny = 0;
 			for(int i =0; i <trackPointCount; i++)
 			{
+				if(i == trackPointCount-1) return;
+
 				TrackBuildRPoint p0 = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 
 				p0.baseTransform = transform;
 
-                if (i <= trackPointCount / 2)
-					p0.position = new Vector3 (50 * i, 
-					                           Random.Range (-10, 10), 
-					                           5 * i);
-				else
-					p0.position = new Vector3 (trackPointCount / 2*50 + 5 * (i - trackPointCount/2), 
-					                           Random.Range (-10, 10), 
-					                           50 * (i - trackPointCount/2));
-				// h and k are the x and y coordinates of the center of the circle 
-				//(x−h)2+(y−k)2=r2
+//                if (i <= trackPointCount / 2)
+//					p0.position = new Vector3 (50 * i, 
+//					                           Random.Range (-10, 10), 
+//					                           5 * i);
+//				else
+//					p0.position = new Vector3 (trackPointCount / 2*50 + 5 * (i - trackPointCount/2), 
+//					                           Random.Range (-10, 10), 
+//					                           50 * (i - trackPointCount/2));
 
-//				float r =  50;
-//				float k = 0;
-//				float h = 0;
-//
-//				float x = Mathf.Sqrt((r*r) - (y−k)*(y−k)) + h
 
-//				 if (i < trackPointCount / 2)
-//					p0.position = new Vector3 (30 * i * i, 
-//					                           Random.Range (-30, 30), 
-//					                           50 * i);
-//				else
-//					p0.position = new Vector3 (5 * (trackPointCount / 2 - i) * (trackPointCount / 2 - i), 
-//					                           Random.Range (-30, 30),
-//					                           50 * (trackPointCount / 2 - i));
-//				=============================================
+				float x = 250 + 250 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
+				float y = 0 + 150 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
 
-//				Vector3 temp;
-//				if(i < trackPointCount/4)
-//				{	temp = new Vector3(i*20,0,0);
-//
-//					Debug.DrawRay(new Vector3(i*20,0,0),Vector3.up*10,Color.green,20);
-//				}
-//				else
-//					if(i >= trackPointCount/4 && i< trackPointCount/2)
-//				{
-//					int goingup = i - trackPointCount/4; 
-//
-//					temp = new Vector3(trackPointCount/4* 20,0,goingup*20);
-//					Debug.DrawRay(temp,Vector3.up*10,Color.green,20);
-//				}
-//				else
-//					if(i >= trackPointCount/2 && i< 3*trackPointCount/4)
-//				{
-//					int goingup = 3*trackPointCount/4 - i-1; 
-//
-//					temp = new Vector3(goingup*20,0,trackPointCount/4*20);
-//					Debug.DrawRay(temp,Vector3.up*10,Color.green,20);
-//				}
-//				else
-//				{
-//					int goingup = trackPointCount - i-1; 
-//
-//					temp = new Vector3(0,0,goingup*20);
-//					Debug.DrawRay(temp,Vector3.up*10,Color.green,20);
-//				}
+				lastknowny += Random.Range (-3, 3);
+
+				p0.position = new Vector3(x,Random.Range (0, 3),y);
+
 
 				//=============================================
 
-				if(Application.isEditor)
+				//if(Application.isEditor)
 				{
-					p0.boundaryHeight = 3;
-					p0.generateBumpers =true;
-					p0.width = Random.Range(10,20);
+					p0.boundaryHeight = 6;
+					p0.width = Random.Range(50,60);
 
-					p0.extrudeLength = 10;
-					p0.extrudeBevel = 5;
+//					p0.trackUpQ = new Quaternion(p0.trackUpQ.x + Random.Range(-1,1),
+//					                             p0.trackUpQ.y,
+//					                             p0.trackUpQ.z,
+//					                             p0.trackUpQ.x);
 				}
 
 				track.AddPoint(p0);
 			}
 
-			for (int i =0; i <trackPointCount; i++) {
+			for (int i =0; i <track.numberOfPoints; i++) {
 				if (i < trackPointCount - 1) {
-					track.GetPoint (i).forwardControlPoint = (track.GetPoint (i + 1).position + track.GetPoint (i).position) / 2;
+					track.GetPoint (i).forwardControlPoint 	= (track.GetPoint (i + 1).position + track.GetPoint (i).position) / 2;
 				} else {
-					track.GetPoint(i).forwardControlPoint = track.GetPoint(i).position - (track.GetPoint(i-1).position - track.GetPoint(i).position);
+					track.GetPoint(i).forwardControlPoint 	= track.GetPoint(i).position - (track.GetPoint(i-1).position - track.GetPoint(i).position);
 					//track.GetPoint (i).forwardControlPoint = (track.GetPoint (0).position + track.GetPoint (i).position) / 2;
 				}
 			}
