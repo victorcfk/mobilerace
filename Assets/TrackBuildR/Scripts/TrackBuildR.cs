@@ -111,6 +111,7 @@ public class TrackBuildR : MonoBehaviour
         track.InitTextures();
         track.baseTransform = transform;
 
+		/*
         TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
         TrackBuildRPoint p1 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
         TrackBuildRPoint p2 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
@@ -145,6 +146,36 @@ public class TrackBuildR : MonoBehaviour
         track.AddPoint(p1);
         track.AddPoint(p2);
         track.AddPoint(p3);
+		*/
+
+
+		for(int i =0; i <5; i++)
+		{
+			TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
+			
+			p0.baseTransform = transform;
+			p0.position = new Vector3(100*i, 0, 5*i*i);
+
+
+//			if(i>0)
+//			{ 
+//				p0.forwardControlPoint = p0.position-track.GetPoint(i+1).position;
+//				//p0.leftForwardControlPoint =  p0.position + p0.forwardControlPoint*5;//+Vector3.Cross(p0.forwardControlPoint,Vector3.up)*10;
+////				p0.rightForwardControlPoint =  p0.position;//-Vector3.Cross(p0.forwardControlPoint,Vector3.up)*10;
+//			}
+
+			Debug.Log(i +" " + p0.position);
+			track.AddPoint(p0);
+		}
+
+		for(int i =0; i <5; i++)
+		{
+			if(i<3)
+				track.GetPoint(i).forwardControlPoint = track.GetPoint(i+1).position;
+			
+		}
+
+
 
         generator = gameObject.AddComponent<TrackBuildRGenerator>();
 
