@@ -832,7 +832,7 @@ public class TrackBuildRGenerator : MonoBehaviour
         track.lastPolycount = polyCount;
 
 #if UNITY_EDITOR
-        EditorUtility.UnloadUnusedAssets();
+        EditorUtility.UnloadUnusedAssetsImmediate();
 #endif
     }
 

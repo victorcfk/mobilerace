@@ -278,7 +278,7 @@ public class TrackBuildRExport
         }
         Object.DestroyImmediate(baseObject);
         EditorUtility.ClearProgressBar();
-        EditorUtility.UnloadUnusedAssets();
+        EditorUtility.UnloadUnusedAssetsImmediate();
         AssetDatabase.Refresh();
     }
 
