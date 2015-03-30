@@ -39,25 +39,19 @@ public class DrivingScript : MonoBehaviour {
 			transform.position = Vector3.MoveTowards(transform.position,
 			                                         new Vector3(transform.position.x, rch.point.y+5,transform.position.z),
 			                                         Time.deltaTime*5);
-			//transform.position = ;
+
+//			transform.rotation = Quaternion.RotateTowards(transform.position,
+//			                                         new Vector3(transform.position.x, rch.point.y+5,transform.position.z),
+//			                                         Time.deltaTime*5);
 		}
 		//=================================================
 
 	}
 
 	// Update is called once per frame
-	void FixedUpdate () {
-
-//        if(Left.Accelerate && !Right.Accelerate)
-//            Left.thingToAccelerate.rigidbody.velocity = Quaternion.AngleAxis(rotaVal*Time.fixedDeltaTime,Vector3.up) * Left.thingToAccelerate.rigidbody.velocity;
-//
-//        if(Right.Accelerate && !Left.Accelerate)
-//            Right.thingToAccelerate.rigidbody.velocity = Quaternion.AngleAxis(-rotaVal*Time.fixedDeltaTime,Vector3.up) * Right.thingToAccelerate.rigidbody.velocity;
-
+	void FixedUpdate () 
+	{
 		GetComponent<Rigidbody>().velocity = (velocityWeWant);
-            //rigidbody.velocity = ;
-
-
 	}
 
 
