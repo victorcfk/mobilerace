@@ -630,8 +630,20 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicTrackMesh[m].mesh;
+
                         if (track.numberOfTextures > 0)
-                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+						{
+							if(!Application.isPlaying)
+							{
+								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+							}
+							else
+							{
+								newMeshHolder.AddComponent<MeshRenderer>().material =  new Material(Shader.Find("Specular"));//track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+							}
+
+
+						}
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -650,7 +662,20 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBoundaryMesh[m].mesh;
                         if (track.numberOfTextures > 0)
-                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+						{
+							if(!Application.isPlaying)
+							{
+								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+							}
+							else
+							{
+								Material mr = newMeshHolder.AddComponent<MeshRenderer>().material;
+								mr = new Material(Shader.Find("Specular"));
+								mr.color = Color.green;
+
+							}
+
+						}
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -754,7 +779,17 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBumperMesh[m].mesh;
                         if (track.numberOfTextures > 0)
-                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bumperTextureStyleIndex).GetMaterial();// track.bumperTexture.material;
+						{
+							if(!Application.isPlaying)
+							{
+								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bumperTextureStyleIndex).GetMaterial();// track.bumperTexture.material;
+							}
+							else
+							{
+								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Specular"));//track.Texture(curve.bumperTextureStyleIndex).GetMaterial();
+							}
+
+						}
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif

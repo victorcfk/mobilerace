@@ -969,7 +969,7 @@ public class TrackBuildREditorInspector
                 if(GUILayout.Button("Optimise Mesh For Runtime", GUILayout.Height(38)))
                 {
                     Undo.RecordObject(_trackBuildR, "Optimise Meshes");
-                    _trackBuildR.OptimseMeshes();
+                    _trackBuildR.OptimizeMeshes();
                     GUI.changed = false;
                 }
                 EditorGUI.EndDisabledGroup();

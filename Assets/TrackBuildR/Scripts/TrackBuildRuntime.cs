@@ -103,95 +103,19 @@ public class TrackBuildRuntime : MonoBehaviour
 	public bool tangentsGenerated {get {return track.tangentsGenerated;}}
 	public bool lightmapGenerated {get {return track.lightmapGenerated;}}
 	public bool optimised {get {return track.optimised;}}
-	
-	bool isDoOldTrack = false;
-	
-	public TrackBuildRPoint bpoint;
-	
+
+
+	public Material useMaterial;
+
+
 	public void Init()
 	{
 		track = gameObject.AddComponent<TrackBuildRTrack>();
 		track.InitTextures();
 		track.baseTransform = transform;
 		
-		if(isDoOldTrack)
-		{
-			TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			TrackBuildRPoint p1 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			TrackBuildRPoint p2 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			TrackBuildRPoint p3 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			
-			p0.baseTransform = transform;
-			p1.baseTransform = transform;
-			p2.baseTransform = transform;
-			p3.baseTransform = transform;
-			
-			p0.position = new Vector3(-20, 0, -20);
-			p1.position = new Vector3(20, 0, -20);
-			p2.position = new Vector3(20, 0, 20);
-			p3.position = new Vector3(-20, 0, 20);
-			
-			p0.forwardControlPoint = new Vector3(0, 0, -20);
-			p1.forwardControlPoint = new Vector3(40, 0, -20);
-			p2.forwardControlPoint = new Vector3(0, 0, 20);
-			p3.forwardControlPoint = new Vector3(-40, 0, 20);
-			
-			p0.leftForwardControlPoint = new Vector3(-15, 0, -20);
-			p1.leftForwardControlPoint = new Vector3(25, 0, -20);
-			p2.leftForwardControlPoint = new Vector3(5, 0, 20);
-			p3.leftForwardControlPoint = new Vector3(-35, 0, 20);
-			
-			p0.rightForwardControlPoint = new Vector3(15, 0, -20);
-			p1.rightForwardControlPoint = new Vector3(55, 0, -20);
-			p2.rightForwardControlPoint = new Vector3(-5, 0, 20);
-			p3.rightForwardControlPoint = new Vector3(-45, 0, 20);
-			
-			track.AddPoint(p0);
-			track.AddPoint(p1);
-			track.AddPoint(p2);
-			track.AddPoint(p3);
-		}
-		else
-		{
-			int trackPointCount = 10;
-			
-			for(int i =0; i <trackPointCount; i++)
-			{
-				//TrackBuildRPoint p0 = Instantiate(bpoint);
-				
-				
-				TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-				
-				p0.baseTransform = transform;
-				p0.position = new Vector3(100*i, Random.Range(-30,30), 15*i*i);
-				
-				
-				//			if(i>0)
-				//			{ 
-				//				p0.forwardControlPoint = p0.position-track.GetPoint(i+1).position;
-				//				//p0.leftForwardControlPoint =  p0.position + p0.forwardControlPoint*5;//+Vector3.Cross(p0.forwardControlPoint,Vector3.up)*10;
-				////				p0.rightForwardControlPoint =  p0.position;//-Vector3.Cross(p0.forwardControlPoint,Vector3.up)*10;
-				//			}
-				
-				Debug.Log(i +" " + p0.position);
-				track.AddPoint(p0);
-			}
-			
-			for(int i =0; i <trackPointCount; i++)
-			{
-				if(i<trackPointCount-1)
-				{
-					track.GetPoint(i).forwardControlPoint = (track.GetPoint(i+1).position + track.GetPoint(i).position)/2;
-				}
-				else
-				{
-					track.GetPoint(i).forwardControlPoint = track.GetPoint(i).position - (track.GetPoint(i-1).position - track.GetPoint(i).position);
-					//track.GetPoint(i).forwardControlPoint = (track.GetPoint(0).position - track.GetPoint(i).position)/2;
-				}
-			}
-		}
-		
-		
+		GameManager.instance.GetTrackPoints(track);
+
 		generator = gameObject.AddComponent<TrackBuildRGenerator>();
 		
 		ForceFullRecalculation();
