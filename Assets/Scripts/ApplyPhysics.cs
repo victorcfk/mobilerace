@@ -4,9 +4,10 @@ using System.Collections;
 public class ApplyPhysics : MonoBehaviour {
 
     public KeyCode FwdAccCode;
+	public KeyCode BckAccCode;
 
     public GameObject Track;
-    public GameObject thingToAccelerate;
+    public GameObject objToAccelerate;
 
     [HideInInspector, System.NonSerialized]
     public bool Accelerate;
@@ -29,13 +30,19 @@ public class ApplyPhysics : MonoBehaviour {
 	[HideInInspector, System.NonSerialized]
 	public bool usingKey;
 
-//    public float rotaVal = 10f;
-//	// Use this for initialization
+	Rigidbody accObjRigidbody;
+
+	void Awake()
+	{
+		accObjRigidbody = objToAccelerate.GetComponent<Rigidbody>();
+	}
+
+	//	Use this for initialization
 	void Start () {
 		normalizedVal =0;
 		usingKey = true;
 	}
-//	
+
 	// Update is called once per frame
 	void FixedUpdate () {
 
@@ -48,20 +55,36 @@ public class ApplyPhysics : MonoBehaviour {
 		//===========================================================================================
 
 		if(Input.GetKey(FwdAccCode)) usingKey = true;
+		if(Input.GetKey(BckAccCode)) usingKey = true;
 
 		if(usingKey)
 		{
 			if(Input.GetKey(FwdAccCode))	normalizedVal =1;
-			else normalizedVal =0;
+			else
+			if(Input.GetKey(BckAccCode))	normalizedVal =0.2f;
+			else
+				normalizedVal =0;
 		}
 
-		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
+		if(normalizedVal > 0.2f )//(Input.GetKey(FwdAccCode))
         {
-			thingToAccelerate.GetComponent<Rigidbody>().AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
+			accObjRigidbody.AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
         }
+		else
+		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
+		{
+
+			//If the velocity is in any way orthognal to the vehicle's forward.
+			if(Vector3.Dot
+			   (accObjRigidbody.velocity,
+			    transform.forward) > 0)
+			{
+				accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.2f,Track.transform.position);
+			}
+		}
         else
         {
-            thingToAccelerate.GetComponent<Rigidbody>().AddForceAtPosition(Track.transform.forward*5,Track.transform.position);
+            accObjRigidbody.AddForceAtPosition(Track.transform.forward*5,Track.transform.position);
         }
 
 

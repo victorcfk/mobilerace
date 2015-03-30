@@ -26,8 +26,8 @@ public class TouchActionAccelerate : TouchAction
 //
 //		if(thing > 0.5f) thing += 0.15f;
 //		else
-		thing *= 1.5f;
-		thing -= 0.3f;
+//		thing *= 1.5f;
+//		thing -= 0.3f;
 
 //		accAmt = thing;
 
