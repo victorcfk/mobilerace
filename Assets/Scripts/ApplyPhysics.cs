@@ -66,25 +66,33 @@ public class ApplyPhysics : MonoBehaviour {
 				normalizedVal =0;
 		}
 
-		if(normalizedVal > 0.2f )//(Input.GetKey(FwdAccCode))
+		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
         {
 			accObjRigidbody.AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
         }
-		else
-		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
-		{
-
-			//If the velocity is in any way orthognal to the vehicle's forward.
-			if(Vector3.Dot
-			   (accObjRigidbody.velocity,
-			    transform.forward) > 0)
-			{
-				accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.2f,Track.transform.position);
-			}
-		}
+//		else
+//		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
+//		{
+//
+//			//If the velocity is in any way orthognal to the vehicle's forward.
+//			if(Vector3.Dot
+//			   (accObjRigidbody.velocity,
+//			    transform.forward) > 0)
+//			{
+//				accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.2f,Track.transform.position);
+//			}
+//		}
         else
         {
-            accObjRigidbody.AddForceAtPosition(Track.transform.forward*5,Track.transform.position);
+			//If the velocity is in any way orthognal to the vehicle's forward.
+						if(Vector3.Dot
+						   (accObjRigidbody.velocity,
+						    transform.forward) > 0)
+						{
+							accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.5f,Track.transform.position);
+						}
+
+//            accObjRigidbody.AddForceAtPosition(Track.transform.forward*1,Track.transform.position);
         }
 
 

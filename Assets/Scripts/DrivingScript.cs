@@ -14,20 +14,20 @@ public class DrivingScript : MonoBehaviour {
 
     public float rotaVal = 3;
 
-	Rigidbody rigidbody;
+	Rigidbody vehRigidbody;//dsad
 
 	void Awake()
 	{
-		rigidbody = GetComponent<Rigidbody>();
+		vehRigidbody = GetComponent<Rigidbody>();
 	}
 
 	void LateUpdate()
 	{
 		//We want the drifting to be constrained
-		velocityWeWant = Vector3.SmoothDamp(rigidbody.velocity,
+		velocityWeWant = Vector3.SmoothDamp(vehRigidbody.velocity,
 
-		                                    Mathf.Clamp(rigidbody.velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-		                                    new Vector3(0,rigidbody.velocity.y,0),														//Add the current downward velocity due to gravity.
+		                                    Mathf.Clamp(vehRigidbody.velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
+		                                    new Vector3(0,vehRigidbody.velocity.y,0),														//Add the current downward velocity due to gravity.
 
 		                                    ref tempo,
 		                                    Time.deltaTime*rotaVal);
@@ -61,7 +61,7 @@ public class DrivingScript : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
-		rigidbody.velocity = (velocityWeWant);
+		vehRigidbody.velocity = (velocityWeWant);
 	}
 
 
