@@ -111,10 +111,11 @@ public class GameManager : MonoBehaviour
 		///===============================================================
 	}
 
-	public bool isDoOldTrack = false;
+	public bool isDoOldTrack;
 	public void GetTrackPoints (TrackBuildRTrack track)
 	{
 		if (isDoOldTrack) {
+
 			TrackBuildRPoint p0 = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 			TrackBuildRPoint p1 = track.gameObject.AddComponent<TrackBuildRPoint> ();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
 			TrackBuildRPoint p2 = track.gameObject.AddComponent<TrackBuildRPoint> ();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
@@ -149,21 +150,45 @@ public class GameManager : MonoBehaviour
 			track.AddPoint (p1);
 			track.AddPoint (p2);
 			track.AddPoint (p3);
-		} else {
-
-			int trackPointCount = 10;
+		} 
+		else 
+		{
+			int trackPointCount = 20;
 			
 			for(int i =0; i <trackPointCount; i++)
 			{
-
-				Vector3 temp;
 				TrackBuildRPoint p0 = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 
-				if (i < trackPointCount / 2)
-					p0.position = new Vector3 (30 * i * i, Random.Range (-30, 30), 100 * i);
-				else
-					p0.position = new Vector3 (5 * (trackPointCount / 2 - i) * (trackPointCount / 2 - i), Random.Range (-30, 30), 100 * (trackPointCount / 2 - i));
+				p0.baseTransform = transform;
 
+                if (i <= trackPointCount / 2)
+					p0.position = new Vector3 (50 * i, 
+					                           Random.Range (-10, 10), 
+					                           5 * i);
+				else
+					p0.position = new Vector3 (trackPointCount / 2*50 + 5 * (i - trackPointCount/2), 
+					                           Random.Range (-10, 10), 
+					                           50 * (i - trackPointCount/2));
+				// h and k are the x and y coordinates of the center of the circle 
+				//(x−h)2+(y−k)2=r2
+
+//				float r =  50;
+//				float k = 0;
+//				float h = 0;
+//
+//				float x = Mathf.Sqrt((r*r) - (y−k)*(y−k)) + h
+
+//				 if (i < trackPointCount / 2)
+//					p0.position = new Vector3 (30 * i * i, 
+//					                           Random.Range (-30, 30), 
+//					                           50 * i);
+//				else
+//					p0.position = new Vector3 (5 * (trackPointCount / 2 - i) * (trackPointCount / 2 - i), 
+//					                           Random.Range (-30, 30),
+//					                           50 * (trackPointCount / 2 - i));
+//				=============================================
+
+//				Vector3 temp;
 //				if(i < trackPointCount/4)
 //				{	temp = new Vector3(i*20,0,0);
 //
@@ -193,6 +218,8 @@ public class GameManager : MonoBehaviour
 //					Debug.DrawRay(temp,Vector3.up*10,Color.green,20);
 //				}
 
+				//=============================================
+
 				if(Application.isEditor)
 				{
 					p0.boundaryHeight = 3;
@@ -206,14 +233,14 @@ public class GameManager : MonoBehaviour
 				track.AddPoint(p0);
 			}
 
-//			for (int i =0; i <trackPointCount; i++) {
-//				if (i < trackPointCount - 1) {
-//					track.GetPoint (i).forwardControlPoint = (track.GetPoint (i + 1).position + track.GetPoint (i).position) / 2;
-//				} else {
-//					track.GetPoint(i).forwardControlPoint = track.GetPoint(i).position - (track.GetPoint(i-1).position - track.GetPoint(i).position);
-//					//track.GetPoint (i).forwardControlPoint = (track.GetPoint (0).position + track.GetPoint (i).position) / 2;
-//				}
-//			}
+			for (int i =0; i <trackPointCount; i++) {
+				if (i < trackPointCount - 1) {
+					track.GetPoint (i).forwardControlPoint = (track.GetPoint (i + 1).position + track.GetPoint (i).position) / 2;
+				} else {
+					track.GetPoint(i).forwardControlPoint = track.GetPoint(i).position - (track.GetPoint(i-1).position - track.GetPoint(i).position);
+					//track.GetPoint (i).forwardControlPoint = (track.GetPoint (0).position + track.GetPoint (i).position) / 2;
+				}
+			}
 
 		}
 	}
@@ -234,7 +261,7 @@ public class GameManager : MonoBehaviour
 
 			LatestPath.name = LatestPath.name + i.ToString ();
 
-			Debug.Log (listOfPieces [0].gameObject);
+			//Debug.Log (listOfPieces [0].gameObject);
 			GameObject.Destroy (listOfPieces [0].gameObject);
 			//Debug.Log("des");
 
