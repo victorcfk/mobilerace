@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -40,7 +41,6 @@ public class GameManager : MonoBehaviour
 	public float
 		MaxFollowHeight;
 
-//	public BezierCurve b;
 	public Vector3 startPoint;
 
 	public List<GameObject> listOfPieces;
@@ -49,6 +49,10 @@ public class GameManager : MonoBehaviour
 
 	public GameObject LatestPath;
 	public GameObject EarliestPath;
+
+	public Text gtext;
+	public Text LeftEng;
+	public Text RightEng;
 
 	void Awake ()
 	{
@@ -91,7 +95,6 @@ public class GameManager : MonoBehaviour
 			}
 		}
 
-
 		for(int i =0; i <trackPointCount; i++)
 		{
 //			float r =  50;
@@ -120,11 +123,12 @@ public class GameManager : MonoBehaviour
 			//p0.position = new Vector3(x,0,y);
 		}
 
-		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) {
+		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
+		{
 			Application.LoadLevel (0);
 		}
 
-		float t = (TheVehicle.GetComponent<Rigidbody> ().velocity.sqrMagnitude - TheVehicle.MinVelocity * TheVehicle.MinVelocity) / (TheVehicle.MaxVelocity * TheVehicle.MaxVelocity - TheVehicle.MinVelocity * TheVehicle.MinVelocity);
+		float t = (TheVehicle.vehRigidbody.velocity.sqrMagnitude - TheVehicle.MinVelocity * TheVehicle.MinVelocity) / (TheVehicle.MaxVelocity * TheVehicle.MaxVelocity - TheVehicle.MinVelocity * TheVehicle.MinVelocity);
 
 		CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
 		CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
@@ -132,7 +136,6 @@ public class GameManager : MonoBehaviour
 		//CamFollow.height   = Mathf.Clamp( TheVehicle.rigidbody.velocity.magnitude , MinFollowHeight, MaxFollowHeight);
 //		if( TheVehicle.rigidbody.velocity > 0 )
 //		{
-//
 //				MaxFollowDistance
 //		}
 	}
@@ -140,7 +143,33 @@ public class GameManager : MonoBehaviour
 
 	public void Update ()
 	{
-		///===============================================================
+		gtext.text = TheVehicle.vehRigidbody.velocity.magnitude.ToString("F0");
+
+
+		//======================================================
+		float t1 = TheVehicle.Left.normalizedVal;
+
+		if(t1>0)
+			LeftEng.text = (TheVehicle.Left.normalizedVal*100).ToString("F0") +"%";
+		else
+			LeftEng.text = "Brake";
+
+		LeftEng.color = new Color(t1,(1-t1),0);
+
+		//======================================================
+
+		float t2 = TheVehicle.Right.normalizedVal;
+
+		if(t2>0)
+			RightEng.text = (TheVehicle.Right.normalizedVal*100).ToString("F0") +"%";
+		else
+			RightEng.text = "Brake";
+
+		RightEng.color = new Color(t2,(1-t2),0);
+
+
+		//======================================================
+
 		GenerateStraightLineObstacleTrack ();
 		///===============================================================
 	}
@@ -207,13 +236,12 @@ public class GameManager : MonoBehaviour
 //					                           Random.Range (-10, 10), 
 //					                           50 * (i - trackPointCount/2));
 
-
-				float x = 250 + 250 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
-				float y = 0 + 150 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
+				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
+				float y = 0 + 350 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
 
 				lastknowny += Random.Range (-3, 3);
 
-				p0.position = new Vector3(x,Random.Range (0, 3),y);
+				p0.position = new Vector3(x,0,y);
 
 
 				//=============================================
@@ -222,6 +250,7 @@ public class GameManager : MonoBehaviour
 				{
 					p0.boundaryHeight = 6;
 					p0.width = Random.Range(50,60);
+
 
 //					p0.trackUpQ = new Quaternion(p0.trackUpQ.x + Random.Range(-1,1),
 //					                             p0.trackUpQ.y,
@@ -260,9 +289,7 @@ public class GameManager : MonoBehaviour
 
 			LatestPath.name = LatestPath.name + i.ToString ();
 
-			//Debug.Log (listOfPieces [0].gameObject);
 			GameObject.Destroy (listOfPieces [0].gameObject);
-			//Debug.Log("des");
 
 			listOfPieces.Add (LatestPath);
 			listOfPieces.RemoveAt (0);
@@ -277,7 +304,6 @@ public class GameManager : MonoBehaviour
 
 	void GenerateObstacles (Vector3 point, int additional=0, GameObject Parent =null)
 	{
-		//GameObject.Instantiate(Ground,point,Quaternion.identity);
 
 		for (int i=0; i <numOfThing + additional; i++) {
 			Vector2 vec2 = Random.insideUnitCircle * rangeOfRand;

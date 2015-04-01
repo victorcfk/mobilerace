@@ -14,7 +14,7 @@ public class DrivingScript : MonoBehaviour {
 
     public float rotaVal = 3;
 
-	Rigidbody vehRigidbody;//dsad
+	public Rigidbody vehRigidbody;//dsad
 
 	void Awake()
 	{
