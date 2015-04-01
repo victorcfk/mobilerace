@@ -13,12 +13,12 @@ public class ApplyPhysics : MonoBehaviour {
     public bool Accelerate;
 
     public ParticleSystem psys;
-	public float pSysMinEmission = 3;
-	public float pSysMaxEmission = 20;
+	public float pSysMinEmission = 1;
+	public float pSysMaxEmission = 50;
 
     public TrailRenderer trail;
-	public float trailMinWidth = 0.05f;
-	public float trailMaxWidth = 1;
+	public float trailMinWidth = 0.01f;
+	public float trailMaxWidth = 3;
 
     public float accVal = 75;
     public float normalizedVal = 0;
@@ -89,10 +89,8 @@ public class ApplyPhysics : MonoBehaviour {
 						   (accObjRigidbody.velocity,
 						    transform.forward) > 0)
 						{
-							accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.5f,Track.transform.position);
+							accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.3f,Track.transform.position);
 						}
-
-//            accObjRigidbody.AddForceAtPosition(Track.transform.forward*1,Track.transform.position);
         }
 
 
