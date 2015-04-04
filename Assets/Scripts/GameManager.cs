@@ -193,12 +193,12 @@ public class GameManager : MonoBehaviour
 			p1.position = new Vector3 (20, 0, -20);
 			p2.position = new Vector3 (20, 0, 20);
 			p3.position = new Vector3 (-20, 0, 20);
-			
+
 			p0.forwardControlPoint = new Vector3 (0, 0, -20);
 			p1.forwardControlPoint = new Vector3 (40, 0, -20);
 			p2.forwardControlPoint = new Vector3 (0, 0, 20);
 			p3.forwardControlPoint = new Vector3 (-40, 0, 20);
-			
+
 			p0.leftForwardControlPoint = new Vector3 (-15, 0, -20);
 			p1.leftForwardControlPoint = new Vector3 (25, 0, -20);
 			p2.leftForwardControlPoint = new Vector3 (5, 0, 20);
@@ -208,7 +208,7 @@ public class GameManager : MonoBehaviour
 			p1.rightForwardControlPoint = new Vector3 (55, 0, -20);
 			p2.rightForwardControlPoint = new Vector3 (-5, 0, 20);
 			p3.rightForwardControlPoint = new Vector3 (-45, 0, 20);
-			
+					
 			track.AddPoint (p0);
 			track.AddPoint (p1);
 			track.AddPoint (p2);
@@ -217,58 +217,50 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			int trackPointCount = 30;
+			List<Vector3> pointlist = new List<Vector3>();
 
 			float lastknowny = 0;
+
 			for(int i =0; i <trackPointCount; i++)
 			{
-				if(i == trackPointCount-1) return;
-
-				TrackBuildRPoint p0 = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-
-				p0.baseTransform = transform;
-
-//                if (i <= trackPointCount / 2)
-//					p0.position = new Vector3 (50 * i, 
-//					                           Random.Range (-10, 10), 
-//					                           5 * i);
-//				else
-//					p0.position = new Vector3 (trackPointCount / 2*50 + 5 * (i - trackPointCount/2), 
-//					                           Random.Range (-10, 10), 
-//					                           50 * (i - trackPointCount/2));
-
 				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
 				float y = 0 + 350 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
 
 				lastknowny += Random.Range (-3, 3);
+				pointlist.Add(new Vector3(x,0,y));
+			}
 
-				p0.position = new Vector3(x,0,y);
+			Debug.Log(pointlist.Count);
 
+			for (int i =0; i <pointlist.Count; i++) 
+			{
+				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
+				
+				bp.baseTransform = transform;
+				bp.position = pointlist[i];
+
+				if (i < trackPointCount - 1) 
+				{
+
+					//bp.trackUpQ = Quaternion.AngleAxis(160,Vector3.up);
+					//bp.crownAngle = -10;
+
+					bp.forwardControlPoint 	= (pointlist[i+1] + pointlist[i]) / 2;
+
+				} else 
+				{
+					//bp.crownAngle = -10;
+					bp.forwardControlPoint 	= (pointlist[i] + pointlist[0]) / 2;
+				}
 
 				//=============================================
 
-				//if(Application.isEditor)
-				{
-					p0.boundaryHeight = 6;
-					p0.width = Random.Range(50,60);
+				bp.boundaryHeight = 6;
+				bp.width = Random.Range(50,60);
 
-
-//					p0.trackUpQ = new Quaternion(p0.trackUpQ.x + Random.Range(-1,1),
-//					                             p0.trackUpQ.y,
-//					                             p0.trackUpQ.z,
-//					                             p0.trackUpQ.x);
-				}
-
-				track.AddPoint(p0);
+				track.AddPoint(bp);
 			}
 
-			for (int i =0; i <track.numberOfPoints; i++) {
-				if (i < trackPointCount - 1) {
-					track.GetPoint (i).forwardControlPoint 	= (track.GetPoint (i + 1).position + track.GetPoint (i).position) / 2;
-				} else {
-					track.GetPoint(i).forwardControlPoint 	= track.GetPoint(i).position - (track.GetPoint(i-1).position - track.GetPoint(i).position);
-					//track.GetPoint (i).forwardControlPoint = (track.GetPoint (0).position + track.GetPoint (i).position) / 2;
-				}
-			}
 
 		}
 	}
