@@ -50,7 +50,7 @@ public class TrackBuildRTrack : MonoBehaviour
     private bool _renderBoundaryWallReverse = false;
 
     public bool includeCollider = true;
-    public bool includeColliderRoof = true;
+    public bool includeColliderRoof = false;
     public float trackColliderWallHeight = 5.0f;
 
     public bool trackBumpers = true;
