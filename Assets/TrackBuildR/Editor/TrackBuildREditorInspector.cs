@@ -1050,7 +1050,7 @@ public class TrackBuildREditorInspector
         GUI.DrawTexture(guiRect, pointPreviewTexture, ScaleMode.ScaleToFit, false);
 
         EditorGUILayout.BeginHorizontal();
-        string trackForwardText = _trackBuildR.previewForward ? "Track Preivew Direction Forward >>" : "<< Track Preivew Direction Backward";
+        string trackForwardText = _trackBuildR.previewForward ? "Track Preview Direction Forward >>" : "<< Track Preview Direction Backward";
         if(GUILayout.Button(trackForwardText))
             _trackBuildR.previewForward = !_trackBuildR.previewForward;
         EditorGUILayout.EndHorizontal();
