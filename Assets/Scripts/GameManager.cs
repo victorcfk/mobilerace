@@ -209,6 +209,20 @@ public class GameManager : MonoBehaviour
 			p2.rightForwardControlPoint = new Vector3 (-5, 0, 20);
 			p3.rightForwardControlPoint = new Vector3 (-45, 0, 20);
 					
+			float angle;
+			Vector3 axis;
+			p0.trackUpQ.ToAngleAxis(out angle, out axis);
+			p0.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+
+			p1.trackUpQ.ToAngleAxis(out angle, out axis);
+			p1.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+
+			p2.trackUpQ.ToAngleAxis(out angle, out axis);
+			p2.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+
+			p3.trackUpQ.ToAngleAxis(out angle, out axis);
+			p3.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+
 			track.AddPoint (p0);
 			track.AddPoint (p1);
 			track.AddPoint (p2);
@@ -216,15 +230,22 @@ public class GameManager : MonoBehaviour
 		} 
 		else 
 		{
-			int trackPointCount = 30;
+			int trackPointCount = 50;
 			List<Vector3> pointlist = new List<Vector3>();
 
 			float lastknowny = 0;
+
+			track.meshResolution =7;
 
 			for(int i =0; i <trackPointCount; i++)
 			{
 				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
 				float y = 0 + 350 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
+
+
+				//float t = 0.5; // given example value
+				//				float x = (1 - t) * (1 - t) * pointlist[i].x + 2 * (1 - t) * t * pointlist[i+1].x + t * t * pointlist[i+2].x;
+				//				float y = (1 - t) * (1 - t) * pointlist[i].y + 2 * (1 - t) * t * pointlist[i+1].y + t * t * pointlist[i+2].y;
 
 				lastknowny += Random.Range (-3, 3);
 				pointlist.Add(new Vector3(x,0,y));
@@ -238,30 +259,47 @@ public class GameManager : MonoBehaviour
 				
 				bp.baseTransform = transform;
 				bp.position = pointlist[i];
+				//bp.crownAngle = -10;
+				bp.boundaryHeight = 10;
+				bp.width = 50;
 
 				if (i < trackPointCount - 1) 
 				{
+					bp.forwardControlPoint 	= //pointlist[i+1];//
+						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
 
-					//bp.trackUpQ = Quaternion.AngleAxis(160,Vector3.up);
-					//bp.crownAngle = -10;
+					bp.leftForwardControlPoint 	= //pointlist[i+1];//
+						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
 
-					bp.forwardControlPoint 	= (pointlist[i+1] + pointlist[i]) / 2;
+					bp.rightForwardControlPoint 	= //pointlist[i+1];//
+						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
+
 
 				} else 
 				{
-					//bp.crownAngle = -10;
-					bp.forwardControlPoint 	= (pointlist[i] + pointlist[0]) / 2;
+					bp.forwardControlPoint 	= //pointlist[0];//
+						((pointlist[i] + pointlist[0]) / 2) ;
+
+					bp.leftForwardControlPoint 	=
+						((pointlist[i] + pointlist[0]) / 2) ;
+
+					bp.rightForwardControlPoint 	=
+						((pointlist[i] + pointlist[0]) / 2) ;
 				}
 
+				//i++;
+
+				//=============================================
+				float angle;
+				Vector3 axis;
+				bp.trackUpQ.ToAngleAxis(out angle, out axis);
+				bp.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
 				//=============================================
 
-				bp.boundaryHeight = 6;
-				bp.width = Random.Range(50,60);
+
 
 				track.AddPoint(bp);
 			}
-
-
 		}
 	}
 
