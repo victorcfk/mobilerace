@@ -162,23 +162,51 @@ public class GameManager : MonoBehaviour
 		} 
 		else 
 		{
-			int trackPointCount = 80;
+			//int trackPointCount = 80;
+			int numOfInterval = 8;
+			int trackInterval = 10;
+
+			float lastknownx = 0;
+			float lastknowny = 0;
+			float lastknownz = 0;
+
 			List<Vector3> pointlist = new List<Vector3>();
 
-			float lastknowny = 0;
+//			for(int i =0; i <trackPointCount; i++)
+//			{
+//				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
+//				float y = 0 + 350 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
+//
+//				lastknowny += Random.Range (-3, 3);
+//				pointlist.Add(new Vector3(x,0,y));
+//			}
 
-			track.meshResolution =7;
+			Vector3 dirAtEnd = Vector3.forward;
+			Vector3 lastPointAtInterval = Vector3.zero;
 
-			for(int i =0; i <trackPointCount; i++)
+
+			int either;// = Random.Range(0,2);
+			for(int j =0; j <numOfInterval; j++)
 			{
-				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
-				float y = 0 + 350 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
+				//pointlist.Add(20*dirAtEnd + lastPointAtInterval);
 
-				lastknowny += Random.Range (-3, 3);
-				pointlist.Add(new Vector3(x,0,y));
+				either = Random.Range(0,2);
+				for(int i =0; i <trackInterval; i++)
+				{
+					float x = 20*i +20*(j*trackInterval);
+					float y = Random.Range(-20,20);
+
+					if(either<=1)
+						pointlist.Add(new Vector3(x,Random.Range(0,20),y));
+					else
+						pointlist.Add(new Vector3(x,Random.Range(0,20),y));
+				}
+
+				lastPointAtInterval = pointlist[pointlist.Count-1];//currenbt last point
+				dirAtEnd = lastPointAtInterval - pointlist[pointlist.Count-2];
 			}
 
-			Debug.Log(pointlist.Count);
+			//Debug.Log(pointlist.Count);
 
 			for (int i =0; i <pointlist.Count; i++) 
 			{
@@ -186,16 +214,18 @@ public class GameManager : MonoBehaviour
 				
 				bp.baseTransform = transform;
 				bp.position = pointlist[i];
-				bp.crownAngle = -5;
+
+				if(i>10 && (i < pointlist.Count-10))
+					bp.crownAngle = -5;
 
 				bp.generateBumpers= true;
 				bp.colliderSides = false;
-
 				bp.boundaryHeight = 0;
-
 				bp.width = 50;
 
-				if (i < trackPointCount - 1) 
+				bp.extrudeTrackBottom = false;
+
+				if (i < pointlist.Count - 1) 
 				{
 					bp.forwardControlPoint 	= pointlist[i+1];
 //						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
@@ -208,7 +238,7 @@ public class GameManager : MonoBehaviour
 				} 
 				else 
 				{
-					bp.forwardControlPoint 	= pointlist[0];
+					bp.forwardControlPoint 	=   pointlist[i] - (pointlist[i-1] -  pointlist[i]);
 //						((pointlist[i] + pointlist[0]) / 2) ;
 //
 //					bp.leftForwardControlPoint 	=
@@ -228,8 +258,11 @@ public class GameManager : MonoBehaviour
 				//=============================================
 
 
-
+				track.meshResolution =7;
 				track.AddPoint(bp);
+
+				track.loop =false;
+
 			}
 		}
 	}
