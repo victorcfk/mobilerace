@@ -21,8 +21,9 @@ public class GameManager : MonoBehaviour
 
 	public DrivingScript TheVehicle;
 	public SmoothFollowCS CamFollow;
+	public Transform CamFollowObject;
 
-	public GameObject CamFollowObject;
+	public bool isDoOldTrack;
 
 	public Material trackMat;
 	public Material borderMat;
@@ -41,15 +42,6 @@ public class GameManager : MonoBehaviour
 	public float
 		MaxFollowHeight;
 
-	public Vector3 startPoint;
-
-	public List<GameObject> listOfPieces;
-
-	public GameObject Ground;
-
-	public GameObject LatestPath;
-	public GameObject EarliestPath;
-
 	public Text gtext;
 	public Text LeftEng;
 	public Text RightEng;
@@ -60,68 +52,13 @@ public class GameManager : MonoBehaviour
 
 		Screen.orientation = ScreenOrientation.Landscape;
 
+		if(CamFollowObject != null)	CamFollow.camFollowTarget = CamFollowObject;
+
 	}
         
 	// Update is called once per frame
 	void LateUpdate ()
 	{
-		int trackPointCount = 51;
-		
-		for(int i =0; i <trackPointCount; i++)
-		{
-			if(i== 0 || i == trackPointCount-1 || i== trackPointCount/2-1 || i == 3*trackPointCount/4  || i == 3*trackPointCount/4 - 1 )
-				continue;
-
-			if(i < trackPointCount/4)
-			{
-				Debug.DrawRay(new Vector3(i*20,0,0),Vector3.up*10,Color.green,20);
-			}
-			else
-				if(i > trackPointCount/4 && i< trackPointCount/2)
-			{
-				int goingup = i - trackPointCount/4; 
-				Debug.DrawRay(new Vector3(trackPointCount/4* 20,0,goingup*20),Vector3.up*10,Color.green,20);
-			}
-			else
-				if(i > trackPointCount/2 && i< 3*trackPointCount/4)
-			{
-				int goingup = 3*trackPointCount/4 - i-1; 
-				Debug.DrawRay(new Vector3(goingup*20,0,trackPointCount/4*20),Vector3.up*10,Color.green,20);
-			}
-			else
-			{
-				int goingup = trackPointCount - i-1; 
-				Debug.DrawRay(new Vector3(0,0,goingup*20),Vector3.up*10,Color.green,20);
-			}
-		}
-
-		for(int i =0; i <trackPointCount; i++)
-		{
-//			float r =  50;
-//			float k = 0;
-//			float h = 0;
-//			float y;
-//			float x;
-//			
-//			if(i <= trackPointCount/2)
-//			{
-//				y = i *50;
-//				x = Mathf.Sqrt((r*r) - (y-k)*(y-k)) + h;
-//			}
-//			else
-//			{
-//				y = trackPointCount - i*50;
-//				x = -Mathf.Sqrt((r*r) - (y-k)*(y-k)) + h;
-//			}
-//		
-//			Debug.DrawRay(new Vector3(x,0,y),Vector3.up*10,Color.red,20);
-//
-			float x = 0 + 10 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180);
-			float y = 0 + 10 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180);
-
-			Debug.DrawRay(new Vector3(x,0,y),Vector3.up*30,Color.red,20);
-			//p0.position = new Vector3(x,0,y);
-		}
 
 		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
 		{
@@ -167,14 +104,9 @@ public class GameManager : MonoBehaviour
 
 		RightEng.color = new Color(t2,(1-t2),0);
 
-
 		//======================================================
-
-		GenerateStraightLineObstacleTrack ();
-		///===============================================================
 	}
 
-	public bool isDoOldTrack;
 	public void GetTrackPoints (TrackBuildRTrack track)
 	{
 		if (isDoOldTrack) {
@@ -304,48 +236,55 @@ public class GameManager : MonoBehaviour
 	}
 
 
-	int i = 1;
-	public GameObject obstaclePrefab;
-	public int numOfThing;
-	public float rangeOfRand;
-
-	void GenerateStraightLineObstacleTrack ()
-	{
-		if (Vector3.SqrMagnitude (TheVehicle.transform.position - LatestPath.transform.position) < 500000) {
-			i++;
-
-			LatestPath = GenerateGround (LatestPath.transform.position + new Vector3 (0, 0, 500));
-			GenerateObstacles (LatestPath.transform.position, i, LatestPath);
-
-			LatestPath.name = LatestPath.name + i.ToString ();
-
-			GameObject.Destroy (listOfPieces [0].gameObject);
-
-			listOfPieces.Add (LatestPath);
-			listOfPieces.RemoveAt (0);
-		}
-	}
-
-
-	GameObject GenerateGround (Vector3 point)
-	{
-		return GameObject.Instantiate (Ground, point, Quaternion.identity) as GameObject;
-	}
-
-	void GenerateObstacles (Vector3 point, int additional=0, GameObject Parent =null)
-	{
-
-		for (int i=0; i <numOfThing + additional; i++) {
-			Vector2 vec2 = Random.insideUnitCircle * rangeOfRand;
-
-			if (Parent)
-				(GameObject.Instantiate (obstaclePrefab,
-			                       new Vector3 (vec2.x, 0, vec2.y) + point,
-			                       obstaclePrefab.transform.rotation) as GameObject).transform.parent = Parent.transform;
-			else
-				GameObject.Instantiate (obstaclePrefab,
-				                       new Vector3 (vec2.x, 0, vec2.y) + point,
-				                       obstaclePrefab.transform.rotation);
-		}
-	}
+//	int i = 1;
+//	public GameObject obstaclePrefab;
+//	public int numOfThing;
+//	public float rangeOfRand;
+//
+//	public List<GameObject> listOfPieces;
+//	
+//	public GameObject Ground;
+//	
+//	public GameObject LatestPath;
+//	public GameObject EarliestPath;
+//
+//	void GenerateStraightLineObstacleTrack ()
+//	{
+//		if (Vector3.SqrMagnitude (TheVehicle.transform.position - LatestPath.transform.position) < 500000) {
+//			i++;
+//
+//			LatestPath = GenerateGround (LatestPath.transform.position + new Vector3 (0, 0, 500));
+//			GenerateObstacles (LatestPath.transform.position, i, LatestPath);
+//
+//			LatestPath.name = LatestPath.name + i.ToString ();
+//
+//			GameObject.Destroy (listOfPieces [0].gameObject);
+//
+//			listOfPieces.Add (LatestPath);
+//			listOfPieces.RemoveAt (0);
+//		}
+//	}
+//
+//
+//	GameObject GenerateGround (Vector3 point)
+//	{
+//		return GameObject.Instantiate (Ground, point, Quaternion.identity) as GameObject;
+//	}
+//
+//	void GenerateObstacles (Vector3 point, int additional=0, GameObject Parent =null)
+//	{
+//
+//		for (int i=0; i <numOfThing + additional; i++) {
+//			Vector2 vec2 = Random.insideUnitCircle * rangeOfRand;
+//
+//			if (Parent)
+//				(GameObject.Instantiate (obstaclePrefab,
+//			                       new Vector3 (vec2.x, 0, vec2.y) + point,
+//			                       obstaclePrefab.transform.rotation) as GameObject).transform.parent = Parent.transform;
+//			else
+//				GameObject.Instantiate (obstaclePrefab,
+//				                       new Vector3 (vec2.x, 0, vec2.y) + point,
+//				                       obstaclePrefab.transform.rotation);
+//		}
+//	}
 }
