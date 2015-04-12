@@ -163,8 +163,8 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 2;
-			int trackInterval = 20;
+			int numOfInterval = 5;
+			int trackInterval = 23;
 
 			float lastknownx = 0;
 			float lastknowny = 0;
