@@ -163,8 +163,8 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 5;
-			int trackInterval = 23;
+			int numOfInterval = 10;
+			int trackInterval = 20;	//must be even
 
 			float lastknownx = 0;
 			float lastknowny = 0;
@@ -185,15 +185,15 @@ public class GameManager : MonoBehaviour
 			//Decide straight or curved
 			//===================================================
 
-			//Vector3 dirAtEnd = Vector3.forward;
-			Vector3 dirAtEnd = new Vector3(-1,0,2).normalized;
+			Vector3 dirAtEnd = Vector3.forward;
+			//Vector3 dirAtEnd = new Vector3(-5,0,-66).normalized;
 			Vector3 lastPointAtInterval = Vector3.zero;
 
-			int straightleftright;
+			int straightleftright = 2;
 
 			for(int j =0; j <numOfInterval; j++)
 			{
-				straightleftright = Random.Range(0,2);
+				straightleftright = Random.Range(0,3);
 
 				if(straightleftright == 0)	pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,1000,5));
 				if(straightleftright == 1)	pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,1000,5));
@@ -273,19 +273,22 @@ public class GameManager : MonoBehaviour
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 
 		float angle = Vector3.Angle(Vector3.forward,startDir);
+		Vector3.Cross(Vector3.forward,startDir);
+
+		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
+		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
+		                            new Vector3(1,1,1));
 
 		for(int i=0; i <numOfPoints; i++)
 		{
-			float x = i;
+			float x = 0;
 			float z = i;
 
 			vecArray[i] =
 				startLoc +	
-					new Vector3(
-						x*Mathf.Cos(angle) + z*Mathf.Sin(angle),
-						0,
-						-x*Mathf.Sin(angle) + z*Mathf.Cos(angle)) * 
-					intervalBtwnPts;
+					g.MultiplyPoint3x4(
+					new Vector3(x,0,z) * 
+					intervalBtwnPts);
 		}
 
 		return vecArray;
@@ -297,7 +300,12 @@ public class GameManager : MonoBehaviour
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 
-		float angle = -Vector3.Angle(Vector3.right,startDir);
+		float angle = Vector3.Angle(Vector3.forward,startDir);
+		Vector3.Cross(Vector3.forward,startDir);
+		
+		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
+		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
+		                            new Vector3(1,1,1));
         
 		for(int i=0; i <numOfPoints; i++)
 		{
@@ -306,10 +314,9 @@ public class GameManager : MonoBehaviour
 						
 			vecArray[i] =
 				startLoc +	
-					new Vector3(
-						x*Mathf.Cos(angle) + z*Mathf.Sin(angle),
-                        0,
-						-x*Mathf.Sin(angle) + z*Mathf.Cos(angle)) * intervalBtwnPts;
+					g.MultiplyPoint3x4(
+						new Vector3(x,0,z) * 
+                        intervalBtwnPts);
             
 //            Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
@@ -323,7 +330,12 @@ public class GameManager : MonoBehaviour
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 		
-		float angle = -Vector3.Angle(Vector3.right,startDir);
+		float angle = Vector3.Angle(Vector3.forward,startDir);
+		Vector3.Cross(Vector3.forward,startDir);
+		
+		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
+		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
+		                            new Vector3(1,1,1));
 		
 		for(int i=0; i <numOfPoints; i++)
 		{
@@ -332,12 +344,12 @@ public class GameManager : MonoBehaviour
 			
 			vecArray[i] =
 				startLoc +	
-					new Vector3(
-						x*Mathf.Cos(angle) + z*Mathf.Sin(angle),
-						0,
-						-x*Mathf.Sin(angle) + z*Mathf.Cos(angle)) * intervalBtwnPts;
-			
-//			Debug.Log(vecArray[i]);
+					g.MultiplyPoint3x4(
+						new Vector3(x,0,z) * 
+						intervalBtwnPts);
+            
+            
+            //			Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
 		}
 		
