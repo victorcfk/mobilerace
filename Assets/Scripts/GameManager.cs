@@ -163,7 +163,7 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 1;
+			int numOfInterval = 2;
 			int trackInterval = 20;
 
 			float lastknownx = 0;
@@ -185,33 +185,25 @@ public class GameManager : MonoBehaviour
 			//Decide straight or curved
 			//===================================================
 
-			Vector3 dirAtEnd = Vector3.forward;
-			//Vector3 dirAtEnd = new Vector3(1,0,2).normalized;
+			//Vector3 dirAtEnd = Vector3.forward;
+			Vector3 dirAtEnd = new Vector3(-1,0,2).normalized;
 			Vector3 lastPointAtInterval = Vector3.zero;
 
 			int straightleftright;
 
 			for(int j =0; j <numOfInterval; j++)
 			{
-				straightleftright = Random.Range(0,3);
+				straightleftright = Random.Range(0,2);
 
-				//pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval,20));
-				pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,100,2));
-
-				//GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,100,5);
-
-//				for(int i =0; i <trackInterval; i++)
-//				{
-//					float x = 20*i + 20*(j*trackInterval);// * dirAtEnd.x;
-//					float z = 0;// Random.Range(-10,10);
-//
-//					//(xt = xo(1+r)^y)
-//
-//					pointlist.Add(new Vector3(x,0,z));
-//				}
+				if(straightleftright == 0)	pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,1000,5));
+				if(straightleftright == 1)	pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,1000,5));
+				if(straightleftright == 2)	pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval,50));
 
 				lastPointAtInterval = pointlist[pointlist.Count-1];//current last point
-				dirAtEnd 			= lastPointAtInterval - pointlist[pointlist.Count-2];
+				dirAtEnd 			= (lastPointAtInterval - pointlist[pointlist.Count-2]).normalized;
+
+				Debug.DrawRay(lastPointAtInterval,dirAtEnd*50,Color.white,5);
+				Debug.DrawRay(lastPointAtInterval,Vector3.up*50,Color.red,5);
             }
 
 
@@ -305,17 +297,17 @@ public class GameManager : MonoBehaviour
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 
-		float angle = Vector3.Angle(Vector3.forward,startDir);
+		float angle = -Vector3.Angle(Vector3.right,startDir);
         
 		for(int i=0; i <numOfPoints; i++)
 		{
-			float x =-Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+			float x =-Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180)+1;//requires the float so the parameter multiplication works
 			float z =Mathf.Sin(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 						
 			vecArray[i] =
 				startLoc +	
 					new Vector3(
-						x*Mathf.Cos(angle) + z*Mathf.Sin(angle)+1,
+						x*Mathf.Cos(angle) + z*Mathf.Sin(angle),
                         0,
 						-x*Mathf.Sin(angle) + z*Mathf.Cos(angle)) * intervalBtwnPts;
             
@@ -331,17 +323,17 @@ public class GameManager : MonoBehaviour
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 		
-		float angle = Vector3.Angle(Vector3.forward,startDir);
+		float angle = -Vector3.Angle(Vector3.right,startDir);
 		
 		for(int i=0; i <numOfPoints; i++)
 		{
-			float x =Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+			float x =Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180)-1;//requires the float so the parameter multiplication works
 			float z =Mathf.Sin(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 			
 			vecArray[i] =
 				startLoc +	
 					new Vector3(
-						x*Mathf.Cos(angle) + z*Mathf.Sin(angle)-1,
+						x*Mathf.Cos(angle) + z*Mathf.Sin(angle),
 						0,
 						-x*Mathf.Sin(angle) + z*Mathf.Cos(angle)) * intervalBtwnPts;
 			
