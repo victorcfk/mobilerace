@@ -165,8 +165,8 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 1;
-			int trackInterval = 30;	//must be even
+			int numOfInterval = 30;
+			int trackInterval = 20;	//must be even
 
 			float lastknownx = 0;
 			float lastknowny = 0;
@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviour
 			//===================================================
 
 			Vector3 dirAtEnd 			= Vector3.forward;
-			Vector3 lastPointAtInterval = Vector3.one*10;
+			Vector3 lastPointAtInterval = Vector3.zero;
 
 			int straightleftright = 0;
 
@@ -203,12 +203,12 @@ public class GameManager : MonoBehaviour
 
 				if(straightleftright == 0)
 				{
-					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,1/3));
+					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,1/3));
 				}
 
 				if(straightleftright == 1)
 				{
-					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,1/3));
+					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,1/3));
 				}
 
 				if(straightleftright == 2)
