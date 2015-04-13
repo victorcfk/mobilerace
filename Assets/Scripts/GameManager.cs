@@ -234,21 +234,24 @@ public class GameManager : MonoBehaviour
 				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 				
 				bp.baseTransform = transform;
-				bp.position = pointlist[i] + new Vector3(0,0.5f,0);
+				bp.position = pointlist[i] + new Vector3(0,-i,0);
 
-				bp.generateBumpers= true;
+				//bp.generateBumpers= true;
 				bp.colliderSides = true;
+				bp.renderBounds = true;
 				bp.boundaryHeight = 5;
 
-				bp.extrudeTrackBottom = false;
+				bp.extrudeTrackBottom = true;
 
 				if (i < pointlist.Count - 1)
 				{
-					bp.forwardControlPoint 	= pointlist[i+1];
+					bp.forwardControlPoint 	= (pointlist[i+1] + new Vector3(0,-i-1,0));
 				} 
 				else 
 				{
-					bp.forwardControlPoint 	=   pointlist[i] - (pointlist[i-1] -  pointlist[i]);
+					bp.forwardControlPoint 	=   
+						(pointlist[i]+ new Vector3(0,-i,0)) - 
+						((pointlist[i-1]+ new Vector3(0,-i-1,0)) -  (pointlist[i]+ new Vector3(0,-i,0)));
 				}
 
 				if(SLR[i] > 0)
