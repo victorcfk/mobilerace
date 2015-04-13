@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
 
 		if(CamFollowObject != null)	CamFollow.camFollowTarget = CamFollowObject;
 
+		Random.seed = System.DateTime.Now.Hour;
+
 	}
         
 	// Update is called once per frame
@@ -163,7 +165,7 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 10;
+			int numOfInterval = 30;
 			int trackInterval = 20;	//must be even
 
 			float lastknownx = 0;
@@ -232,8 +234,8 @@ public class GameManager : MonoBehaviour
 				bp.position = pointlist[i] + new Vector3(0,Random.Range(0,-1f),0);
 
 				bp.generateBumpers= true;
-				bp.colliderSides = false;
-				bp.boundaryHeight = 0;
+				bp.colliderSides = true;
+				bp.boundaryHeight = 5;
 
 
 				bp.extrudeTrackBottom = false;
