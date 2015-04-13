@@ -203,12 +203,12 @@ public class GameManager : MonoBehaviour
 
 				if(straightleftright == 0)
 				{
-					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,1/3));
+					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,0.25f));
 				}
 
 				if(straightleftright == 1)
 				{
-					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,1/3));
+					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,0.25f));
 				}
 
 				if(straightleftright == 2)
@@ -227,6 +227,7 @@ public class GameManager : MonoBehaviour
 			//===================================================
 
 			Debug.Log(pointlist.Count +" "+SLR.Count);
+			float currAngle = 0;
 
 			for (int i =0; i <pointlist.Count; i++) 
 			{
@@ -244,70 +245,88 @@ public class GameManager : MonoBehaviour
 				if (i < pointlist.Count - 1)
 				{
 					bp.forwardControlPoint 	= pointlist[i+1];
-//						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
-//
-//					bp.leftForwardControlPoint 	= //pointlist[i+1];//
-//						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
-//
-//					bp.rightForwardControlPoint 	= //pointlist[i+1];//
-//						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
 				} 
 				else 
 				{
 					bp.forwardControlPoint 	=   pointlist[i] - (pointlist[i-1] -  pointlist[i]);
-//						((pointlist[i] + pointlist[0]) / 2) ;
-//
-//					bp.leftForwardControlPoint 	=
-//						((pointlist[i] + pointlist[0]) / 2) ;
-//
-//					bp.rightForwardControlPoint 	=
-//						((pointlist[i] + pointlist[0]) / 2) ;
 				}
 
 				if(SLR[i] > 0)
 				{
-					Debug.Log("right");
+					Debug.Log("right " + SLR[i]);
 
-					bp.width = 60;
+					bp.width = 50;
 					//=============================================
 					float angle;
 					Vector3 axis;
 					bp.trackUpQ.ToAngleAxis(out angle, out axis);
-					bp.trackUpQ =  Quaternion.AngleAxis(angle - 20,axis);
-//					bp.trackUpQ =  Quaternion.AngleAxis(angle - SLR[i]*30,axis);
 
-					bp.position += new Vector3(0,3,0);
-//					if(SLR[i] < 0.5f)
-//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*SLR[i]*30,axis);
-//					else
-//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*(1-SLR[i])*30,axis);
+					float multi = 1;
+					//if( Vector3.Dot(axis, Vector3.up) >0 )
+					if( axis.y<0 )
+					{
+						multi = -1;
+					}
 
+					if(SLR[i] < 0.5f)
+					{
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + SLR[i]*multi*90f,axis);
+						bp.position += new Vector3(0,SLR[i]*30f,0);
+
+						Debug.DrawRay(bp.position,axis*10,Color.green,5);
+						Debug.Log(SLR[i]*120+ " -- "+ SLR[i]*20);
+					}
+					else
+					{
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + (1-SLR[i])*multi*90f,axis);
+						bp.position += new Vector3(0,(1-SLR[i])*30f,0);
+
+						Debug.DrawRay(bp.position,axis*10,Color.green,5);
+						Debug.Log((1-SLR[i])*120+ " -- "+ (1-SLR[i])*20);
+					}
 					//=============================================
 				}
 				else
 				if(SLR[i] < 0)
 				{
-					Debug.Log("left");
+					Debug.Log("left " + SLR[i]);
 
-					bp.width = 60;
+					bp.width = 50;
 					//=============================================
 					float angle;
 					Vector3 axis;
 					bp.trackUpQ.ToAngleAxis(out angle, out axis);
-					bp.trackUpQ =  Quaternion.AngleAxis(angle + 20,axis);
-//					bp.trackUpQ =  Quaternion.AngleAxis(angle - SLR[i]*30,axis);
 
-					bp.position += new Vector3(0,3,0);
+					float multi = 1;
+					//if( Vector3.Dot(axis, Vector3.up) > 0 )
+					if( axis.y<0 )
+					{
+						multi = -1;
+					}
 
-//					bp.position += new Vector3(0,10,10);
-//					if(SLR[i] > -0.5f)
-//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*SLR[i]*30,axis);
-//					else
-//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*(1-SLR[i])*30,axis);
+					if(SLR[i] > -0.5f)
+					{
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + SLR[i]*multi*90f,axis);
+						bp.position += new Vector3(0,-SLR[i]*30f,0);
+
+						Debug.DrawRay(bp.position,axis*10,Color.green,5);
+						Debug.Log(SLR[i]*120+ " -- "+ -SLR[i]*20);
+					}
+					else
+					{
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + (-1-SLR[i])*multi*90f,axis);
+						bp.position += new Vector3(0,-(-1-SLR[i])*30f,0);
+
+						Debug.DrawRay(bp.position,axis*10,Color.green,5);
+						Debug.Log((-1-SLR[i])*120+ " -- "+ -(-1-SLR[i])*20);
+					}
+
+
 					//=============================================
 				}
 				else
 				{
+					currAngle = 0;
 					bp.width = 50;
 
 //					if(i>10 && (i < pointlist.Count-10))
@@ -381,7 +400,7 @@ public class GameManager : MonoBehaviour
 						new Vector3(x,y,z) * 
                         intervalBtwnPts);
             
-			SLR.Add(i/(float)numOfPoints);
+			SLR.Add(-i/(float)numOfPoints);
 //            Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
         }
@@ -414,7 +433,7 @@ public class GameManager : MonoBehaviour
 						new Vector3(x,y,z) * 
 						intervalBtwnPts);
             
-			SLR.Add(-i/(float)numOfPoints);
+			SLR.Add(i/(float)numOfPoints);
             //			Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
 		}
