@@ -27,7 +27,7 @@ public class DrivingScript : MonoBehaviour {
 		velocityWeWant = Vector3.SmoothDamp(vehRigidbody.velocity,
 
 		                                    Mathf.Clamp(vehRigidbody.velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-		                                    new Vector3(0,Mathf.Clamp(vehRigidbody.velocity.y,-5,-10),0),														//Add the current downward velocity due to gravity.
+		                                    new Vector3(0,Mathf.Clamp(vehRigidbody.velocity.y,0,-10),0),														//Add the current downward velocity due to gravity.
 
 		                                    ref tempo,
 		                                    Time.deltaTime*rotaVal);
@@ -46,12 +46,16 @@ public class DrivingScript : MonoBehaviour {
 //		
 //		if(Physics.Raycast(transform.position,Vector3.down, out rch,5000))
 //		{
-//			transform.position = Vector3.MoveTowards(transform.position,
-//			                                         new Vector3(transform.position.x, rch.point.y+5,transform.position.z),
-//			                                         Time.deltaTime*5);
-//
-////			transform.rotation = Quaternion.RotateTowards(transform.position,
+////			transform.position = Vector3.MoveTowards(transform.position,
 ////			                                         new Vector3(transform.position.x, rch.point.y+5,transform.position.z),
+////			                                         Time.deltaTime*5);
+//
+////			transform.up = Vector3.MoveTowards(transform.up,
+////			                                   rch.normal,
+////			                                   Time.deltaTime*5);
+//
+////			transform.rotation = Quaternion.RotateTowards(transform.rotation,
+////			                                         Quaternion.AngleAxis(0,rch.normal),
 ////			                                         Time.deltaTime*5);
 //		}
 		//=================================================
