@@ -27,7 +27,7 @@ public class DrivingScript : MonoBehaviour {
 		velocityWeWant = Vector3.SmoothDamp(vehRigidbody.velocity,
 
 		                                    Mathf.Clamp(vehRigidbody.velocity.magnitude,MinVelocity,MaxVelocity) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-		                                    new Vector3(0,vehRigidbody.velocity.y,0),														//Add the current downward velocity due to gravity.
+		                                    new Vector3(0,Mathf.Clamp(vehRigidbody.velocity.y,-5,-10),0),														//Add the current downward velocity due to gravity.
 
 		                                    ref tempo,
 		                                    Time.deltaTime*rotaVal);
