@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
 //		}
 	}
 
-	List<int> SLR = new List<int>();
+	List<float> SLR = new List<float>();
 	public void Update ()
 	{
 		gtext.text = TheVehicle.vehRigidbody.velocity.magnitude.ToString("F0");
@@ -165,8 +165,8 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 30;
-			int trackInterval = 20;	//must be even
+			int numOfInterval = 1;
+			int trackInterval = 30;	//must be even
 
 			float lastknownx = 0;
 			float lastknowny = 0;
@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviour
 			//===================================================
 
 			Vector3 dirAtEnd 			= Vector3.forward;
-			Vector3 lastPointAtInterval = Vector3.zero;
+			Vector3 lastPointAtInterval = Vector3.one*10;
 
 			int straightleftright = 0;
 
@@ -199,14 +199,16 @@ public class GameManager : MonoBehaviour
 				else
 					straightleftright = Random.Range(0,3);
 
+				//diameter of circle  = intervalbtwnpoints *trackinterval * portionOfCircle
+
 				if(straightleftright == 0)
 				{
-					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,5));
+					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,1/3));
 				}
 
 				if(straightleftright == 1)
 				{
-					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,5));
+					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,1/3));
 				}
 
 				if(straightleftright == 2)
@@ -231,16 +233,15 @@ public class GameManager : MonoBehaviour
 				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 				
 				bp.baseTransform = transform;
-				bp.position = pointlist[i] + new Vector3(0,Random.Range(0,-1f),0);
+				bp.position = pointlist[i] + new Vector3(0,0.5f,0);
 
 				bp.generateBumpers= true;
 				bp.colliderSides = true;
 				bp.boundaryHeight = 5;
 
-
 				bp.extrudeTrackBottom = false;
 
-				if (i < pointlist.Count - 1) 
+				if (i < pointlist.Count - 1)
 				{
 					bp.forwardControlPoint 	= pointlist[i+1];
 //						((pointlist[i+1] + pointlist[i]) / 2 + pointlist[i])/2;
@@ -263,34 +264,56 @@ public class GameManager : MonoBehaviour
 //						((pointlist[i] + pointlist[0]) / 2) ;
 				}
 
-				if(SLR[i] == 0)
+				if(SLR[i] > 0)
 				{
-					bp.width = 50;
+					Debug.Log("right");
+
+					bp.width = 60;
 					//=============================================
 					float angle;
 					Vector3 axis;
 					bp.trackUpQ.ToAngleAxis(out angle, out axis);
 					bp.trackUpQ =  Quaternion.AngleAxis(angle - 20,axis);
+//					bp.trackUpQ =  Quaternion.AngleAxis(angle - SLR[i]*30,axis);
+
+					bp.position += new Vector3(0,3,0);
+//					if(SLR[i] < 0.5f)
+//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*SLR[i]*30,axis);
+//					else
+//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*(1-SLR[i])*30,axis);
+
 					//=============================================
 				}
 				else
-				if(SLR[i] == 1)
+				if(SLR[i] < 0)
 				{
-					bp.width = 50;
+					Debug.Log("left");
+
+					bp.width = 60;
 					//=============================================
 					float angle;
 					Vector3 axis;
 					bp.trackUpQ.ToAngleAxis(out angle, out axis);
 					bp.trackUpQ =  Quaternion.AngleAxis(angle + 20,axis);
+//					bp.trackUpQ =  Quaternion.AngleAxis(angle - SLR[i]*30,axis);
+
+					bp.position += new Vector3(0,3,0);
+
+//					bp.position += new Vector3(0,10,10);
+//					if(SLR[i] > -0.5f)
+//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*SLR[i]*30,axis);
+//					else
+//						bp.trackUpQ =  Quaternion.AngleAxis(angle - 2*(1-SLR[i])*30,axis);
 					//=============================================
 				}
 				else
 				{
-					bp.width = 70;
-					if(i>10 && (i < pointlist.Count-10))
-							bp.crownAngle = -7;
-				}
+					bp.width = 50;
 
+//					if(i>10 && (i < pointlist.Count-10))
+//						bp.crownAngle = -3;
+
+				}
 
 				i+=3;
 
@@ -326,7 +349,7 @@ public class GameManager : MonoBehaviour
 					new Vector3(x,y,z) * 
 					intervalBtwnPts);
 
-			SLR.Add(2);
+			SLR.Add(0);
 		}
 
 		return vecArray;
@@ -344,12 +367,13 @@ public class GameManager : MonoBehaviour
 		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
 		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
 		                            new Vector3(1,1,1));
-        
+
+		portionOfCircle = Mathf.Clamp(portionOfCircle,0.1f,1);
 		for(int i=0; i <numOfPoints; i++)
 		{
-			float x =-Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180)+1;//requires the float so the parameter multiplication works
+			float x =-Mathf.Cos(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180)+1;//requires the float so the parameter multiplication works
 			float y = startDir.y*i;
-			float z =Mathf.Sin(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+			float z =Mathf.Sin(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 						
 			vecArray[i] =
 				startLoc +	
@@ -357,7 +381,7 @@ public class GameManager : MonoBehaviour
 						new Vector3(x,y,z) * 
                         intervalBtwnPts);
             
-			SLR.Add(0);
+			SLR.Add(i/(float)numOfPoints);
 //            Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
         }
@@ -376,12 +400,13 @@ public class GameManager : MonoBehaviour
 		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
 		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
 		                            new Vector3(1,1,1));
-		
+
+		portionOfCircle = Mathf.Clamp(portionOfCircle,0.1f,1);
 		for(int i=0; i <numOfPoints; i++)
 		{
-			float x =Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180)-1;//requires the float so the parameter multiplication works
+			float x =Mathf.Cos(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180)-1;//requires the float so the parameter multiplication works
 			float y = startDir.y*i;
-			float z =Mathf.Sin(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+			float z =Mathf.Sin(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 			
 			vecArray[i] =
 				startLoc +	
@@ -389,7 +414,7 @@ public class GameManager : MonoBehaviour
 						new Vector3(x,y,z) * 
 						intervalBtwnPts);
             
-			SLR.Add(1);
+			SLR.Add(-i/(float)numOfPoints);
             //			Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
 		}
