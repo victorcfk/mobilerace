@@ -203,17 +203,17 @@ public class GameManager : MonoBehaviour
 
 				if(straightleftright == 0)
 				{
-					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,0.25f));
+					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(150,400),Random.Range(0.10f,0.80f)));
 				}
 
 				if(straightleftright == 1)
 				{
-					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,400,0.25f));
+					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(150,400),Random.Range(0.10f,0.80f)));
 				}
 
-				if(straightleftright == 2)
+				if(straightleftright >= 2)
 				{
-					pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval/2,30));
+					pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval/2,Random.Range(20,30)));
 				}
 
 				lastPointAtInterval = pointlist[pointlist.Count-1];//current last point
@@ -256,7 +256,7 @@ public class GameManager : MonoBehaviour
 
 				if(SLR[i] > 0)
 				{
-					Debug.Log("right " + SLR[i]);
+					//Debug.Log("right " + SLR[i]);
 
 					bp.width = 50;
 					//=============================================
@@ -274,25 +274,25 @@ public class GameManager : MonoBehaviour
 					if(SLR[i] < 0.5f)
 					{
 						bp.trackUpQ =  Quaternion.AngleAxis(angle + SLR[i]*multi*90f,axis);
-						bp.position += new Vector3(0,SLR[i]*30f,0);
+						bp.position += new Vector3(0,SLR[i]*23f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						Debug.Log(SLR[i]*120+ " -- "+ SLR[i]*20);
+						//Debug.Log(SLR[i]*120+ " -- "+ SLR[i]*20);
 					}
 					else
 					{
 						bp.trackUpQ =  Quaternion.AngleAxis(angle + (1-SLR[i])*multi*90f,axis);
-						bp.position += new Vector3(0,(1-SLR[i])*30f,0);
+						bp.position += new Vector3(0,(1-SLR[i])*23f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						Debug.Log((1-SLR[i])*120+ " -- "+ (1-SLR[i])*20);
+						//Debug.Log((1-SLR[i])*120+ " -- "+ (1-SLR[i])*20);
 					}
 					//=============================================
 				}
 				else
 				if(SLR[i] < 0)
 				{
-					Debug.Log("left " + SLR[i]);
+					//Debug.Log("left " + SLR[i]);
 
 					bp.width = 50;
 					//=============================================
@@ -310,18 +310,18 @@ public class GameManager : MonoBehaviour
 					if(SLR[i] > -0.5f)
 					{
 						bp.trackUpQ =  Quaternion.AngleAxis(angle + SLR[i]*multi*90f,axis);
-						bp.position += new Vector3(0,-SLR[i]*30f,0);
+						bp.position += new Vector3(0,-SLR[i]*21.5f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						Debug.Log(SLR[i]*120+ " -- "+ -SLR[i]*20);
+						//Debug.Log(SLR[i]*120+ " -- "+ -SLR[i]*20);
 					}
 					else
 					{
 						bp.trackUpQ =  Quaternion.AngleAxis(angle + (-1-SLR[i])*multi*90f,axis);
-						bp.position += new Vector3(0,-(-1-SLR[i])*30f,0);
+						bp.position += new Vector3(0,-(-1-SLR[i])*21.5f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						Debug.Log((-1-SLR[i])*120+ " -- "+ -(-1-SLR[i])*20);
+						//Debug.Log((-1-SLR[i])*120+ " -- "+ -(-1-SLR[i])*20);
 					}
 
 
@@ -329,15 +329,13 @@ public class GameManager : MonoBehaviour
 				}
 				else
 				{
-					currAngle = 0;
 					bp.width = 50;
-
-//					if(i>10 && (i < pointlist.Count-10))
-//						bp.crownAngle = -3;
-
 				}
 
-				i+=3;
+				if(i>10 && (i < pointlist.Count-10))
+					bp.crownAngle = -4;
+
+                i+=3;
 
 				track.AddPoint(bp);
 
@@ -353,6 +351,7 @@ public class GameManager : MonoBehaviour
 	{
 		return point - new Vector3(0,dropVal*position,0);
 	}
+
 	Vector3[] GenerateStraight(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts)
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
@@ -360,6 +359,7 @@ public class GameManager : MonoBehaviour
 		float angle = Vector3.Angle(Vector3.forward,startDir);
 		Vector3.Cross(Vector3.forward,startDir);
 
+		//Matrix by which to rotate piece by
 		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
 		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
 		                            new Vector3(1,1,1));
@@ -390,7 +390,8 @@ public class GameManager : MonoBehaviour
 
 		float angle = Vector3.Angle(Vector3.forward,startDir);
 		Vector3.Cross(Vector3.forward,startDir);
-		
+
+		//Matrix by which to rotate piece by
 		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
 		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
 		                            new Vector3(1,1,1));
@@ -423,7 +424,8 @@ public class GameManager : MonoBehaviour
 		
 		float angle = Vector3.Angle(Vector3.forward,startDir);
 		Vector3.Cross(Vector3.forward,startDir);
-		
+
+		//Matrix by which to rotate piece by
 		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
 		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
 		                            new Vector3(1,1,1));
