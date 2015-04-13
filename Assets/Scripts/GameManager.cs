@@ -227,31 +227,31 @@ public class GameManager : MonoBehaviour
 			//===================================================
 
 			Debug.Log(pointlist.Count +" "+SLR.Count);
-			float currAngle = 0;
+			float dropAmount = 0.1f;
 
 			for (int i =0; i <pointlist.Count; i++) 
 			{
 				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 				
 				bp.baseTransform = transform;
-				bp.position = pointlist[i] + new Vector3(0,-i,0);
+				bp.position = DropPointOnArray(pointlist[i],i,dropAmount);
 
 				//bp.generateBumpers= true;
 				bp.colliderSides = true;
 				bp.renderBounds = true;
 				bp.boundaryHeight = 5;
 
-				bp.extrudeTrackBottom = true;
+//				bp.extrudeTrackBottom = true;
 
 				if (i < pointlist.Count - 1)
 				{
-					bp.forwardControlPoint 	= (pointlist[i+1] + new Vector3(0,-i-1,0));
+					bp.forwardControlPoint 	= DropPointOnArray(pointlist[i+1],i+1,dropAmount);
 				} 
 				else 
 				{
 					bp.forwardControlPoint 	=   
-						(pointlist[i]+ new Vector3(0,-i,0)) - 
-						((pointlist[i-1]+ new Vector3(0,-i-1,0)) -  (pointlist[i]+ new Vector3(0,-i,0)));
+						DropPointOnArray(pointlist[i],i,dropAmount) - 
+							DropPointOnArray(pointlist[i-1],i-1,dropAmount) - DropPointOnArray(pointlist[i],i,dropAmount);
 				}
 
 				if(SLR[i] > 0)
@@ -341,13 +341,18 @@ public class GameManager : MonoBehaviour
 
 				track.AddPoint(bp);
 
-				track.meshResolution =7;
+				track.meshResolution =8;
 				track.loop =false;
+				track.renderBoundaryWallReverse =true;
 
 			}
 		}
 	}
 
+	Vector3 DropPointOnArray(Vector3 point, int position, float dropVal)
+	{
+		return point - new Vector3(0,dropVal*position,0);
+	}
 	Vector3[] GenerateStraight(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts)
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
