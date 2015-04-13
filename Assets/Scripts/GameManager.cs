@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour
 //		}
 	}
 
-
+	List<int> SLR = new List<int>();
 	public void Update ()
 	{
 		gtext.text = TheVehicle.vehRigidbody.velocity.magnitude.ToString("F0");
@@ -185,19 +185,32 @@ public class GameManager : MonoBehaviour
 			//Decide straight or curved
 			//===================================================
 
-			Vector3 dirAtEnd = Vector3.forward;
-			//Vector3 dirAtEnd = new Vector3(-5,0,-66).normalized;
+			Vector3 dirAtEnd 			= Vector3.forward;
 			Vector3 lastPointAtInterval = Vector3.zero;
 
-			int straightleftright = 2;
+			int straightleftright = 0;
 
 			for(int j =0; j <numOfInterval; j++)
 			{
-				straightleftright = Random.Range(0,3);
+				if(straightleftright == 1 || straightleftright ==0)
+					straightleftright = 2;
+				else
+					straightleftright = Random.Range(0,3);
 
-				if(straightleftright == 0)	pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,1000,5));
-				if(straightleftright == 1)	pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,1000,5));
-				if(straightleftright == 2)	pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval,50));
+				if(straightleftright == 0)
+				{
+					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,5));
+				}
+
+				if(straightleftright == 1)
+				{
+					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval,200,5));
+				}
+
+				if(straightleftright == 2)
+				{
+					pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval/2,30));
+				}
 
 				lastPointAtInterval = pointlist[pointlist.Count-1];//current last point
 				dirAtEnd 			= (lastPointAtInterval - pointlist[pointlist.Count-2]).normalized;
@@ -209,21 +222,19 @@ public class GameManager : MonoBehaviour
 
 			//===================================================
 
+			Debug.Log(pointlist.Count +" "+SLR.Count);
 
 			for (int i =0; i <pointlist.Count; i++) 
 			{
 				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 				
 				bp.baseTransform = transform;
-				bp.position = pointlist[i];
-
-				if(i>10 && (i < pointlist.Count-10))
-					bp.crownAngle = -5;
+				bp.position = pointlist[i] + new Vector3(0,Random.Range(0,-1f),0);
 
 				bp.generateBumpers= true;
 				bp.colliderSides = false;
 				bp.boundaryHeight = 0;
-				bp.width = 50;
+
 
 				bp.extrudeTrackBottom = false;
 
@@ -250,14 +261,36 @@ public class GameManager : MonoBehaviour
 //						((pointlist[i] + pointlist[0]) / 2) ;
 				}
 
-				i+=3;
+				if(SLR[i] == 0)
+				{
+					bp.width = 50;
+					//=============================================
+					float angle;
+					Vector3 axis;
+					bp.trackUpQ.ToAngleAxis(out angle, out axis);
+					bp.trackUpQ =  Quaternion.AngleAxis(angle - 20,axis);
+					//=============================================
+				}
+				else
+				if(SLR[i] == 1)
+				{
+					bp.width = 50;
+					//=============================================
+					float angle;
+					Vector3 axis;
+					bp.trackUpQ.ToAngleAxis(out angle, out axis);
+					bp.trackUpQ =  Quaternion.AngleAxis(angle + 20,axis);
+					//=============================================
+				}
+				else
+				{
+					bp.width = 70;
+					if(i>10 && (i < pointlist.Count-10))
+							bp.crownAngle = -7;
+				}
 
-				//=============================================
-//				float angle;
-//				Vector3 axis;
-//				bp.trackUpQ.ToAngleAxis(out angle, out axis);
-//				bp.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
-				//=============================================
+
+				i+=3;
 
 				track.AddPoint(bp);
 
@@ -282,13 +315,16 @@ public class GameManager : MonoBehaviour
 		for(int i=0; i <numOfPoints; i++)
 		{
 			float x = 0;
+			float y = startDir.y*i;
 			float z = i;
 
 			vecArray[i] =
 				startLoc +	
 					g.MultiplyPoint3x4(
-					new Vector3(x,0,z) * 
+					new Vector3(x,y,z) * 
 					intervalBtwnPts);
+
+			SLR.Add(2);
 		}
 
 		return vecArray;
@@ -310,14 +346,16 @@ public class GameManager : MonoBehaviour
 		for(int i=0; i <numOfPoints; i++)
 		{
 			float x =-Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180)+1;//requires the float so the parameter multiplication works
+			float y = startDir.y*i;
 			float z =Mathf.Sin(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 						
 			vecArray[i] =
 				startLoc +	
 					g.MultiplyPoint3x4(
-						new Vector3(x,0,z) * 
+						new Vector3(x,y,z) * 
                         intervalBtwnPts);
             
+			SLR.Add(0);
 //            Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
         }
@@ -340,22 +378,21 @@ public class GameManager : MonoBehaviour
 		for(int i=0; i <numOfPoints; i++)
 		{
 			float x =Mathf.Cos(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180)-1;//requires the float so the parameter multiplication works
+			float y = startDir.y*i;
 			float z =Mathf.Sin(i/(float)numOfPoints/portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 			
 			vecArray[i] =
 				startLoc +	
 					g.MultiplyPoint3x4(
-						new Vector3(x,0,z) * 
+						new Vector3(x,y,z) * 
 						intervalBtwnPts);
             
-            
+			SLR.Add(1);
             //			Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
 		}
 		
 		return vecArray;
-
-
 	}
 
 //	int i = 1;
