@@ -165,12 +165,11 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 30;
+			int numOfInterval = 15;
 			int trackInterval = 20;	//must be even
 
-			float lastknownx = 0;
-			float lastknowny = 0;
-			float lastknownz = 0;
+			float trackWidth = 50;
+			float crownAngle = -4;
 
 			List<Vector3> pointlist = new List<Vector3>();
 
@@ -190,25 +189,25 @@ public class GameManager : MonoBehaviour
 			Vector3 dirAtEnd 			= Vector3.forward;
 			Vector3 lastPointAtInterval = Vector3.zero;
 
-			int straightleftright = 0;
+			int straightleftright = 2;
 
 			for(int j =0; j <numOfInterval; j++)
 			{
-				if(straightleftright == 1 || straightleftright ==0)
-					straightleftright = 2;
-				else
-					straightleftright = Random.Range(0,3);
+//				if(straightleftright == 1 || straightleftright ==0)
+//					straightleftright = 2;
+//				else
+					straightleftright = Random.Range(0,5);
 
 				//diameter of circle  = intervalbtwnpoints *trackinterval * portionOfCircle
 
 				if(straightleftright == 0)
 				{
-					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(150,400),Random.Range(0.10f,0.80f)));
+					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
 				}
 
 				if(straightleftright == 1)
 				{
-					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(150,400),Random.Range(0.10f,0.80f)));
+					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
 				}
 
 				if(straightleftright >= 2)
@@ -221,44 +220,44 @@ public class GameManager : MonoBehaviour
 
 				Debug.DrawRay(lastPointAtInterval,dirAtEnd*50,Color.white,5);
 				Debug.DrawRay(lastPointAtInterval,Vector3.up*50,Color.red,5);
-            }
 
+            }
 
 			//===================================================
 
 			Debug.Log(pointlist.Count +" "+SLR.Count);
-			float dropAmount = 0.1f;
+
+			DropPointsOnArray(pointlist);
 
 			for (int i =0; i <pointlist.Count; i++) 
 			{
 				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 				
 				bp.baseTransform = transform;
-				bp.position = DropPointOnArray(pointlist[i],i,dropAmount);
+				bp.position = pointlist[i];
 
 				//bp.generateBumpers= true;
 				bp.colliderSides = true;
-				bp.renderBounds = true;
+
 				bp.boundaryHeight = 5;
+				bp.width = 50;
 
 //				bp.extrudeTrackBottom = true;
 
 				if (i < pointlist.Count - 1)
 				{
-					bp.forwardControlPoint 	= DropPointOnArray(pointlist[i+1],i+1,dropAmount);
+					bp.forwardControlPoint 	= pointlist[i+1];
 				} 
 				else 
 				{
 					bp.forwardControlPoint 	=   
-						DropPointOnArray(pointlist[i],i,dropAmount) - 
-							DropPointOnArray(pointlist[i-1],i-1,dropAmount) - DropPointOnArray(pointlist[i],i,dropAmount);
+						2*pointlist[i] - pointlist[i-1];
 				}
 
 				if(SLR[i] > 0)
 				{
 					//Debug.Log("right " + SLR[i]);
 
-					bp.width = 50;
 					//=============================================
 					float angle;
 					Vector3 axis;
@@ -294,7 +293,6 @@ public class GameManager : MonoBehaviour
 				{
 					//Debug.Log("left " + SLR[i]);
 
-					bp.width = 50;
 					//=============================================
 					float angle;
 					Vector3 axis;
@@ -327,29 +325,32 @@ public class GameManager : MonoBehaviour
 
 					//=============================================
 				}
-				else
-				{
-					bp.width = 50;
-				}
+
+				bp.width = trackWidth;
 
 				if(i>10 && (i < pointlist.Count-10))
-					bp.crownAngle = -4;
+					bp.crownAngle = crownAngle;
 
                 i+=3;
 
 				track.AddPoint(bp);
 
-				track.meshResolution =8;
+				track.meshResolution = 8;
 				track.loop =false;
-				track.renderBoundaryWallReverse =true;
 
 			}
 		}
 	}
 
-	Vector3 DropPointOnArray(Vector3 point, int position, float dropVal)
+	void DropPointsOnArray(List<Vector3> pointlist)
 	{
-		return point - new Vector3(0,dropVal*position,0);
+		float dropAmount= 0;
+		for (int i =0; i <pointlist.Count; i++) 
+		{
+			dropAmount +=Random.Range(-0.1f,-0.2f);
+			
+			pointlist[i] += new Vector3(0,dropAmount,0); //DropPointOnArray(pointlist[i],i,0.1f); 
+		}
 	}
 
 	Vector3[] GenerateStraight(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts)
