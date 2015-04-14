@@ -9,6 +9,8 @@ public class TouchActionDecelerate : TouchAction {
     
     public override void onAction(float thing= 0)
     {
+//		return;
+
         //apply.Accelerate = false;
         apply.normalizedVal = 0;
 		apply.usingKey = false;
