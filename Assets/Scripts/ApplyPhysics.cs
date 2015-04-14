@@ -84,12 +84,12 @@ public class ApplyPhysics : MonoBehaviour {
 //		}
         else
         {
-			//If the velocity is in any way orthognal to the vehicle's forward.
+			//If the velocity is in any way orthognal to the vehicle's forward. So we are moving
 						if(Vector3.Dot
 						   (accObjRigidbody.velocity,
 						    transform.forward) > 0)
 						{
-							accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.3f,Track.transform.position);
+							accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.1f,Track.transform.position);
 						}
         }
 
