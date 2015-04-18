@@ -6,8 +6,9 @@ public class ApplyPhysics : MonoBehaviour {
     public KeyCode FwdAccCode;
 	public KeyCode BckAccCode;
 
-    public GameObject Track;
+    public GameObject Engine;
     public GameObject objToAccelerate;
+	Rigidbody accObjRigidbody;
 
     [HideInInspector, System.NonSerialized]
     public bool Accelerate;
@@ -30,11 +31,12 @@ public class ApplyPhysics : MonoBehaviour {
 	[HideInInspector, System.NonSerialized]
 	public bool usingKey;
 
-	Rigidbody accObjRigidbody;
+
 
 	void Awake()
 	{
-		accObjRigidbody = objToAccelerate.GetComponent<Rigidbody>();
+		if(Engine == null)	Engine = gameObject;
+		if(accObjRigidbody == null)	accObjRigidbody = objToAccelerate.GetComponent<Rigidbody>();
 	}
 
 	//	Use this for initialization
@@ -45,6 +47,11 @@ public class ApplyPhysics : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
+
+//		if(Input.anyKey) normalizedVal = Mathf.Clamp(normalizedVal + Time.deltaTime,0f,1f);	//0
+//		else
+//			normalizedVal = Mathf.Clamp(normalizedVal - Time.deltaTime,0f,1f);
+        
 
 		//Average out the input values.
 		//===========================================================================================
@@ -68,7 +75,7 @@ public class ApplyPhysics : MonoBehaviour {
 
 		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
         {
-			accObjRigidbody.AddForceAtPosition(Track.transform.forward* accVal * normalizedVal,Track.transform.position);
+			accObjRigidbody.AddForceAtPosition(Engine.transform.forward* accVal * normalizedVal,Engine.transform.position);
         }
 //		else
 //		if(normalizedVal > 0 )//(Input.GetKey(FwdAccCode))
@@ -89,7 +96,7 @@ public class ApplyPhysics : MonoBehaviour {
 						   (accObjRigidbody.velocity,
 						    transform.forward) > 0)
 						{
-							accObjRigidbody.AddForceAtPosition(-Track.transform.forward* accVal * 0.1f,Track.transform.position);
+							accObjRigidbody.AddForceAtPosition(-Engine.transform.forward* accVal * 0.1f,Engine.transform.position);
 						}
         }
 

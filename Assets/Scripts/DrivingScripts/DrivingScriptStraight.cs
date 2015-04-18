@@ -1,0 +1,75 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class DrivingScriptStraight : DrivingScriptBasic {
+
+	public GameObject objToAccelerate;
+
+	[HideInInspector, System.NonSerialized]
+	public bool Accelerate;
+
+	public float accVal = 75;
+	public float normalizedVal = 1;
+
+	public KeyCode LeftTurnCode;
+	public KeyCode RightTurnCode;
+
+	public float rotationCorrectionVal = 3;
+
+	float LeftRightAcc;
+	bool isBraking;
+
+	Vector3 tempo = Vector3.forward;
+
+	// Update is called once per frame
+	void Update () 
+	{
+		ControlUpdates();
+	}
+
+	void FixedUpdate()
+	{
+		accObjRigidBody.angularVelocity = LeftRightAcc * transform.up * 10f;
+
+		if(isBraking)
+		{
+			//If the velocity is in any way orthognal to the vehicle's forward. So we are moving
+			if(Vector3.Dot
+			   (accObjRigidBody.velocity,
+			 transform.forward) > 0)
+			{
+				accObjRigidBody.AddForceAtPosition(-accObjRigidBody.transform.forward* accVal * 0.1f,accObjRigidBody.transform.position);
+			}
+
+		}
+		else
+		{
+			accObjRigidBody.AddForceAtPosition(accObjRigidBody.transform.forward* accVal * normalizedVal,accObjRigidBody.transform.position);
+		}
+
+		accObjRigidBody.velocity = Vector3.SmoothDamp(accObjRigidBody.velocity,
+		                                    
+		                                    Mathf.Clamp(accObjRigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
+		                                    new Vector3(0,Mathf.Clamp(accObjRigidBody.velocity.y,-10,-20),0),														//Add the current downward velocity due to gravity.
+		                                    
+		                                    ref tempo,
+		                                    Time.fixedDeltaTime*rotationCorrectionVal);
+
+	}
+
+	void ControlUpdates()
+	{
+	
+		LeftRightAcc = Input.acceleration.x;
+
+		if(Input.GetKey(RightTurnCode)) 
+			LeftRightAcc = 1;
+		else
+			if(Input.GetKey(LeftTurnCode)) 
+				LeftRightAcc = -1;
+		else
+		{
+			isBraking = Input.anyKey;
+		}
+	}
+}

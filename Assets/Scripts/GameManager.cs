@@ -19,7 +19,9 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	public DrivingScript TheVehicle;
+	public DrivingScriptBasic TheVehicle;
+	Rigidbody vehRigidBody;
+
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
 
@@ -46,11 +48,13 @@ public class GameManager : MonoBehaviour
 	public Text LeftEng;
 	public Text RightEng;
 
+	List<float> SLR = new List<float>();
+
 	void Awake ()
 	{
 		_instance = this;
 
-		Screen.orientation = ScreenOrientation.Landscape;
+		vehRigidBody = TheVehicle.GetComponent<Rigidbody>();
 
 		if(CamFollowObject != null)	CamFollow.camFollowTarget = CamFollowObject;
 
@@ -67,7 +71,7 @@ public class GameManager : MonoBehaviour
 			Application.LoadLevel (0);
 		}
 
-		float t = (TheVehicle.vehRigidbody.velocity.sqrMagnitude - TheVehicle.MinVelocity * TheVehicle.MinVelocity) / (TheVehicle.MaxVelocity * TheVehicle.MaxVelocity - TheVehicle.MinVelocity * TheVehicle.MinVelocity);
+		float t = (vehRigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
 
 		CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
 		CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
@@ -79,33 +83,42 @@ public class GameManager : MonoBehaviour
 //		}
 	}
 
-	List<float> SLR = new List<float>();
 	public void Update ()
 	{
-		gtext.text = TheVehicle.vehRigidbody.velocity.magnitude.ToString("F0");
+		gtext.text = vehRigidBody.velocity.magnitude.ToString("F0");
 
 
 		//======================================================
-		float t1 = TheVehicle.Left.normalizedVal;
+		if(TheVehicle is DrivingScriptTwinEngine)
+		{
+			float t1 = (TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal;
 
-		if(t1>0)
-			LeftEng.text = (TheVehicle.Left.normalizedVal*100).ToString("F0") +"%";
-		else
-			LeftEng.text = "Brake";
+			if(t1>0)
+					LeftEng.text = ((TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal*100).ToString("F0") +"%";
+			else
+				LeftEng.text = "Brake";
 
-		LeftEng.color = new Color(t1,(1-t1),0);
+			LeftEng.color = new Color(t1,(1-t1),0);
+		}
+
+		if(TheVehicle is DrivingScriptStraight)
+		{
+
+			LeftEng.text = Input.acceleration.x.ToString("F0");
+		}
 
 		//======================================================
+		if(TheVehicle is DrivingScriptTwinEngine)
+		{
+			float t2 = (TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal;
 
-		float t2 = TheVehicle.Right.normalizedVal;
+			if(t2>0)
+					RightEng.text = ((TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal*100).ToString("F0") +"%";
+			else
+				RightEng.text = "Brake";
 
-		if(t2>0)
-			RightEng.text = (TheVehicle.Right.normalizedVal*100).ToString("F0") +"%";
-		else
-			RightEng.text = "Brake";
-
-		RightEng.color = new Color(t2,(1-t2),0);
-
+			RightEng.color = new Color(t2,(1-t2),0);
+		}
 		//======================================================
 	}
 

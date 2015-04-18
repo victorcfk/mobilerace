@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class TouchActionReverseControls : TouchAction {
@@ -23,10 +23,10 @@ public class TouchActionReverseControls : TouchAction {
 
     void swap()
     {
-        GameObject temp = left.Track.gameObject;
+        GameObject temp = left.Engine.gameObject;
 
-        left.Track = right.Track;
-        right.Track = temp;
+        left.Engine = right.Engine;
+        right.Engine = temp;
 
         /*
          *  ApplyPhysics temp = left.apply;
