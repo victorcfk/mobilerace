@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
 	public Text LeftEng;
 	public Text RightEng;
 
-	List<float> SLR = new List<float>();
+	List<float> StraightLeftRight = new List<float>();
 
 	void Awake ()
 	{
@@ -83,6 +83,9 @@ public class GameManager : MonoBehaviour
 		CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
 
 	}
+
+	public List<Vector3> pointlist = new List<Vector3>();
+	public TrackBuildRTrack track;
 
 	public void Update ()
 	{
@@ -185,8 +188,6 @@ public class GameManager : MonoBehaviour
 			float trackWidth = 50;
 			float crownAngle = -4;
 
-			List<Vector3> pointlist = new List<Vector3>();
-
 //			for(int i =0; i <trackPointCount; i++)
 //			{
 //				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
@@ -239,7 +240,7 @@ public class GameManager : MonoBehaviour
 
 			//===================================================
 
-			Debug.Log(pointlist.Count +" "+SLR.Count);
+			Debug.Log(pointlist.Count +" "+StraightLeftRight.Count);
 
 			DropPointsOnArray(pointlist);
 
@@ -268,7 +269,7 @@ public class GameManager : MonoBehaviour
 						2*pointlist[i] - pointlist[i-1];
 				}
 
-				if(SLR[i] > 0)
+				if(StraightLeftRight[i] > 0)
 				{
 					//Debug.Log("right " + SLR[i]);
 
@@ -284,18 +285,18 @@ public class GameManager : MonoBehaviour
 						multi = -1;
 					}
 
-					if(SLR[i] < 0.5f)
+					if(StraightLeftRight[i] < 0.5f)
 					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + SLR[i]*multi*90f,axis);
-						bp.position += new Vector3(0,SLR[i]*23f,0);
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + StraightLeftRight[i]*multi*90f,axis);
+						bp.position += new Vector3(0,StraightLeftRight[i]*23f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
 						//Debug.Log(SLR[i]*120+ " -- "+ SLR[i]*20);
 					}
 					else
 					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + (1-SLR[i])*multi*90f,axis);
-						bp.position += new Vector3(0,(1-SLR[i])*23f,0);
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + (1-StraightLeftRight[i])*multi*90f,axis);
+						bp.position += new Vector3(0,(1-StraightLeftRight[i])*23f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
 						//Debug.Log((1-SLR[i])*120+ " -- "+ (1-SLR[i])*20);
@@ -303,7 +304,7 @@ public class GameManager : MonoBehaviour
 					//=============================================
 				}
 				else
-				if(SLR[i] < 0)
+				if(StraightLeftRight[i] < 0)
 				{
 					//Debug.Log("left " + SLR[i]);
 
@@ -319,18 +320,18 @@ public class GameManager : MonoBehaviour
 						multi = -1;
 					}
 
-					if(SLR[i] > -0.5f)
+					if(StraightLeftRight[i] > -0.5f)
 					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + SLR[i]*multi*90f,axis);
-						bp.position += new Vector3(0,-SLR[i]*21.5f,0);
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + StraightLeftRight[i]*multi*90f,axis);
+						bp.position += new Vector3(0,-StraightLeftRight[i]*21.5f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
 						//Debug.Log(SLR[i]*120+ " -- "+ -SLR[i]*20);
 					}
 					else
 					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + (-1-SLR[i])*multi*90f,axis);
-						bp.position += new Vector3(0,-(-1-SLR[i])*21.5f,0);
+						bp.trackUpQ =  Quaternion.AngleAxis(angle + (-1-StraightLeftRight[i])*multi*90f,axis);
+						bp.position += new Vector3(0,-(-1-StraightLeftRight[i])*21.5f,0);
 
 						Debug.DrawRay(bp.position,axis*10,Color.green,5);
 						//Debug.Log((-1-SLR[i])*120+ " -- "+ -(-1-SLR[i])*20);
@@ -348,11 +349,12 @@ public class GameManager : MonoBehaviour
                 i+=3;
 
 				track.AddPoint(bp);
-
-				track.meshResolution = 8;
-				track.loop =false;
-
 			}
+
+			track.meshResolution = 10;
+			track.loop =false;
+            
+			this.track = track;
 		}
 	}
 
@@ -371,8 +373,6 @@ public class GameManager : MonoBehaviour
 			Mat++;
 			return trackMat2;
 		}
-
-
 	}
 
 
@@ -421,7 +421,7 @@ public class GameManager : MonoBehaviour
 					new Vector3(x,y,z) * 
 					intervalBtwnPts);
 
-			SLR.Add(0);
+			StraightLeftRight.Add(0);
 		}
 
 		return vecArray;
@@ -454,7 +454,7 @@ public class GameManager : MonoBehaviour
 						new Vector3(x,y,z) * 
                         intervalBtwnPts);
             
-			SLR.Add(-i/(float)numOfPoints);
+			StraightLeftRight.Add(-i/(float)numOfPoints);
 //            Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
         }
@@ -488,7 +488,7 @@ public class GameManager : MonoBehaviour
 						new Vector3(x,y,z) * 
 						intervalBtwnPts);
             
-			SLR.Add(i/(float)numOfPoints);
+			StraightLeftRight.Add(i/(float)numOfPoints);
             //			Debug.Log(vecArray[i]);
 //			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
 		}
