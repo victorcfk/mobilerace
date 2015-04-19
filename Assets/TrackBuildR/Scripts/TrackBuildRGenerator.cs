@@ -639,7 +639,9 @@ public class TrackBuildRGenerator : MonoBehaviour
 //							}
 //							else
 							{
-								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(GameManager.instance.trackMat);
+
+								newMeshHolder.AddComponent<MeshRenderer>().material = GameManager.instance.GetVariedTrackMatToUse();
+									
 								//newMeshHolder.AddComponent<MeshRenderer>().material =  new Material(Shader.Find("Specular"));//track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
 							}
 
@@ -671,7 +673,7 @@ public class TrackBuildRGenerator : MonoBehaviour
 //							else
 							{
 
-								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(GameManager.instance.borderMat);
+								newMeshHolder.AddComponent<MeshRenderer>().material = GameManager.instance.GetBorderMatToUse();
 
 //								Material mr = newMeshHolder.AddComponent<MeshRenderer>().material;
 //								mr = new Material(Shader.Find("Specular"));
@@ -782,7 +784,8 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBumperMesh[m].mesh;
-                        if (track.numberOfTextures > 0)
+                       
+						if (track.numberOfTextures > 0)
 						{
 //							if(!Application.isPlaying || !Application.isMobilePlatform)
 //							{
@@ -790,8 +793,7 @@ public class TrackBuildRGenerator : MonoBehaviour
 //							}
 //							else
 							{
-
-								newMeshHolder.AddComponent<MeshRenderer>().material = new Material(GameManager.instance.trackMat);
+								newMeshHolder.AddComponent<MeshRenderer>().material = GameManager.instance.GetTrackMatToUse();
 									//new Material(Shader.Find("Specular"));//track.Texture(curve.bumperTextureStyleIndex).GetMaterial();
 							}
 

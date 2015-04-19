@@ -27,8 +27,14 @@ public class GameManager : MonoBehaviour
 
 	public bool isDoOldTrack;
 
-	public Material trackMat;
-	public Material borderMat;
+	[SerializeField]
+	Material trackMat;
+	[SerializeField]
+	Material trackMat2;
+	[SerializeField]
+	Material borderMat;
+
+	public int Mat;
 
 	[Range (1,20)]
 	public float
@@ -75,12 +81,7 @@ public class GameManager : MonoBehaviour
 
 		CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
 		CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
-		//CamFollow.distance = Mathf.Clamp( TheVehicle.rigidbody.velocity.magnitude , MinFollowDistance, MaxFollowDistance);
-		//CamFollow.height   = Mathf.Clamp( TheVehicle.rigidbody.velocity.magnitude , MinFollowHeight, MaxFollowHeight);
-//		if( TheVehicle.rigidbody.velocity > 0 )
-//		{
-//				MaxFollowDistance
-//		}
+
 	}
 
 	public void Update ()
@@ -338,7 +339,7 @@ public class GameManager : MonoBehaviour
 
 					//=============================================
 				}
-
+				bp.generateBumpers =false;
 				bp.width = trackWidth;
 
 				if(i>10 && (i < pointlist.Count-10))
@@ -355,7 +356,37 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	void DropPointsOnArray(List<Vector3> pointlist)
+	public Material GetVariedTrackMatToUse()
+	{
+		if(Mat > 7 ) Mat = 0;
+
+		if(Mat > 3 )
+		{
+			Mat++;
+
+			return trackMat;
+		}
+		else
+		{
+			Mat++;
+			return trackMat2;
+		}
+
+
+	}
+
+
+	public Material GetTrackMatToUse()
+	{
+		return trackMat;
+    }
+
+	public Material GetBorderMatToUse()
+	{
+		return borderMat;
+    }
+    
+    void DropPointsOnArray(List<Vector3> pointlist)
 	{
 		float dropAmount= 0;
 		for (int i =0; i <pointlist.Count; i++) 
