@@ -261,11 +261,11 @@ public class GameManager : MonoBehaviour
 
 		ParseTrackBoundsAndCreateQuad (generatedPointList);
 
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
+//		CapsuleCast ();
+//		CapsuleCast ();
+//		CapsuleCast ();
+//		CapsuleCast ();
+//		CapsuleCast ();
 	}
 
 	public Material GetVariedTrackMatToUse ()
@@ -428,8 +428,6 @@ public class GameManager : MonoBehaviour
 		
 		float width = UpperBounds.x - LowerBounds.x;
 		float height = UpperBounds.z - LowerBounds.z;
-		
-		//		 textureScale = new Vector2(width,height);
 		
 		Vector2 textureScale = new Vector2 (width / Mathf.Min (width, height), height / Mathf.Min (width, height));
 		
