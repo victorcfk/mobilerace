@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
 	Material trackMat2;
 	[SerializeField]
 	Material borderMat;
+	[SerializeField]
+	Material groundMat;
 
 	public int Mat;
 
@@ -55,6 +57,11 @@ public class GameManager : MonoBehaviour
 	public Text RightEng;
 
 	List<float> StraightLeftRight = new List<float>();
+	public List<Vector3> generatedPointList = new List<Vector3>();
+	public TrackBuildRTrack track;
+
+	public Vector3 UpperBounds;
+	public Vector3 LowerBounds;
 
 	void Awake ()
 	{
@@ -65,13 +72,11 @@ public class GameManager : MonoBehaviour
 		if(CamFollowObject != null)	CamFollow.camFollowTarget = CamFollowObject;
 
 		Random.seed = System.DateTime.Now.Hour;
-
 	}
         
 	// Update is called once per frame
 	void LateUpdate ()
 	{
-
 		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
 		{
 			Application.LoadLevel (0);
@@ -81,16 +86,11 @@ public class GameManager : MonoBehaviour
 
 		CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
 		CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
-
 	}
-
-	public List<Vector3> pointlist = new List<Vector3>();
-	public TrackBuildRTrack track;
 
 	public void Update ()
 	{
 		gtext.text = vehRigidBody.velocity.magnitude.ToString("F0");
-
 
 		//======================================================
 		if(TheVehicle is DrivingScriptTwinEngine)
@@ -107,7 +107,6 @@ public class GameManager : MonoBehaviour
 
 		if(TheVehicle is DrivingScriptStraight)
 		{
-
 			LeftEng.text = Input.acceleration.x.ToString("F0");
 		}
 
@@ -182,7 +181,7 @@ public class GameManager : MonoBehaviour
 		else 
 		{
 			//int trackPointCount = 80;
-			int numOfInterval = 15;
+			int numOfInterval = 20;
 			int trackInterval = 20;	//must be even
 
 			float trackWidth = 50;
@@ -217,21 +216,21 @@ public class GameManager : MonoBehaviour
 
 				if(straightleftright == 0)
 				{
-					pointlist.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
+					generatedPointList.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
 				}
 
 				if(straightleftright == 1)
 				{
-					pointlist.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
+					generatedPointList.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
 				}
 
 				if(straightleftright >= 2)
 				{
-					pointlist.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval/2,Random.Range(20,30)));
+					generatedPointList.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval/2,Random.Range(20,30)));
 				}
 
-				lastPointAtInterval = pointlist[pointlist.Count-1];//current last point
-				dirAtEnd 			= (lastPointAtInterval - pointlist[pointlist.Count-2]).normalized;
+				lastPointAtInterval = generatedPointList[generatedPointList.Count-1];//current last point
+				dirAtEnd 			= (lastPointAtInterval - generatedPointList[generatedPointList.Count-2]).normalized;
 
 				Debug.DrawRay(lastPointAtInterval,dirAtEnd*50,Color.white,5);
 				Debug.DrawRay(lastPointAtInterval,Vector3.up*50,Color.red,5);
@@ -240,16 +239,16 @@ public class GameManager : MonoBehaviour
 
 			//===================================================
 
-			Debug.Log(pointlist.Count +" "+StraightLeftRight.Count);
+			Debug.Log(generatedPointList.Count +" "+StraightLeftRight.Count);
 
-			DropPointsOnArray(pointlist);
+			DropPointsOnArray(generatedPointList,0.25f,0.25f);
 
-			for (int i =0; i <pointlist.Count; i++) 
+			for (int i =0; i <generatedPointList.Count; i++) 
 			{
 				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
 				
 				bp.baseTransform = transform;
-				bp.position = pointlist[i];
+				bp.position = generatedPointList[i];
 
 				//bp.generateBumpers= true;
 				bp.colliderSides = true;
@@ -259,14 +258,14 @@ public class GameManager : MonoBehaviour
 
 //				bp.extrudeTrackBottom = true;
 
-				if (i < pointlist.Count - 1)
+				if (i < generatedPointList.Count - 1)
 				{
-					bp.forwardControlPoint 	= pointlist[i+1];
+					bp.forwardControlPoint 	= generatedPointList[i+1];
 				} 
 				else 
 				{
 					bp.forwardControlPoint 	=   
-						2*pointlist[i] - pointlist[i-1];
+						2*generatedPointList[i] - generatedPointList[i-1];
 				}
 
 				if(StraightLeftRight[i] > 0)
@@ -343,7 +342,7 @@ public class GameManager : MonoBehaviour
 				bp.generateBumpers =false;
 				bp.width = trackWidth;
 
-				if(i>10 && (i < pointlist.Count-10))
+				if(i>10 && (i < generatedPointList.Count-10))
 					bp.crownAngle = crownAngle;
 
                 i+=3;
@@ -355,6 +354,14 @@ public class GameManager : MonoBehaviour
 			track.loop =false;
             
 			this.track = track;
+
+			ParseTrackBoundsAndCreateQuad(generatedPointList);
+
+			CapsuleCast();
+			CapsuleCast();
+			CapsuleCast();
+			CapsuleCast();
+			CapsuleCast();
 		}
 	}
 
@@ -375,7 +382,6 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-
 	public Material GetTrackMatToUse()
 	{
 		return trackMat;
@@ -386,17 +392,7 @@ public class GameManager : MonoBehaviour
 		return borderMat;
     }
     
-    void DropPointsOnArray(List<Vector3> pointlist)
-	{
-		float dropAmount= 0;
-		for (int i =0; i <pointlist.Count; i++) 
-		{
-			dropAmount +=Random.Range(-0.1f,-0.2f);
-			
-			pointlist[i] += new Vector3(0,dropAmount,0); //DropPointOnArray(pointlist[i],i,0.1f); 
-		}
-	}
-
+	#region Functions for adding the base points to the track object
 	Vector3[] GenerateStraight(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts)
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
@@ -427,7 +423,6 @@ public class GameManager : MonoBehaviour
 		return vecArray;
 
 	}
-
 
 	Vector3[] GenerateRightCurve(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
 	{
@@ -496,55 +491,148 @@ public class GameManager : MonoBehaviour
 		return vecArray;
 	}
 
-//	int i = 1;
-//	public GameObject obstaclePrefab;
-//	public int numOfThing;
-//	public float rangeOfRand;
-//
-//	public List<GameObject> listOfPieces;
-//	
-//	public GameObject Ground;
-//	
-//	public GameObject LatestPath;
-//	public GameObject EarliestPath;
-//
-//	void GenerateStraightLineObstacleTrack ()
-//	{
-//		if (Vector3.SqrMagnitude (TheVehicle.transform.position - LatestPath.transform.position) < 500000) {
-//			i++;
-//
-//			LatestPath = GenerateGround (LatestPath.transform.position + new Vector3 (0, 0, 500));
-//			GenerateObstacles (LatestPath.transform.position, i, LatestPath);
-//
-//			LatestPath.name = LatestPath.name + i.ToString ();
-//
-//			GameObject.Destroy (listOfPieces [0].gameObject);
-//
-//			listOfPieces.Add (LatestPath);
-//			listOfPieces.RemoveAt (0);
-//		}
-//	}
-//
-//
-//	GameObject GenerateGround (Vector3 point)
-//	{
-//		return GameObject.Instantiate (Ground, point, Quaternion.identity) as GameObject;
-//	}
-//
-//	void GenerateObstacles (Vector3 point, int additional=0, GameObject Parent =null)
-//	{
-//
-//		for (int i=0; i <numOfThing + additional; i++) {
-//			Vector2 vec2 = Random.insideUnitCircle * rangeOfRand;
-//
-//			if (Parent)
-//				(GameObject.Instantiate (obstaclePrefab,
-//			                       new Vector3 (vec2.x, 0, vec2.y) + point,
-//			                       obstaclePrefab.transform.rotation) as GameObject).transform.parent = Parent.transform;
-//			else
-//				GameObject.Instantiate (obstaclePrefab,
-//				                       new Vector3 (vec2.x, 0, vec2.y) + point,
-//				                       obstaclePrefab.transform.rotation);
-//		}
-//	}
+	/// <summary>
+	/// Lowers all the points in the array by a random amount bounded by the provided ranges.
+	/// </summary>
+	/// <param name="pointlist">Pointlist.</param>
+	/// <param name="dropLowerRange">Drop lower range.</param>
+	/// <param name="dropUpperRange">Drop upper range.</param>
+	void DropPointsOnArray(List<Vector3> pointlist,float dropLowerRange, float dropUpperRange)
+	{
+		float dropAmount= 0;
+		for (int i =0; i <pointlist.Count; i++) 
+		{
+			dropAmount +=Random.Range(-dropLowerRange,-dropUpperRange);
+			
+			pointlist[i] += new Vector3(0,dropAmount,0); //DropPointOnArray(pointlist[i],i,0.1f); 
+        }
+    }
+
+	#endregion
+
+	#region Functions for creating the ground Quad and buildings
+
+	void ParseTrackBoundsAndCreateQuad(List<Vector3> pointlist)
+	{
+		UpperBounds = Vector3.zero;
+		LowerBounds = Vector3.zero;
+		
+		for (int i =0; i <pointlist.Count; i++) 
+		{
+			UpperBounds.x = Mathf.Max(UpperBounds.x,pointlist[i].x);
+			UpperBounds.y = Mathf.Max(UpperBounds.y,pointlist[i].y);
+			UpperBounds.z = Mathf.Max(UpperBounds.z,pointlist[i].z);
+			
+			LowerBounds.x = Mathf.Min(LowerBounds.x,pointlist[i].x);
+			LowerBounds.y = Mathf.Min(LowerBounds.y,pointlist[i].y);
+			LowerBounds.z = Mathf.Min(LowerBounds.z,pointlist[i].z);
+		}
+		
+		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),UpperBounds,Quaternion.identity);
+		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),LowerBounds,Quaternion.identity);
+		
+		Vector3 g = (UpperBounds+LowerBounds)/2;
+		g.y= LowerBounds.y;
+		
+		float width = UpperBounds.x-LowerBounds.x;
+		float height = UpperBounds.z-LowerBounds.z;
+		
+		//		 textureScale = new Vector2(width,height);
+		
+		Vector2 textureScale = new Vector2(width/Mathf.Min(width,height),height/Mathf.Min(width,height));
+		
+		Vector3[] vertices = new Vector3[]
+		{
+			new Vector3( UpperBounds.x, g.y, UpperBounds.z),
+			new Vector3( UpperBounds.x, g.y, LowerBounds.z),
+			new Vector3( LowerBounds.x, g.y, UpperBounds.z),
+			new Vector3( LowerBounds.x, g.y, LowerBounds.z),
+		};
+		
+		GetMeshWithTexture(vertices, textureScale);
+	}
+
+	/// <summary>
+	/// Creates a mesh and binds a texture to it with texturescale
+	/// </summary>
+	/// <param name="vertices">Vertices.</param>
+	/// <param name="textureScale">Texture scale.</param>
+	void GetMeshWithTexture(Vector3[] vertices, Vector2 textureScale) {  
+		
+		// Create object
+		Mesh _m1 = CreateMeshFromVertices(vertices);
+		var item = (GameObject) new GameObject(
+			"HelloWorld", 
+			typeof(MeshRenderer), // Required to render
+			typeof(MeshFilter)    // Required to have a mesh
+			);
+
+		item.GetComponent<MeshFilter>().mesh = _m1;
+		item.GetComponent<Renderer>().material = groundMat;
+		item.GetComponent<Renderer>().material.SetTextureScale("_MainTex", textureScale);
+
+	}
+
+	// Create a quad mesh
+	Mesh CreateMeshFromVertices(Vector3[] vertices) {
+		
+		Mesh mesh = new Mesh();
+		
+		Vector2[] uv = new Vector2[]
+		{
+			new Vector2(1, 1),
+			new Vector2(1, 0),
+			new Vector2(0, 1),
+			new Vector2(0, 0),
+		};
+		
+		int[] triangles = new int[]
+		{
+			0, 1, 2,
+			2, 1, 3,
+		};
+		
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+        
+        return mesh;
+    }
+
+	
+	
+	public GameObject Building;
+	void CapsuleCast()
+	{
+		Vector3 topCent = (UpperBounds + LowerBounds)/2;
+		topCent.y = UpperBounds.y;
+		
+		while(true)
+		{
+			Vector3 displace = Random.insideUnitCircle*1000;
+			displace.z = displace.y;
+			displace.y = 0;
+			
+			
+			Ray ray = new Ray(topCent + displace,Vector3.down);
+			
+			Debug.DrawRay(topCent + displace,Vector3.down * (UpperBounds.y - LowerBounds.y),Color.white,5);
+			//			return;
+			if(
+				!Physics.SphereCast( ray , 100, (UpperBounds.y - LowerBounds.y) )
+				)
+            {
+                GameObject.Instantiate(Building,topCent + displace,Building.transform.rotation);
+                
+                return;
+            }
+            else
+                Debug.Log ("dasdsa");
+        }
+    }
+
+	#endregion
+
+
 }
