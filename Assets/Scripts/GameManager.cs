@@ -25,16 +25,18 @@ public class GameManager : MonoBehaviour
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
 
-	public bool isDoOldTrack;
-
 	[SerializeField]
-	Material trackMat;
+	Material
+		trackMat;
 	[SerializeField]
-	Material trackMat2;
+	Material
+		trackMat2;
 	[SerializeField]
-	Material borderMat;
+	Material
+		borderMat;
 	[SerializeField]
-	Material groundMat;
+	Material
+		groundMat;
 
 	public int Mat;
 
@@ -56,8 +58,8 @@ public class GameManager : MonoBehaviour
 	public Text LeftEng;
 	public Text RightEng;
 
-	List<float> StraightLeftRight = new List<float>();
-	public List<Vector3> generatedPointList = new List<Vector3>();
+	List<float> StraightLeftRight = new List<float> ();
+	public List<Vector3> generatedPointList = new List<Vector3> ();
 	public TrackBuildRTrack track;
 
 	public Vector3 UpperBounds;
@@ -67,9 +69,10 @@ public class GameManager : MonoBehaviour
 	{
 		_instance = this;
 
-		vehRigidBody = TheVehicle.GetComponent<Rigidbody>();
+		vehRigidBody = TheVehicle.GetComponent<Rigidbody> ();
 
-		if(CamFollowObject != null)	CamFollow.camFollowTarget = CamFollowObject;
+		if (CamFollowObject != null)
+			CamFollow.camFollowTarget = CamFollowObject;
 
 		Random.seed = System.DateTime.Now.Hour;
 	}
@@ -77,8 +80,7 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void LateUpdate ()
 	{
-		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
-		{
+		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) {
 			Application.LoadLevel (0);
 		}
 
@@ -90,402 +92,294 @@ public class GameManager : MonoBehaviour
 
 	public void Update ()
 	{
-		gtext.text = vehRigidBody.velocity.magnitude.ToString("F0");
+		gtext.text = vehRigidBody.velocity.magnitude.ToString ("F0");
 
 		//======================================================
-		if(TheVehicle is DrivingScriptTwinEngine)
-		{
+		if (TheVehicle is DrivingScriptTwinEngine) {
 			float t1 = (TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal;
 
-			if(t1>0)
-					LeftEng.text = ((TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal*100).ToString("F0") +"%";
+			if (t1 > 0)
+				LeftEng.text = ((TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal * 100).ToString ("F0") + "%";
 			else
 				LeftEng.text = "Brake";
 
-			LeftEng.color = new Color(t1,(1-t1),0);
+			LeftEng.color = new Color (t1, (1 - t1), 0);
 		}
 
-		if(TheVehicle is DrivingScriptStraight)
-		{
-			LeftEng.text = Input.acceleration.x.ToString("F0");
+		if (TheVehicle is DrivingScriptStraight) {
+			LeftEng.text = Input.acceleration.x.ToString ("F0");
 		}
 
 		//======================================================
-		if(TheVehicle is DrivingScriptTwinEngine)
-		{
+		if (TheVehicle is DrivingScriptTwinEngine) {
 			float t2 = (TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal;
 
-			if(t2>0)
-					RightEng.text = ((TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal*100).ToString("F0") +"%";
+			if (t2 > 0)
+				RightEng.text = ((TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal * 100).ToString ("F0") + "%";
 			else
 				RightEng.text = "Brake";
 
-			RightEng.color = new Color(t2,(1-t2),0);
+			RightEng.color = new Color (t2, (1 - t2), 0);
 		}
 		//======================================================
 	}
 
 	public void GetTrackPoints (TrackBuildRTrack track)
 	{
-		if (isDoOldTrack) {
+		//int trackPointCount = 80;
+		int numOfInterval = 20;
+		int trackInterval = 20;	//must be even
 
-			TrackBuildRPoint p0 = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			TrackBuildRPoint p1 = track.gameObject.AddComponent<TrackBuildRPoint> ();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			TrackBuildRPoint p2 = track.gameObject.AddComponent<TrackBuildRPoint> ();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			TrackBuildRPoint p3 = track.gameObject.AddComponent<TrackBuildRPoint> ();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-			
-			p0.baseTransform = transform;
-			p1.baseTransform = transform;
-			p2.baseTransform = transform;
-			p3.baseTransform = transform;
-			
-			p0.position = new Vector3 (-20, 0, -20);
-			p1.position = new Vector3 (20, 0, -20);
-			p2.position = new Vector3 (20, 0, 20);
-			p3.position = new Vector3 (-20, 0, 20);
+		float trackWidth = 50;
+		float crownAngle = -4;
 
-			p0.forwardControlPoint = new Vector3 (0, 0, -20);
-			p1.forwardControlPoint = new Vector3 (40, 0, -20);
-			p2.forwardControlPoint = new Vector3 (0, 0, 20);
-			p3.forwardControlPoint = new Vector3 (-40, 0, 20);
+		//===================================================
+		//Decide straight or curved
+		//===================================================
 
-			p0.leftForwardControlPoint = new Vector3 (-15, 0, -20);
-			p1.leftForwardControlPoint = new Vector3 (25, 0, -20);
-			p2.leftForwardControlPoint = new Vector3 (5, 0, 20);
-			p3.leftForwardControlPoint = new Vector3 (-35, 0, 20);
-			
-			p0.rightForwardControlPoint = new Vector3 (15, 0, -20);
-			p1.rightForwardControlPoint = new Vector3 (55, 0, -20);
-			p2.rightForwardControlPoint = new Vector3 (-5, 0, 20);
-			p3.rightForwardControlPoint = new Vector3 (-45, 0, 20);
-					
-			float angle;
-			Vector3 axis;
-			p0.trackUpQ.ToAngleAxis(out angle, out axis);
-			p0.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+		Vector3 dirAtEnd = Vector3.forward;
+		Vector3 lastPointAtInterval = Vector3.zero;
 
-			p1.trackUpQ.ToAngleAxis(out angle, out axis);
-			p1.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+		int straightleftright = 2;
 
-			p2.trackUpQ.ToAngleAxis(out angle, out axis);
-			p2.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+		for (int j =0; j <numOfInterval; j++) {
 
-			p3.trackUpQ.ToAngleAxis(out angle, out axis);
-			p3.trackUpQ =  Quaternion.AngleAxis(angle + 30,axis);
+			straightleftright = Random.Range (0, 5);
 
-			track.AddPoint (p0);
-			track.AddPoint (p1);
-			track.AddPoint (p2);
-			track.AddPoint (p3);
-		} 
-		else 
-		{
-			//int trackPointCount = 80;
-			int numOfInterval = 20;
-			int trackInterval = 20;	//must be even
-
-			float trackWidth = 50;
-			float crownAngle = -4;
-
-//			for(int i =0; i <trackPointCount; i++)
-//			{
-//				float x = 550 + 550 * Mathf.Cos(i/(float)trackPointCount*360 * Mathf.PI / 180) + Random.Range(-2,2);
-//				float y = 0 + 350 * Mathf.Sin(i/(float)trackPointCount*360 * Mathf.PI / 180)+ Random.Range(-2,2);
-//
-//				lastknowny += Random.Range (-3, 3);
-//				pointlist.Add(new Vector3(x,0,y));
-//			}
-
-			//===================================================
-			//Decide straight or curved
-			//===================================================
-
-			Vector3 dirAtEnd 			= Vector3.forward;
-			Vector3 lastPointAtInterval = Vector3.zero;
-
-			int straightleftright = 2;
-
-			for(int j =0; j <numOfInterval; j++)
-			{
-//				if(straightleftright == 1 || straightleftright ==0)
-//					straightleftright = 2;
-//				else
-					straightleftright = Random.Range(0,5);
-
-				//diameter of circle  = intervalbtwnpoints *trackinterval * portionOfCircle
-
-				if(straightleftright == 0)
-				{
-					generatedPointList.AddRange(GenerateRightCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
-				}
-
-				if(straightleftright == 1)
-				{
-					generatedPointList.AddRange(GenerateLeftCurve(lastPointAtInterval,dirAtEnd,trackInterval*5,Random.Range(200,400),Random.Range(0.25f,0.80f)));
-				}
-
-				if(straightleftright >= 2)
-				{
-					generatedPointList.AddRange(GenerateStraight(lastPointAtInterval,dirAtEnd,trackInterval/2,Random.Range(20,30)));
-				}
-
-				lastPointAtInterval = generatedPointList[generatedPointList.Count-1];//current last point
-				dirAtEnd 			= (lastPointAtInterval - generatedPointList[generatedPointList.Count-2]).normalized;
-
-				Debug.DrawRay(lastPointAtInterval,dirAtEnd*50,Color.white,5);
-				Debug.DrawRay(lastPointAtInterval,Vector3.up*50,Color.red,5);
-
-            }
-
-			//===================================================
-
-			Debug.Log(generatedPointList.Count +" "+StraightLeftRight.Count);
-
-			DropPointsOnArray(generatedPointList,0.25f,0.25f);
-
-			for (int i =0; i <generatedPointList.Count; i++) 
-			{
-				TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-				
-				bp.baseTransform = transform;
-				bp.position = generatedPointList[i];
-
-				//bp.generateBumpers= true;
-				bp.colliderSides = true;
-
-				bp.boundaryHeight = 5;
-				bp.width = 50;
-
-//				bp.extrudeTrackBottom = true;
-
-				if (i < generatedPointList.Count - 1)
-				{
-					bp.forwardControlPoint 	= generatedPointList[i+1];
-				} 
-				else 
-				{
-					bp.forwardControlPoint 	=   
-						2*generatedPointList[i] - generatedPointList[i-1];
-				}
-
-				if(StraightLeftRight[i] > 0)
-				{
-					//Debug.Log("right " + SLR[i]);
-
-					//=============================================
-					float angle;
-					Vector3 axis;
-					bp.trackUpQ.ToAngleAxis(out angle, out axis);
-
-					float multi = 1;
-					//if( Vector3.Dot(axis, Vector3.up) >0 )
-					if( axis.y<0 )
-					{
-						multi = -1;
-					}
-
-					if(StraightLeftRight[i] < 0.5f)
-					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + StraightLeftRight[i]*multi*90f,axis);
-						bp.position += new Vector3(0,StraightLeftRight[i]*23f,0);
-
-						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						//Debug.Log(SLR[i]*120+ " -- "+ SLR[i]*20);
-					}
-					else
-					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + (1-StraightLeftRight[i])*multi*90f,axis);
-						bp.position += new Vector3(0,(1-StraightLeftRight[i])*23f,0);
-
-						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						//Debug.Log((1-SLR[i])*120+ " -- "+ (1-SLR[i])*20);
-					}
-					//=============================================
-				}
-				else
-				if(StraightLeftRight[i] < 0)
-				{
-					//Debug.Log("left " + SLR[i]);
-
-					//=============================================
-					float angle;
-					Vector3 axis;
-					bp.trackUpQ.ToAngleAxis(out angle, out axis);
-
-					float multi = 1;
-					//if( Vector3.Dot(axis, Vector3.up) > 0 )
-					if( axis.y<0 )
-					{
-						multi = -1;
-					}
-
-					if(StraightLeftRight[i] > -0.5f)
-					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + StraightLeftRight[i]*multi*90f,axis);
-						bp.position += new Vector3(0,-StraightLeftRight[i]*21.5f,0);
-
-						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						//Debug.Log(SLR[i]*120+ " -- "+ -SLR[i]*20);
-					}
-					else
-					{
-						bp.trackUpQ =  Quaternion.AngleAxis(angle + (-1-StraightLeftRight[i])*multi*90f,axis);
-						bp.position += new Vector3(0,-(-1-StraightLeftRight[i])*21.5f,0);
-
-						Debug.DrawRay(bp.position,axis*10,Color.green,5);
-						//Debug.Log((-1-SLR[i])*120+ " -- "+ -(-1-SLR[i])*20);
-					}
-
-
-					//=============================================
-				}
-				bp.generateBumpers =false;
-				bp.width = trackWidth;
-
-				if(i>10 && (i < generatedPointList.Count-10))
-					bp.crownAngle = crownAngle;
-
-                i+=3;
-
-				track.AddPoint(bp);
+			if (straightleftright == 0) {
+				generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.25f, 0.80f)));
 			}
 
-			track.meshResolution = 10;
-			track.loop =false;
-            
-			this.track = track;
+			if (straightleftright == 1) {
+				generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.25f, 0.80f)));
+			}
 
-			ParseTrackBoundsAndCreateQuad(generatedPointList);
+			if (straightleftright >= 2) {
+				generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval / 2, Random.Range (20, 30)));
+			}
 
-			CapsuleCast();
-			CapsuleCast();
-			CapsuleCast();
-			CapsuleCast();
-			CapsuleCast();
+			lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
+			dirAtEnd = (lastPointAtInterval - generatedPointList [generatedPointList.Count - 2]).normalized;
+
+			Debug.DrawRay (lastPointAtInterval, dirAtEnd * 50, Color.white, 5);
+			Debug.DrawRay (lastPointAtInterval, Vector3.up * 50, Color.red, 5);
+
 		}
+
+		//===================================================
+
+		Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
+
+		DropPointsOnArray (generatedPointList, 0.25f, 0.25f);
+
+		for (int i =0; i <generatedPointList.Count; i++) {
+			TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
+
+			bp.baseTransform = transform;
+			bp.position = generatedPointList [i];
+
+			//bp.generateBumpers= true;
+			bp.colliderSides = true;
+
+			bp.boundaryHeight = 5;
+			bp.width = 50;
+
+			if (i < generatedPointList.Count - 1) {
+				bp.forwardControlPoint = generatedPointList [i + 1];
+			} else {
+				bp.forwardControlPoint = 
+						2 * generatedPointList [i] - generatedPointList [i - 1];
+			}
+
+			if (StraightLeftRight [i] > 0) {
+
+				//=============================================
+				float angle;
+				Vector3 axis;
+				bp.trackUpQ.ToAngleAxis (out angle, out axis);
+
+				float multi = 1;
+				if (axis.y < 0) {
+					multi = -1;
+				}
+
+				if (StraightLeftRight [i] < 0.5f) {
+					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
+					bp.position += new Vector3 (0, StraightLeftRight [i] * 23f, 0);
+
+					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+				} else {
+					bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
+					bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 23f, 0);
+
+					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+				}
+				//=============================================
+			} else
+				if (StraightLeftRight [i] < 0) {
+
+				//=============================================
+				float angle;
+				Vector3 axis;
+				bp.trackUpQ.ToAngleAxis (out angle, out axis);
+
+				float multi = 1;
+				if (axis.y < 0) {
+					multi = -1;
+				}
+
+				if (StraightLeftRight [i] > -0.5f) {
+					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
+					bp.position += new Vector3 (0, -StraightLeftRight [i] * 21.5f, 0);
+
+					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+				} else {
+					bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
+					bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 21.5f, 0);
+
+					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+				}
+
+
+				//=============================================
+			}
+			bp.generateBumpers = false;
+			bp.width = trackWidth;
+
+			if (i > 10 && (i < generatedPointList.Count - 10))
+				bp.crownAngle = crownAngle;
+
+			i += 3;
+
+			track.AddPoint (bp);
+		}
+
+		track.meshResolution = 10;
+		track.loop = false;
+            
+		this.track = track;
+
+		ParseTrackBoundsAndCreateQuad (generatedPointList);
+
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
 	}
 
-	public Material GetVariedTrackMatToUse()
+	public Material GetVariedTrackMatToUse ()
 	{
-		if(Mat > 7 ) Mat = 0;
+		if (Mat > 7)
+			Mat = 0;
 
-		if(Mat > 3 )
-		{
+		if (Mat > 3) {
 			Mat++;
 
 			return trackMat;
-		}
-		else
-		{
+		} else {
 			Mat++;
 			return trackMat2;
 		}
 	}
 
-	public Material GetTrackMatToUse()
+	public Material GetTrackMatToUse ()
 	{
 		return trackMat;
-    }
+	}
 
-	public Material GetBorderMatToUse()
+	public Material GetBorderMatToUse ()
 	{
 		return borderMat;
-    }
+	}
     
 	#region Functions for adding the base points to the track object
-	Vector3[] GenerateStraight(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts)
+	Vector3[] GenerateStraight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts)
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 
-		float angle = Vector3.Angle(Vector3.forward,startDir);
-		Vector3.Cross(Vector3.forward,startDir);
+		float angle = Vector3.Angle (Vector3.forward, startDir);
+		Vector3.Cross (Vector3.forward, startDir);
 
 		//Matrix by which to rotate piece by
-		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
-		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
-		                            new Vector3(1,1,1));
+		Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+		                            Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+		                            new Vector3 (1, 1, 1));
 
-		for(int i=0; i <numOfPoints; i++)
-		{
+		for (int i=0; i <numOfPoints; i++) {
 			float x = 0;
-			float y = startDir.y*i;
+			float y = startDir.y * i;
 			float z = i;
 
-			vecArray[i] =
-				startLoc +	
-					g.MultiplyPoint3x4(
-					new Vector3(x,y,z) * 
-					intervalBtwnPts);
+			vecArray [i] =
+				startLoc + 
+				g.MultiplyPoint3x4 (
+					new Vector3 (x, y, z) * 
+				intervalBtwnPts);
 
-			StraightLeftRight.Add(0);
+			StraightLeftRight.Add (0);
 		}
 
 		return vecArray;
 
 	}
 
-	Vector3[] GenerateRightCurve(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
+	Vector3[] GenerateRightCurve (Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 
-		float angle = Vector3.Angle(Vector3.forward,startDir);
-		Vector3.Cross(Vector3.forward,startDir);
+		float angle = Vector3.Angle (Vector3.forward, startDir);
+		Vector3.Cross (Vector3.forward, startDir);
 
 		//Matrix by which to rotate piece by
-		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
-		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
-		                            new Vector3(1,1,1));
+		Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+		                            Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+		                            new Vector3 (1, 1, 1));
 
-		portionOfCircle = Mathf.Clamp(portionOfCircle,0.1f,1);
-		for(int i=0; i <numOfPoints; i++)
-		{
-			float x =-Mathf.Cos(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180)+1;//requires the float so the parameter multiplication works
-			float y = startDir.y*i;
-			float z =Mathf.Sin(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+		portionOfCircle = Mathf.Clamp (portionOfCircle, 0.1f, 1);
+		for (int i=0; i <numOfPoints; i++) {
+			float x = -Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + 1;//requires the float so the parameter multiplication works
+			float y = startDir.y * i;
+			float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 						
-			vecArray[i] =
-				startLoc +	
-					g.MultiplyPoint3x4(
-						new Vector3(x,y,z) * 
-                        intervalBtwnPts);
+			vecArray [i] =
+				startLoc + 
+				g.MultiplyPoint3x4 (
+						new Vector3 (x, y, z) * 
+				intervalBtwnPts);
             
-			StraightLeftRight.Add(-i/(float)numOfPoints);
-//            Debug.Log(vecArray[i]);
-//			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
-        }
+			StraightLeftRight.Add (-i / (float)numOfPoints);
+		}
 
 		return vecArray;
 
 	}
 
-	Vector3[] GenerateLeftCurve(Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
+	Vector3[] GenerateLeftCurve (Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
 	{
 		Vector3[] vecArray = new Vector3[numOfPoints]; 
 		
-		float angle = Vector3.Angle(Vector3.forward,startDir);
-		Vector3.Cross(Vector3.forward,startDir);
+		float angle = Vector3.Angle (Vector3.forward, startDir);
+		Vector3.Cross (Vector3.forward, startDir);
 
 		//Matrix by which to rotate piece by
-		Matrix4x4 g = Matrix4x4.TRS(Vector3.zero,
-		                            Quaternion.AngleAxis(angle,Vector3.Cross(Vector3.forward,startDir)),
-		                            new Vector3(1,1,1));
+		Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+		                            Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+		                            new Vector3 (1, 1, 1));
 
-		portionOfCircle = Mathf.Clamp(portionOfCircle,0.1f,1);
-		for(int i=0; i <numOfPoints; i++)
-		{
-			float x =Mathf.Cos(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180)-1;//requires the float so the parameter multiplication works
-			float y = startDir.y*i;
-			float z =Mathf.Sin(i/(float)numOfPoints*portionOfCircle*360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+		portionOfCircle = Mathf.Clamp (portionOfCircle, 0.1f, 1);
+		for (int i=0; i <numOfPoints; i++) {
+			float x = Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) - 1;//requires the float so the parameter multiplication works
+			float y = startDir.y * i;
+			float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
 			
-			vecArray[i] =
-				startLoc +	
-					g.MultiplyPoint3x4(
-						new Vector3(x,y,z) * 
-						intervalBtwnPts);
+			vecArray [i] =
+				startLoc + 
+				g.MultiplyPoint3x4 (
+						new Vector3 (x, y, z) * 
+				intervalBtwnPts);
             
-			StraightLeftRight.Add(i/(float)numOfPoints);
-            //			Debug.Log(vecArray[i]);
-//			Debug.DrawRay(vecArray[i],Vector3.up*20,Color.white,10);
+			StraightLeftRight.Add (i / (float)numOfPoints);
 		}
 		
 		return vecArray;
@@ -497,59 +391,57 @@ public class GameManager : MonoBehaviour
 	/// <param name="pointlist">Pointlist.</param>
 	/// <param name="dropLowerRange">Drop lower range.</param>
 	/// <param name="dropUpperRange">Drop upper range.</param>
-	void DropPointsOnArray(List<Vector3> pointlist,float dropLowerRange, float dropUpperRange)
+	void DropPointsOnArray (List<Vector3> pointlist, float dropLowerRange, float dropUpperRange)
 	{
-		float dropAmount= 0;
-		for (int i =0; i <pointlist.Count; i++) 
-		{
-			dropAmount +=Random.Range(-dropLowerRange,-dropUpperRange);
+		float dropAmount = 0;
+		for (int i =0; i <pointlist.Count; i++) {
+			dropAmount += Random.Range (-dropLowerRange, -dropUpperRange);
 			
-			pointlist[i] += new Vector3(0,dropAmount,0); //DropPointOnArray(pointlist[i],i,0.1f); 
-        }
-    }
+			pointlist [i] += new Vector3 (0, dropAmount, 0); //DropPointOnArray(pointlist[i],i,0.1f); 
+		}
+	}
 
 	#endregion
 
 	#region Functions for creating the ground Quad and buildings
 
-	void ParseTrackBoundsAndCreateQuad(List<Vector3> pointlist)
+	void ParseTrackBoundsAndCreateQuad (List<Vector3> pointlist)
 	{
 		UpperBounds = Vector3.zero;
 		LowerBounds = Vector3.zero;
 		
-		for (int i =0; i <pointlist.Count; i++) 
-		{
-			UpperBounds.x = Mathf.Max(UpperBounds.x,pointlist[i].x);
-			UpperBounds.y = Mathf.Max(UpperBounds.y,pointlist[i].y);
-			UpperBounds.z = Mathf.Max(UpperBounds.z,pointlist[i].z);
+		for (int i =0; i <pointlist.Count; i++) {
+			UpperBounds.x = Mathf.Max (UpperBounds.x, pointlist [i].x);
+			UpperBounds.y = Mathf.Max (UpperBounds.y, pointlist [i].y);
+			UpperBounds.z = Mathf.Max (UpperBounds.z, pointlist [i].z);
 			
-			LowerBounds.x = Mathf.Min(LowerBounds.x,pointlist[i].x);
-			LowerBounds.y = Mathf.Min(LowerBounds.y,pointlist[i].y);
-			LowerBounds.z = Mathf.Min(LowerBounds.z,pointlist[i].z);
+			LowerBounds.x = Mathf.Min (LowerBounds.x, pointlist [i].x);
+			LowerBounds.y = Mathf.Min (LowerBounds.y, pointlist [i].y);
+			LowerBounds.z = Mathf.Min (LowerBounds.z, pointlist [i].z);
 		}
 		
-		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),UpperBounds,Quaternion.identity);
-		GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),LowerBounds,Quaternion.identity);
+		GameObject.Instantiate (GameObject.CreatePrimitive (PrimitiveType.Cube), UpperBounds, Quaternion.identity);
+		GameObject.Instantiate (GameObject.CreatePrimitive (PrimitiveType.Cube), LowerBounds, Quaternion.identity);
 		
-		Vector3 g = (UpperBounds+LowerBounds)/2;
-		g.y= LowerBounds.y;
+		Vector3 g = (UpperBounds + LowerBounds) / 2;
+		g.y = LowerBounds.y;
 		
-		float width = UpperBounds.x-LowerBounds.x;
-		float height = UpperBounds.z-LowerBounds.z;
+		float width = UpperBounds.x - LowerBounds.x;
+		float height = UpperBounds.z - LowerBounds.z;
 		
 		//		 textureScale = new Vector2(width,height);
 		
-		Vector2 textureScale = new Vector2(width/Mathf.Min(width,height),height/Mathf.Min(width,height));
+		Vector2 textureScale = new Vector2 (width / Mathf.Min (width, height), height / Mathf.Min (width, height));
 		
 		Vector3[] vertices = new Vector3[]
 		{
-			new Vector3( UpperBounds.x, g.y, UpperBounds.z),
-			new Vector3( UpperBounds.x, g.y, LowerBounds.z),
-			new Vector3( LowerBounds.x, g.y, UpperBounds.z),
-			new Vector3( LowerBounds.x, g.y, LowerBounds.z),
+			new Vector3 (UpperBounds.x, g.y, UpperBounds.z),
+			new Vector3 (UpperBounds.x, g.y, LowerBounds.z),
+			new Vector3 (LowerBounds.x, g.y, UpperBounds.z),
+			new Vector3 (LowerBounds.x, g.y, LowerBounds.z),
 		};
 		
-		GetMeshWithTexture(vertices, textureScale);
+		GetMeshWithTexture (vertices, textureScale);
 	}
 
 	/// <summary>
@@ -557,33 +449,35 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	/// <param name="vertices">Vertices.</param>
 	/// <param name="textureScale">Texture scale.</param>
-	void GetMeshWithTexture(Vector3[] vertices, Vector2 textureScale) {  
+	void GetMeshWithTexture (Vector3[] vertices, Vector2 textureScale)
+	{  
 		
 		// Create object
-		Mesh _m1 = CreateMeshFromVertices(vertices);
-		var item = (GameObject) new GameObject(
+		Mesh _m1 = CreateMeshFromVertices (vertices);
+		var item = (GameObject)new GameObject (
 			"HelloWorld", 
 			typeof(MeshRenderer), // Required to render
 			typeof(MeshFilter)    // Required to have a mesh
-			);
+		);
 
-		item.GetComponent<MeshFilter>().mesh = _m1;
-		item.GetComponent<Renderer>().material = groundMat;
-		item.GetComponent<Renderer>().material.SetTextureScale("_MainTex", textureScale);
+		item.GetComponent<MeshFilter> ().mesh = _m1;
+		item.GetComponent<Renderer> ().material = groundMat;
+		item.GetComponent<Renderer> ().material.SetTextureScale ("_MainTex", textureScale);
 
 	}
 
 	// Create a quad mesh
-	Mesh CreateMeshFromVertices(Vector3[] vertices) {
+	Mesh CreateMeshFromVertices (Vector3[] vertices)
+	{
 		
-		Mesh mesh = new Mesh();
+		Mesh mesh = new Mesh ();
 		
 		Vector2[] uv = new Vector2[]
 		{
-			new Vector2(1, 1),
-			new Vector2(1, 0),
-			new Vector2(0, 1),
-			new Vector2(0, 0),
+			new Vector2 (1, 1),
+			new Vector2 (1, 0),
+			new Vector2 (0, 1),
+			new Vector2 (0, 0),
 		};
 		
 		int[] triangles = new int[]
@@ -592,45 +486,40 @@ public class GameManager : MonoBehaviour
 			2, 1, 3,
 		};
 		
-        mesh.vertices = vertices;
-        mesh.uv = uv;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+		mesh.vertices = vertices;
+		mesh.uv = uv;
+		mesh.triangles = triangles;
+		mesh.RecalculateNormals ();
         
-        return mesh;
-    }
-
-	
+		return mesh;
+	}
 	
 	public GameObject Building;
-	void CapsuleCast()
+	void CapsuleCast ()
 	{
-		Vector3 topCent = (UpperBounds + LowerBounds)/2;
+		Vector3 topCent = (UpperBounds + LowerBounds) / 2;
 		topCent.y = UpperBounds.y;
 		
-		while(true)
-		{
-			Vector3 displace = Random.insideUnitCircle*1000;
+		while (true) {
+			Vector3 displace = Random.insideUnitCircle * 1000;
 			displace.z = displace.y;
 			displace.y = 0;
 			
 			
-			Ray ray = new Ray(topCent + displace,Vector3.down);
+			Ray ray = new Ray (topCent + displace, Vector3.down);
 			
-			Debug.DrawRay(topCent + displace,Vector3.down * (UpperBounds.y - LowerBounds.y),Color.white,5);
+			Debug.DrawRay (topCent + displace, Vector3.down * (UpperBounds.y - LowerBounds.y), Color.white, 5);
 			//			return;
-			if(
-				!Physics.SphereCast( ray , 100, (UpperBounds.y - LowerBounds.y) )
-				)
-            {
-                GameObject.Instantiate(Building,topCent + displace,Building.transform.rotation);
+			if (
+				!Physics.SphereCast (ray, 100, (UpperBounds.y - LowerBounds.y))
+				) {
+				GameObject.Instantiate (Building, topCent + displace, Building.transform.rotation);
                 
-                return;
-            }
-            else
-                Debug.Log ("dasdsa");
-        }
-    }
+				return;
+			} else
+				Debug.Log ("dasdsa");
+		}
+	}
 
 	#endregion
 
