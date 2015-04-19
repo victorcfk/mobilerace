@@ -23,7 +23,7 @@ public class DrivingScriptAI : MonoBehaviour {
 			}
 
 			Vehicle.transform.forward = 
-				Vector3.RotateTowards(transform.forward,GameManager.instance.track.points[i].position-transform.position + Vector3.up*12,Mathf.PI* Time.deltaTime,100);
+				Vector3.RotateTowards(transform.forward,GameManager.instance.track.points[i].position-transform.position + Vector3.up*12,Mathf.PI*2* Time.deltaTime,500);
 
 			//Vehicle.transform.LookAt(GameManager.instance.track.points[i].position + Vector3.up*12);
 		}
