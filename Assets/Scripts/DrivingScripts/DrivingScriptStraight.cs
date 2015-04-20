@@ -50,7 +50,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 		accObjRigidBody.velocity = Vector3.SmoothDamp(accObjRigidBody.velocity,
 		                                    
 		                                    Mathf.Clamp(accObjRigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-		                                    new Vector3(0,Mathf.Clamp(accObjRigidBody.velocity.y,-10,-20),0),														//Add the current downward velocity due to gravity.
+		                                    new Vector3(0,Mathf.Clamp(accObjRigidBody.velocity.y,-40,-40),0),														//Add the current downward velocity due to gravity.
 		                                    
 		                                    ref tempo,
 		                                    Time.fixedDeltaTime*rotationCorrectionVal);
