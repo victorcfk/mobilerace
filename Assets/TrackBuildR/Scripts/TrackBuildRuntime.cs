@@ -203,7 +203,7 @@ public class TrackBuildRuntime : MonoBehaviour
 	//                track.diagramGO.SetActive(!Application.isPlaying&&track.showDiagram);
 	//    }
 	
-	void Start()
+	void Awake()
 	{
 		if (!Application.isPlaying)
 		{
@@ -212,6 +212,8 @@ public class TrackBuildRuntime : MonoBehaviour
 		}
 		
 		Init();
+
+		GameManager.instance.PostTrackBuild();
 	}
 	
 	private void UpgradeData()

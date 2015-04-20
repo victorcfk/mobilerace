@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
 		if (CamFollowObject != null)
 			CamFollow.camFollowTarget = CamFollowObject;
 
-		Random.seed = System.DateTime.Now.Hour;
+		Random.seed = System.DateTime.Now.Second;
 	}
         
 	// Update is called once per frame
@@ -259,16 +259,9 @@ public class GameManager : MonoBehaviour
             
 		this.track = track;
 
-		ParseTrackBoundsAndCreateQuad (generatedPointList);
-
-//		CapsuleCast ();
-//		CapsuleCast ();
-//		CapsuleCast ();
-//		CapsuleCast ();
-//		CapsuleCast ();
-	}
-
-	public Material GetVariedTrackMatToUse ()
+    }
+    
+    public Material GetVariedTrackMatToUse ()
 	{
 		if (Mat > 7)
 			Mat = 0;
@@ -438,9 +431,26 @@ public class GameManager : MonoBehaviour
 			new Vector3 (LowerBounds.x, g.y, UpperBounds.z),
 			new Vector3 (LowerBounds.x, g.y, LowerBounds.z),
 		};
-		
-		GetMeshWithTexture (vertices, textureScale);
+
+		QuadCreate(new Vector3(width,height,1),g,textureScale);
+		//GetMeshWithTexture (vertices, textureScale);
 	}
+
+	public GameObject groundQuad;
+	/// <summary>
+	/// Creates a mesh and binds a texture to it with texturescale
+	/// </summary>
+	/// <param name="vertices">Vertices.</param>
+	/// <param name="textureScale">Texture scale.</param>
+	void QuadCreate (Vector3 scale, Vector3 cent, Vector2 textureScale)
+	{  
+		groundQuad.transform.localScale = scale;
+
+		groundQuad.transform.position = cent;
+
+		groundQuad.GetComponent<MeshRenderer> ().material.SetTextureScale ("_MainTex", textureScale);
+	}
+
 
 	/// <summary>
 	/// Creates a mesh and binds a texture to it with texturescale
@@ -453,14 +463,15 @@ public class GameManager : MonoBehaviour
 		// Create object
 		Mesh _m1 = CreateMeshFromVertices (vertices);
 		var item = (GameObject)new GameObject (
-			"HelloWorld", 
+			"G", 
 			typeof(MeshRenderer), // Required to render
 			typeof(MeshFilter)    // Required to have a mesh
 		);
 
 		item.GetComponent<MeshFilter> ().mesh = _m1;
-		item.GetComponent<Renderer> ().material = groundMat;
-		item.GetComponent<Renderer> ().material.SetTextureScale ("_MainTex", textureScale);
+		item.GetComponent<MeshRenderer> ().material = (groundMat);
+
+		item.GetComponent<MeshRenderer> ().material.SetTextureScale ("_MainTex", textureScale);
 
 	}
 
@@ -491,31 +502,62 @@ public class GameManager : MonoBehaviour
         
 		return mesh;
 	}
-	
+
+	public void PostTrackBuild()
+	{
+		ParseTrackBoundsAndCreateQuad (generatedPointList);
+
+
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+		CapsuleCast ();
+
+	}
+
 	public GameObject Building;
 	void CapsuleCast ()
 	{
 		Vector3 topCent = (UpperBounds + LowerBounds) / 2;
 		topCent.y = UpperBounds.y;
+
+		Vector3 btmCent = (UpperBounds + LowerBounds) / 2;
+		btmCent.y = LowerBounds.y;
 		
-		while (true) {
+		while (true) 
+		{
 			Vector3 displace = Random.insideUnitCircle * 1000;
 			displace.z = displace.y;
 			displace.y = 0;
 			
 			
-			Ray ray = new Ray (topCent + displace, Vector3.down);
+			Ray ray = new Ray (topCent + displace + Vector3.up*100, Vector3.down);
 			
-			Debug.DrawRay (topCent + displace, Vector3.down * (UpperBounds.y - LowerBounds.y), Color.white, 5);
+			//Debug.DrawRay (topCent + displace, Vector3.down * (UpperBounds.y - LowerBounds.y), Color.white, 5);
+
 			//			return;
+
+			RaycastHit rch;
+
 			if (
-				!Physics.SphereCast (ray, 100, (UpperBounds.y - LowerBounds.y))
-				) {
-				GameObject.Instantiate (Building, topCent + displace, Building.transform.rotation);
+				!Physics.SphereCast (ray,100,out rch,(UpperBounds.y - LowerBounds.y +100))
+				) 
+			{
+				GameObject.Instantiate (Building, btmCent + displace, Building.transform.rotation);
                 
+//				Debug.DrawLine (topCent + displace + Vector3.up*100, rch.point, Color.cyan, 5);
+//				Debug.Log ("wehit");
 				return;
-			} else
-				Debug.Log ("dasdsa");
+			} 
+			else
+			{
+//				Debug.DrawRay (topCent + displace + Vector3.up*100, Vector3.down * (UpperBounds.y - LowerBounds.y + 100), Color.white, 5);
+//				Debug.Log ("dasdsa " + (UpperBounds.y - LowerBounds.y));
+			}
 		}
 	}
 
