@@ -9,7 +9,7 @@ public class DrivingScriptBasic : MonoBehaviour {
 	public Rigidbody accObjRigidBody;
 
 	// Use this for initialization
-	void Awake () {
+	protected virtual void Awake () {
 
 		if(accObjRigidBody == null)
 			accObjRigidBody = GetComponent<Rigidbody>();

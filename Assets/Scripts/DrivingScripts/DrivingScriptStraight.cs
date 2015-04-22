@@ -14,12 +14,21 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	public KeyCode LeftTurnCode;
 	public KeyCode RightTurnCode;
 
+	public float turnAngularVelocity;
+
 	public float rotationCorrectionVal = 3;
+
+
 
 	float LeftRightAcc;
 	bool isBraking;
 
 	Vector3 tempo = Vector3.forward;
+
+	protected override void Awake () {
+		
+		base.Awake();
+	}
 
 	// Update is called once per frame
 	void Update () 
@@ -29,7 +38,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	void FixedUpdate()
 	{
-		accObjRigidBody.angularVelocity = LeftRightAcc * transform.up * 10f;
+		accObjRigidBody.angularVelocity = LeftRightAcc * transform.up * turnAngularVelocity * Time.deltaTime;
 
 		if(isBraking)
 		{
