@@ -435,8 +435,8 @@ public class GameManager : MonoBehaviour
 			new Vector3 (LowerBounds.x, g.y, LowerBounds.z),
 		};
 
-		QuadCreate(new Vector3(width,height,1),g,textureScale);
-		//GetMeshWithTexture (vertices, textureScale);
+		//QuadCreate(new Vector3(width,height,1),g,textureScale);
+		GetMeshWithTexture (vertices, textureScale);
 	}
 
 	public GameObject groundQuad;
@@ -466,7 +466,7 @@ public class GameManager : MonoBehaviour
 		// Create object
 		Mesh _m1 = CreateMeshFromVertices (vertices);
 		var item = (GameObject)new GameObject (
-			"G", 
+			"GeneratedGround", 
 			typeof(MeshRenderer), // Required to render
 			typeof(MeshFilter)    // Required to have a mesh
 		);
@@ -506,33 +506,45 @@ public class GameManager : MonoBehaviour
 		return mesh;
 	}
 
-	public GameObject Building;
+	public GameObject[] Buildings;
 	public void PostTrackBuild()
 	{
 		ParseTrackBoundsAndCreateQuad (generatedPointList);
 
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
 
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
 
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
 
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
-		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+
 	}
 	
-	void SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius)
+	void SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius, GameObject obj)
 	{
 		Vector3 topCent = (UpperBounds + LowerBounds) / 2;
 		topCent.y = UpperBounds.y;
@@ -545,30 +557,20 @@ public class GameManager : MonoBehaviour
 			float xTestLoc = Random.Range(LowerBounds.x,UpperBounds.x);
 			float zTestLoc = Random.Range(LowerBounds.z,UpperBounds.z);
 
-			Vector3 rayStart = new Vector3(xTestLoc,LowerBounds.y,zTestLoc);
+			Vector3 rayStart = new Vector3(xTestLoc,LowerBounds.y-sphereRadius,zTestLoc);	//want to start below the ground for accuracy, spherecast ignores objects it starts in
 			Ray ray = new Ray (rayStart , Vector3.up);
-			
-			//Debug.DrawRay (topCent + displace, Vector3.down * (UpperBounds.y - LowerBounds.y), Color.white, 5);
-
-			//			return;
 
 			RaycastHit rch;
 
 			if (
-				!Physics.SphereCast (ray,sphereRadius,out rch,(UpperBounds.y - LowerBounds.y))
+				!Physics.SphereCast (ray,sphereRadius,out rch,(UpperBounds.y - LowerBounds.y) + sphereRadius)
 				) 
 			{
-				GameObject.Instantiate (Building, rayStart, Building.transform.rotation);
+				Debug.DrawRay (rayStart, Vector3.up, Color.cyan, 5);
+				GameObject.Instantiate (obj, rayStart, obj.transform.rotation);
                 
-//				Debug.DrawLine (topCent + displace + Vector3.up*100, rch.point, Color.cyan, 5);
-//				Debug.Log ("wehit");
 				return;
 			} 
-			else
-			{
-//				Debug.DrawRay (topCent + displace + Vector3.up*100, Vector3.down * (UpperBounds.y - LowerBounds.y + 100), Color.white, 5);
-//				Debug.Log ("dasdsa " + (UpperBounds.y - LowerBounds.y));
-			}
 		}
 	}
 
