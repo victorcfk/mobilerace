@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
 		int trackInterval = 20;	//must be even
 
 		float trackWidth = 50;
-		float crownAngle = -4;
+		float crownAngle = -6;
 
 		//===================================================
 		//Decide straight or curved
@@ -181,7 +181,8 @@ public class GameManager : MonoBehaviour
 			//bp.generateBumpers= true;
 			bp.colliderSides = true;
 
-			bp.boundaryHeight = 5;
+			//bp.boundaryHeight = 10;
+			bp.renderBounds = false;
 			bp.width = 50;
 
 			if (i < generatedPointList.Count - 1) {
@@ -244,10 +245,12 @@ public class GameManager : MonoBehaviour
 				//=============================================
 			}
 			bp.generateBumpers = false;
-			bp.width = trackWidth;
+			bp.extrudeTrackBottom = false;
 
 			if (i > 10 && (i < generatedPointList.Count - 10))
 				bp.crownAngle = crownAngle;
+
+
 
 			i += 3;
 
@@ -255,8 +258,8 @@ public class GameManager : MonoBehaviour
 		}
 
 		track.meshResolution = 10;
-		track.loop = false;
-            
+		track.loop = false; 
+
 		this.track = track;
 
     }
@@ -527,14 +530,14 @@ public class GameManager : MonoBehaviour
 
 		Vector3 btmCent = (UpperBounds + LowerBounds) / 2;
 		btmCent.y = LowerBounds.y;
-		
-		while (true) 
+
+
+        while (true) 
 		{
-			Vector3 displace = Random.insideUnitCircle * 1000;
+			Vector3 displace = Random.insideUnitCircle * (UpperBounds - LowerBounds).magnitude;
 			displace.z = displace.y;
-			displace.y = 0;
-			
-			
+            displace.y = 0;
+
 			Ray ray = new Ray (topCent + displace + Vector3.up*100, Vector3.down);
 			
 			//Debug.DrawRay (topCent + displace, Vector3.down * (UpperBounds.y - LowerBounds.y), Color.white, 5);
