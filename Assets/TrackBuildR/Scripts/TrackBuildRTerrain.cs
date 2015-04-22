@@ -13,6 +13,7 @@ public class TrackBuildRTerrain
         Vector3 meshScale = terrainData.heightmapScale;
         float terrainAccuracy = track.terrainAccuracy;
         float terrainMergeMargin = track.terrainMergeMargin;
+        float trackY = track.transform.position.y;
 
         float[,] originalData = terrainData.GetHeights(0, 0, terrainWidth, terrainHeight);
         float[,] mergeData = new float[terrainWidth, terrainHeight];
@@ -39,14 +40,15 @@ public class TrackBuildRTerrain
         float mergeWidth = track.terrainMergeWidth;
         AnimationCurve mergeCurve = track.mergeCurve;
         float minScaleUnit = Mathf.Min(meshScale.x, meshScale.z);
+        Vector3 trackHeightMod = new Vector3(0,trackY,0);
         for(int i = 0; i < numberOfCurves; i++)
         {
             TrackBuildRPoint curve = track[i];
             int storedPointSize = curve.storedPointSize;
             for(int p = 0; p < storedPointSize-1; p++)
             {
-                Vector3 pointA = curve.sampledPoints[p];
-                Vector3 pointB = curve.sampledPoints[p+1];
+                Vector3 pointA = curve.sampledPoints[p] + trackHeightMod;
+                Vector3 pointB = curve.sampledPoints[p + 1] + trackHeightMod;
                 Vector3 crossA = curve.sampledTrackCrosses[p];
                 Vector3 crossB = curve.sampledTrackCrosses[p+1];
                 float widthA = curve.sampledWidths[p] * terrainMergeMargin;

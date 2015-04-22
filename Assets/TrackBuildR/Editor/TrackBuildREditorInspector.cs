@@ -619,8 +619,6 @@ public class TrackBuildREditorInspector
 
                 Title("Terrain", TrackBuildRColours.RED);
 
-                EditorGUILayout.HelpBox("I'd love to hear feedback on this new feature.\nWhat works? What doesn't.\nLet me know!", MessageType.Info);
-
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Terrain Mode", GUILayout.Width(90));
                 EditorGUI.BeginDisabledGroup(_trackBuildR.terrainMode == TrackBuildR.terrainModes.mergeTerrain);
@@ -661,7 +659,7 @@ public class TrackBuildREditorInspector
 
                         EditorGUILayout.BeginVertical("box");
                         EditorGUILayout.LabelField("Terrain Match Margin");
-                        _track.terrainMergeMargin = EditorGUILayout.Slider(_track.terrainMergeMargin, 1, 5);
+                        _track.terrainMergeMargin = EditorGUILayout.Slider(_track.terrainMergeMargin, 1, 20);
                         EditorGUILayout.EndVertical();
 
                         EditorGUILayout.BeginVertical("box");
@@ -935,20 +933,6 @@ public class TrackBuildREditorInspector
                 _track.showWireframe = EditorGUILayout.Toggle(_track.showWireframe, GUILayout.Width(15));
                 EditorGUILayout.EndHorizontal();
 
-                //Tangent calculation
-                EditorGUILayout.BeginHorizontal(GUILayout.Width(400));
-                EditorGUI.BeginDisabledGroup(_trackBuildR.tangentsGenerated);
-                if(GUILayout.Button("Build Tangents", GUILayout.Height(38)))
-                {
-                    Undo.RecordObject(_trackBuildR, "Build Tangents");
-                    _trackBuildR.GenerateTangents();
-                    GUI.changed = false;
-                }
-                EditorGUI.EndDisabledGroup();
-                if(!_trackBuildR.tangentsGenerated)
-                    EditorGUILayout.HelpBox("The model doesn't have tangents", MessageType.Warning);
-                EditorGUILayout.EndHorizontal();
-
                 //Lightmap rendering
                 EditorGUILayout.BeginHorizontal(GUILayout.Width(400));
                 EditorGUI.BeginDisabledGroup(_trackBuildR.lightmapGenerated);
@@ -969,7 +953,7 @@ public class TrackBuildREditorInspector
                 if(GUILayout.Button("Optimise Mesh For Runtime", GUILayout.Height(38)))
                 {
                     Undo.RecordObject(_trackBuildR, "Optimise Meshes");
-                    _trackBuildR.OptimizeMeshes();
+                    _trackBuildR.OptimseMeshes();
                     GUI.changed = false;
                 }
                 EditorGUI.EndDisabledGroup();
@@ -1017,7 +1001,7 @@ public class TrackBuildREditorInspector
 
     private static void RenderPreview(TrackBuildR _trackBuildR)
     {
-		if (!SystemInfo.supportsRenderTextures)
+        if (!SystemInfo.supportsRenderTextures)
             return;
 
         if (EditorApplication.isPlaying)
@@ -1050,7 +1034,7 @@ public class TrackBuildREditorInspector
         GUI.DrawTexture(guiRect, pointPreviewTexture, ScaleMode.ScaleToFit, false);
 
         EditorGUILayout.BeginHorizontal();
-        string trackForwardText = _trackBuildR.previewForward ? "Track Preview Direction Forward >>" : "<< Track Preview Direction Backward";
+        string trackForwardText = _trackBuildR.previewForward ? "Track Preivew Direction Forward >>" : "<< Track Preivew Direction Backward";
         if(GUILayout.Button(trackForwardText))
             _trackBuildR.previewForward = !_trackBuildR.previewForward;
         EditorGUILayout.EndHorizontal();

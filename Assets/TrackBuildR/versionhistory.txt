@@ -4,6 +4,13 @@ Version History
 Any issues, comments or suggestions please send to email@jasperstocker.com
 
 ------------------------------------------------------
+1.3 - 22 March 2015
+------------------------------------------------------
+Unity 5 Compatible
+Fixed terrain issue with non origin based tracks
+Fixed side collider not saving state
+
+------------------------------------------------------
 1.27 - 6 December 2014
 ------------------------------------------------------
 ADDED bumper modes, automatic, always, left and right.

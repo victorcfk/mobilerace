@@ -88,6 +88,7 @@ public class TrackBuildRPoint : MonoBehaviour
     [SerializeField]
     private bool _trackCollider = true;
 
+    [SerializeField]
     private bool _colliderSides = true;
 
     [SerializeField]

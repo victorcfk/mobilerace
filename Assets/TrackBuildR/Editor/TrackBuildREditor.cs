@@ -917,9 +917,7 @@ public class TrackBuildREditor : Editor
         TrackBuildREditorInspector.OnInspectorGUI(_trackBuildR, selectedPoint, selectedCurveIndex);
 
         if (GUI.changed)
-        {
             UpdateGui();
-        }
     }
 
     /// <summary>

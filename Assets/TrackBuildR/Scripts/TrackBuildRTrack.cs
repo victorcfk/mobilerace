@@ -50,7 +50,7 @@ public class TrackBuildRTrack : MonoBehaviour
     private bool _renderBoundaryWallReverse = false;
 
     public bool includeCollider = true;
-    public bool includeColliderRoof = false;
+    public bool includeColliderRoof = true;
     public float trackColliderWallHeight = 5.0f;
 
     public bool trackBumpers = true;
@@ -90,7 +90,7 @@ public class TrackBuildRTrack : MonoBehaviour
     private float _trackLength;
 
     [SerializeField]
-    private float _meshResolution = 5f;//the world unit distance for mesh face sizes for nextNormIndex completed mesh
+    private float _meshResolution = 1.5f;//the world unit distance for mesh face sizes for nextNormIndex completed mesh
     public float editMeshResolution = 3.0f;//the world unit distance for mesh face sizes - used when editing the track to reduce redraw time
 
     [SerializeField]
@@ -1004,7 +1004,7 @@ public class TrackBuildRTrack : MonoBehaviour
 #endif
     }
 
-    public void OptimizeMeshes()
+    public void OptimseMeshes()
     {
 #if UNITY_EDITOR
         for (int i = 0; i < numberOfCurves; i++)
