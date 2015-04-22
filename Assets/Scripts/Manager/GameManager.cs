@@ -506,24 +506,33 @@ public class GameManager : MonoBehaviour
 		return mesh;
 	}
 
+	public GameObject Building;
 	public void PostTrackBuild()
 	{
 		ParseTrackBoundsAndCreateQuad (generatedPointList);
 
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
 
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
-		CapsuleCast ();
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
 
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,20);
 	}
-
-	public GameObject Building;
-	void CapsuleCast ()
+	
+	void SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius)
 	{
 		Vector3 topCent = (UpperBounds + LowerBounds) / 2;
 		topCent.y = UpperBounds.y;
@@ -531,14 +540,13 @@ public class GameManager : MonoBehaviour
 		Vector3 btmCent = (UpperBounds + LowerBounds) / 2;
 		btmCent.y = LowerBounds.y;
 
-
         while (true) 
 		{
-			Vector3 displace = Random.insideUnitCircle * (UpperBounds - LowerBounds).magnitude;
-			displace.z = displace.y;
-            displace.y = 0;
+			float xTestLoc = Random.Range(LowerBounds.x,UpperBounds.x);
+			float zTestLoc = Random.Range(LowerBounds.z,UpperBounds.z);
 
-			Ray ray = new Ray (topCent + displace + Vector3.up*100, Vector3.down);
+			Vector3 rayStart = new Vector3(xTestLoc,LowerBounds.y,zTestLoc);
+			Ray ray = new Ray (rayStart , Vector3.up);
 			
 			//Debug.DrawRay (topCent + displace, Vector3.down * (UpperBounds.y - LowerBounds.y), Color.white, 5);
 
@@ -547,10 +555,10 @@ public class GameManager : MonoBehaviour
 			RaycastHit rch;
 
 			if (
-				!Physics.SphereCast (ray,100,out rch,(UpperBounds.y - LowerBounds.y +100))
+				!Physics.SphereCast (ray,sphereRadius,out rch,(UpperBounds.y - LowerBounds.y))
 				) 
 			{
-				GameObject.Instantiate (Building, btmCent + displace, Building.transform.rotation);
+				GameObject.Instantiate (Building, rayStart, Building.transform.rotation);
                 
 //				Debug.DrawLine (topCent + displace + Vector3.up*100, rch.point, Color.cyan, 5);
 //				Debug.Log ("wehit");
