@@ -40,17 +40,17 @@ public class GameManager : MonoBehaviour
 
 	public int Mat;
 
-	[Range (1,20)]
+	[Range (1,100)]
 	public float
 		MinFollowDistance;
-	[Range (1,20)]
+	[Range (1,100)]
 	public float
 		MaxFollowDistance;
 
-	[Range (1,20)]
+	[Range (1,100)]
 	public float
 		MinFollowHeight;
-	[Range (1,20)]
+	[Range (1,100)]
 	public float
 		MaxFollowHeight;
 
@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
 	public void GetTrackPoints (TrackBuildRTrack track)
 	{
 		//int trackPointCount = 80;
-		int numOfInterval = 20;
+		int numOfInterval = 25;
 		int trackInterval = 20;	//must be even
 
 		float trackWidth = 50;
@@ -531,12 +531,32 @@ public class GameManager : MonoBehaviour
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
 
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+
 
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
 
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+		
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
 		SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
@@ -567,8 +587,13 @@ public class GameManager : MonoBehaviour
 				) 
 			{
 				Debug.DrawRay (rayStart, Vector3.up, Color.cyan, 5);
-				GameObject.Instantiate (obj, rayStart, obj.transform.rotation);
+				GameObject g = GameObject.Instantiate (obj, rayStart, obj.transform.rotation) as GameObject;
                 
+				g.transform.localScale = new Vector3(
+
+					g.transform.localScale.x*Random.Range(1,1.5f),
+					g.transform.localScale.y*Random.Range(1,1.5f),
+					g.transform.localScale.z*Random.Range(1,1.5f));
 				return;
 			} 
 		}
