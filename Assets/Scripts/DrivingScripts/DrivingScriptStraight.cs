@@ -47,7 +47,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 			   (accObjRigidBody.velocity,
 			 transform.forward) > 0)
 			{
-				accObjRigidBody.AddForceAtPosition(-accObjRigidBody.transform.forward* accVal * 0.1f,accObjRigidBody.transform.position);
+				accObjRigidBody.AddForceAtPosition(-accObjRigidBody.transform.forward* accVal,accObjRigidBody.transform.position);
 			}
 
 		}
