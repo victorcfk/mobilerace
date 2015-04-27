@@ -20,7 +20,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 
 
-	float LeftRightAcc;
+    public float LeftRightAcc { get; private set;}
 	bool isBraking;
 
 	Vector3 tempo = Vector3.forward;

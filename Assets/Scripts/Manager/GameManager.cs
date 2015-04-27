@@ -65,6 +65,8 @@ public class GameManager : MonoBehaviour
 	public Vector3 UpperBounds;
 	public Vector3 LowerBounds;
 
+    Vector3 CamFollowObjectOrigPosition;
+
 	void Awake ()
 	{
 		_instance = this;
@@ -74,8 +76,9 @@ public class GameManager : MonoBehaviour
 		if (CamFollowObject != null)
 			CamFollow.camFollowTarget = CamFollowObject;
 
-		Random.seed = System.DateTime.Now.Minute;
+        CamFollowObjectOrigPosition = CamFollowObject.transform.localPosition;
 
+		Random.seed = System.DateTime.Now.Minute;
 
 	}
         
@@ -86,11 +89,20 @@ public class GameManager : MonoBehaviour
 			Application.LoadLevel (0);
 		}
 
-		float t = (vehRigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
-
-		CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
-		CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
+        CamManagement();
 	}
+
+    public void CamManagement()
+    {
+        float t = (vehRigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
+        float a = (TheVehicle as DrivingScriptStraight).LeftRightAcc;
+
+        CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
+        CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
+
+        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*4,Time.deltaTime*5);
+
+    }
 
 	public void Update ()
 	{
