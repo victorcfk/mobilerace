@@ -74,7 +74,9 @@ public class GameManager : MonoBehaviour
 		if (CamFollowObject != null)
 			CamFollow.camFollowTarget = CamFollowObject;
 
-		Random.seed = System.DateTime.Now.Second;
+		Random.seed = System.DateTime.Now.Minute;
+
+
 	}
         
 	// Update is called once per frame
