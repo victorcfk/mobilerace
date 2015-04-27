@@ -132,8 +132,8 @@ public class GameManager : MonoBehaviour
 		int numOfInterval = 25;
 		int trackInterval = 20;	//must be even
 
-		float trackWidth = 50;
-		float crownAngle = -6;
+		
+		float crownAngle = -5;
 
 		//===================================================
 		//Decide straight or curved
@@ -206,20 +206,22 @@ public class GameManager : MonoBehaviour
 					multi = -1;
 				}
 
-				if (StraightLeftRight [i] < 0.5f) {
+				if (StraightLeftRight [i] < 0.5f) { //left turn
 					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
 					bp.position += new Vector3 (0, StraightLeftRight [i] * 23f, 0);
+                    bp.width += StraightLeftRight [i] * 50;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				} else {
 					bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
 					bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 23f, 0);
+                    bp.width += (1 - StraightLeftRight [i]) * 50;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				}
 				//=============================================
 			} else
-				if (StraightLeftRight [i] < 0) {
+				if (StraightLeftRight [i] < 0) { //right turn
 
 				//=============================================
 				float angle;
@@ -234,15 +236,18 @@ public class GameManager : MonoBehaviour
 				if (StraightLeftRight [i] > -0.5f) {
 					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
 					bp.position += new Vector3 (0, -StraightLeftRight [i] * 21.5f, 0);
+                    bp.width += (-StraightLeftRight [i]) * 75;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+
 				} else {
-					bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
+					
+                    bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
 					bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 21.5f, 0);
+                    bp.width += (1 - (-StraightLeftRight [i])) * 75;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				}
-
 
 				//=============================================
 			}
@@ -252,9 +257,7 @@ public class GameManager : MonoBehaviour
 			if (i > 10 && (i < generatedPointList.Count - 10))
 				bp.crownAngle = crownAngle;
 
-
-
-			i += 3;
+			i += 3; //skip over points
 
 			track.AddPoint (bp);
 		}
