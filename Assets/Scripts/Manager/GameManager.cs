@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
         CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
         CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
 
-        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*4,Time.deltaTime*5);
+        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*7,Time.deltaTime*7);
 
     }
 
@@ -161,11 +161,11 @@ public class GameManager : MonoBehaviour
 			straightleftright = Random.Range (0, 5);
 
 			if (straightleftright == 0) {
-				generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.25f, 0.80f)));
+				generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (150, 400), Random.Range (0.25f, 0.80f)));
 			}
 
 			if (straightleftright == 1) {
-				generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.25f, 0.80f)));
+				generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (150, 400), Random.Range (0.25f, 0.80f)));
 			}
 
 			if (straightleftright >= 2) {
@@ -220,14 +220,14 @@ public class GameManager : MonoBehaviour
 
 				if (StraightLeftRight [i] < 0.5f) { //left turn
 					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-					bp.position += new Vector3 (0, StraightLeftRight [i] * 23f, 0);
-                    bp.width += StraightLeftRight [i] * 50;
+					bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
+                    bp.width += StraightLeftRight [i] * 45;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				} else {
 					bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-					bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 23f, 0);
-                    bp.width += (1 - StraightLeftRight [i]) * 50;
+					bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
+                    bp.width += (1 - StraightLeftRight [i]) * 45;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				}
