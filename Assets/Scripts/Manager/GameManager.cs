@@ -158,14 +158,16 @@ public class GameManager : MonoBehaviour
 
 		for (int j =0; j <numOfInterval; j++) {
 
-			straightleftright = Random.Range (0, 5);
+			straightleftright = Random.Range (0, 10);
+           if(j==0)
+                straightleftright =2;
 
 			if (straightleftright == 0) {
-				generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (150, 400), Random.Range (0.25f, 0.80f)));
+				generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (175, 400), Random.Range (0.25f, 0.75f)));
 			}
 
 			if (straightleftright == 1) {
-				generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (150, 400), Random.Range (0.25f, 0.80f)));
+				generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (175, 400), Random.Range (0.25f, 0.75f)));
 			}
 
 			if (straightleftright >= 2) {
@@ -197,7 +199,7 @@ public class GameManager : MonoBehaviour
 
 			//bp.boundaryHeight = 10;
 			bp.renderBounds = false;
-			bp.width = 50;
+			bp.width = 75;
 
 			if (i < generatedPointList.Count - 1) {
 				bp.forwardControlPoint = generatedPointList [i + 1];
@@ -220,13 +222,13 @@ public class GameManager : MonoBehaviour
 
 				if (StraightLeftRight [i] < 0.5f) { //left turn
 					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-					bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
+					bp.position += new Vector3 (0, StraightLeftRight [i] * 40f, 0);
                     bp.width += StraightLeftRight [i] * 45;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				} else {
 					bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-					bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
+					bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 40f, 0);
                     bp.width += (1 - StraightLeftRight [i]) * 45;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
@@ -247,16 +249,16 @@ public class GameManager : MonoBehaviour
 
 				if (StraightLeftRight [i] > -0.5f) {
 					bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-					bp.position += new Vector3 (0, -StraightLeftRight [i] * 21.5f, 0);
-                    bp.width += (-StraightLeftRight [i]) * 75;
+					bp.position += new Vector3 (0, -StraightLeftRight [i] * 30f, 0);
+                    bp.width += (-StraightLeftRight [i]) * 100;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 
 				} else {
 					
                     bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
-					bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 21.5f, 0);
-                    bp.width += (1 - (-StraightLeftRight [i])) * 75;
+					bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 30f, 0);
+                    bp.width += (1 - (-StraightLeftRight [i])) * 100;
 
 					Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
 				}
