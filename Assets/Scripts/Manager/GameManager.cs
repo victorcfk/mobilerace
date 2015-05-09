@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     public GameObject menu;
     public Button restartButton;
     public InputField seedInputField;
-    public Slider tiltSensitivity;
+    public Slider tiltSensitivitySlider;
 
     [Space (10)]
 	
@@ -85,9 +85,8 @@ public class GameManager : MonoBehaviour
         CamFollowObjectOrigPosition = CamFollowObject.transform.localPosition;
 
         menu.SetActive(false);
-
-		Random.seed = System.DateTime.Now.Minute;
-
+        seedInputField.text = Random.seed.ToString();
+        tiltSensitivitySlider.normalizedValue = (TheVehicle as DrivingScriptStraight).turnSensitivity;
 	}
 
     void LateUpdate ()
@@ -108,12 +107,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-
-//        Button restartButton;
-//        public InputField seedInputField;
-//        public Slider tiltSensitivity;
-
-        
         CamManagement();
     }
 

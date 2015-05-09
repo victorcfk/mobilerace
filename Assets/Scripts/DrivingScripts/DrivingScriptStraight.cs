@@ -14,7 +14,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	public KeyCode RightTurnCode;
 
 	public float turnAngularVelocity;
-    public float turnSensitivity;
+    public float turnSensitivity = 1;
 
 	public float rotationCorrectionVal = 3;
 
@@ -26,7 +26,6 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	protected override void Awake () {
 		
 		base.Awake();
-        turnSensitivity = 1;
 	}
 
 	// Update is called once per frame
