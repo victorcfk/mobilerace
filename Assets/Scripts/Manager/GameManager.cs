@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
 
+    public GameObject Menu;
+
 	[SerializeField]
 	Material
 		trackMat;
@@ -82,29 +84,9 @@ public class GameManager : MonoBehaviour
 
 	}
         
-	// Update is called once per frame
-	void LateUpdate ()
-	{
-		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) {
-			Application.LoadLevel (0);
-		}
 
-        CamManagement();
-	}
 
-    public void CamManagement()
-    {
-        float t = (vehRigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
-        float a = (TheVehicle as DrivingScriptStraight).LeftRightAcc;
-
-        CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
-        CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
-
-        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*7,Time.deltaTime*7);
-
-    }
-
-	public void Update ()
+	void Update ()
 	{
 		gtext.text = vehRigidBody.velocity.magnitude.ToString ("F0");
 
@@ -137,6 +119,39 @@ public class GameManager : MonoBehaviour
 		}
 		//======================================================
 	}
+
+    void LateUpdate ()
+    {
+        
+        if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
+        {
+            //Application.LoadLevel (0);
+            if(Menu.activeInHierarchy)
+            {
+                Menu.SetActive(false);
+                Time.timeScale = 1;
+            }
+            else
+            {
+                Menu.SetActive(true);
+                Time.timeScale = 0;
+            }
+        }
+        
+        CamManagement();
+    }
+
+    public void CamManagement()
+    {
+        float t = (vehRigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
+        float a = (TheVehicle as DrivingScriptStraight).LeftRightAcc;
+        
+        CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
+        CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
+        
+        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*7,Time.deltaTime*7);
+        
+    }
 
 	public void GetTrackPoints (TrackBuildRTrack track)
 	{
