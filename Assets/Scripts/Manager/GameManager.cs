@@ -469,25 +469,8 @@ public class GameManager : MonoBehaviour
 			new Vector3 (LowerBounds.x, g.y, LowerBounds.z),
 		};
 
-		//QuadCreate(new Vector3(width,height,1),g,textureScale);
 		GetMeshWithTexture (vertices, textureScale);
 	}
-
-	public GameObject groundQuad;
-	/// <summary>
-	/// Creates a mesh and binds a texture to it with texturescale
-	/// </summary>
-	/// <param name="vertices">Vertices.</param>
-	/// <param name="textureScale">Texture scale.</param>
-	void QuadCreate (Vector3 scale, Vector3 cent, Vector2 textureScale)
-	{  
-		groundQuad.transform.localScale = scale;
-
-		groundQuad.transform.position = cent;
-
-		groundQuad.GetComponent<MeshRenderer> ().material.SetTextureScale ("_MainTex", textureScale);
-	}
-
 
 	/// <summary>
 	/// Creates a mesh and binds a texture to it with texturescale
