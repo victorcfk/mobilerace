@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class DrivingScriptTwinEngine : DrivingScriptBasic {
@@ -13,10 +13,10 @@ public class DrivingScriptTwinEngine : DrivingScriptBasic {
 	void LateUpdate()
 	{
 			//We want the drifting to be constrained
-			velocityWeWant = Vector3.SmoothDamp(accObjRigidBody.velocity,
+			velocityWeWant = Vector3.SmoothDamp(rigidBody.velocity,
 
-			                                    Mathf.Clamp(accObjRigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-			                                    new Vector3(0,Mathf.Clamp(accObjRigidBody.velocity.y,-10,-20),0),														//Add the current downward velocity due to gravity.
+			                                    Mathf.Clamp(rigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
+			                                    new Vector3(0,Mathf.Clamp(rigidBody.velocity.y,-10,-20),0),														//Add the current downward velocity due to gravity.
 
 			                                    ref tempo,
 			                                    Time.deltaTime*rotationCorrectionVal);
@@ -49,7 +49,7 @@ public class DrivingScriptTwinEngine : DrivingScriptBasic {
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
-		accObjRigidBody.velocity = (velocityWeWant);
+		rigidBody.velocity = (velocityWeWant);
 	}
 
 }

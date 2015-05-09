@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
 	}
 
 	public DrivingScriptBasic TheVehicle;
-	Rigidbody vehRigidBody;
 
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
@@ -73,8 +72,6 @@ public class GameManager : MonoBehaviour
 	{
 		_instance = this;
 
-		vehRigidBody = TheVehicle.GetComponent<Rigidbody> ();
-
 		if (CamFollowObject != null)
 			CamFollow.camFollowTarget = CamFollowObject;
 
@@ -83,12 +80,10 @@ public class GameManager : MonoBehaviour
 		Random.seed = System.DateTime.Now.Minute;
 
 	}
-        
-
 
 	void Update ()
 	{
-		gtext.text = vehRigidBody.velocity.magnitude.ToString ("F0");
+		gtext.text = TheVehicle.rigidBody.velocity.magnitude.ToString ("F0");
 
 		//======================================================
 		if (TheVehicle is DrivingScriptTwinEngine) {
@@ -143,7 +138,7 @@ public class GameManager : MonoBehaviour
 
     public void CamManagement()
     {
-        float t = (vehRigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
+        float t = (TheVehicle.rigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
         float a = (TheVehicle as DrivingScriptStraight).LeftRightAcc;
         
         CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);

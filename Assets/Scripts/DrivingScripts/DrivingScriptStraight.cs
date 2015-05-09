@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class DrivingScriptStraight : DrivingScriptBasic {
@@ -38,28 +38,28 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	void FixedUpdate()
 	{
-		accObjRigidBody.angularVelocity = LeftRightAcc * transform.up * turnAngularVelocity * Time.deltaTime;
+		rigidBody.angularVelocity = LeftRightAcc * transform.up * turnAngularVelocity * Time.deltaTime;
 
 		if(isBraking)
 		{
 			//If the velocity is in any way orthognal to the vehicle's forward. So we are moving
 			if(Vector3.Dot
-			   (accObjRigidBody.velocity,
+			   (rigidBody.velocity,
 			 transform.forward) > 0)
 			{
-				accObjRigidBody.AddForceAtPosition(-accObjRigidBody.transform.forward* accVal,accObjRigidBody.transform.position);
+				rigidBody.AddForceAtPosition(-rigidBody.transform.forward* accVal,rigidBody.transform.position);
 			}
 
 		}
 		else
 		{
-			accObjRigidBody.AddForceAtPosition(accObjRigidBody.transform.forward* accVal * normalizedVal,accObjRigidBody.transform.position);
+			rigidBody.AddForceAtPosition(rigidBody.transform.forward* accVal * normalizedVal,rigidBody.transform.position);
 		}
 
-		accObjRigidBody.velocity = Vector3.SmoothDamp(accObjRigidBody.velocity,
+		rigidBody.velocity = Vector3.SmoothDamp(rigidBody.velocity,
 		                                    
-		                                    Mathf.Clamp(accObjRigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-		                                    new Vector3(0,Mathf.Clamp(accObjRigidBody.velocity.y,-40,-40),0),														//Add the current downward velocity due to gravity.
+		                                    Mathf.Clamp(rigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
+		                                    new Vector3(0,Mathf.Clamp(rigidBody.velocity.y,-40,-40),0),														//Add the current downward velocity due to gravity.
 		                                    
 		                                    ref tempo,
 		                                    Time.fixedDeltaTime*rotationCorrectionVal);
