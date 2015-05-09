@@ -9,16 +9,14 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	public bool Accelerate;
 
 	public float accVal = 75;
-	public float normalizedVal = 1;
 
-	public KeyCode LeftTurnCode;
+    public KeyCode LeftTurnCode;
 	public KeyCode RightTurnCode;
 
 	public float turnAngularVelocity;
+    public float turnSensitivity;
 
 	public float rotationCorrectionVal = 3;
-
-
 
     public float LeftRightAcc { get; private set;}
 	bool isBraking;
@@ -28,6 +26,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	protected override void Awake () {
 		
 		base.Awake();
+        turnSensitivity = 1;
 	}
 
 	// Update is called once per frame
@@ -38,7 +37,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	void FixedUpdate()
 	{
-		rigidBody.angularVelocity = LeftRightAcc * transform.up * turnAngularVelocity * Time.deltaTime;
+        rigidBody.angularVelocity = LeftRightAcc * turnSensitivity * turnAngularVelocity * transform.up * Time.deltaTime;
 
 		if(isBraking)
 		{
@@ -53,7 +52,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 		}
 		else
 		{
-			rigidBody.AddForceAtPosition(rigidBody.transform.forward* accVal * normalizedVal,rigidBody.transform.position);
+			rigidBody.AddForceAtPosition(rigidBody.transform.forward* accVal,rigidBody.transform.position);
 		}
 
 		rigidBody.velocity = Vector3.SmoothDamp(rigidBody.velocity,
@@ -68,7 +67,6 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	void ControlUpdates()
 	{
-	
 		LeftRightAcc = Input.acceleration.x;
 
 		if(Input.GetKey(RightTurnCode)) 

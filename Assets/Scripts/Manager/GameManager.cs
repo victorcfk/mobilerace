@@ -24,9 +24,16 @@ public class GameManager : MonoBehaviour
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
 
-    public GameObject Menu;
+    [Space (10)]
 
-	[SerializeField]
+    public GameObject menu;
+    public Button restartButton;
+    public InputField seedInputField;
+    public Slider tiltSensitivity;
+
+    [Space (10)]
+	
+    [SerializeField]
 	Material
 		trackMat;
 	[SerializeField]
@@ -39,7 +46,9 @@ public class GameManager : MonoBehaviour
 	Material
 		groundMat;
 
-	public int Mat;
+    [Space (10)]
+
+	int Mat;
 
 	[Range (1,100)]
 	public float
@@ -55,9 +64,7 @@ public class GameManager : MonoBehaviour
 	public float
 		MaxFollowHeight;
 
-	public Text gtext;
-	public Text LeftEng;
-	public Text RightEng;
+    [Space (10)]
 
 	List<float> StraightLeftRight = new List<float> ();
 	public List<Vector3> generatedPointList = new List<Vector3> ();
@@ -77,42 +84,10 @@ public class GameManager : MonoBehaviour
 
         CamFollowObjectOrigPosition = CamFollowObject.transform.localPosition;
 
+        menu.SetActive(false);
+
 		Random.seed = System.DateTime.Now.Minute;
 
-	}
-
-	void Update ()
-	{
-		gtext.text = TheVehicle.rigidBody.velocity.magnitude.ToString ("F0");
-
-		//======================================================
-		if (TheVehicle is DrivingScriptTwinEngine) {
-			float t1 = (TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal;
-
-			if (t1 > 0)
-				LeftEng.text = ((TheVehicle as DrivingScriptTwinEngine).Left.normalizedVal * 100).ToString ("F0") + "%";
-			else
-				LeftEng.text = "Brake";
-
-			LeftEng.color = new Color (t1, (1 - t1), 0);
-		}
-
-		if (TheVehicle is DrivingScriptStraight) {
-			LeftEng.text = Input.acceleration.x.ToString ("F0");
-		}
-
-		//======================================================
-		if (TheVehicle is DrivingScriptTwinEngine) {
-			float t2 = (TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal;
-
-			if (t2 > 0)
-				RightEng.text = ((TheVehicle as DrivingScriptTwinEngine).Right.normalizedVal * 100).ToString ("F0") + "%";
-			else
-				RightEng.text = "Brake";
-
-			RightEng.color = new Color (t2, (1 - t2), 0);
-		}
-		//======================================================
 	}
 
     void LateUpdate ()
@@ -121,19 +96,44 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
         {
             //Application.LoadLevel (0);
-            if(Menu.activeInHierarchy)
+            if(menu.activeInHierarchy)
             {
-                Menu.SetActive(false);
+                menu.SetActive(false);
                 Time.timeScale = 1;
             }
             else
             {
-                Menu.SetActive(true);
+                menu.SetActive(true);
                 Time.timeScale = 0;
             }
         }
+
+
+//        Button restartButton;
+//        public InputField seedInputField;
+//        public Slider tiltSensitivity;
+
         
         CamManagement();
+    }
+
+    public void restartButtonPressed()
+    {
+        Time.timeScale = 1;
+        Application.LoadLevel(0);
+        Time.timeScale = 1;
+    }
+
+    public void sliderChanged(float value)
+    {
+//        Debug.Log(value);
+        (TheVehicle as DrivingScriptStraight).turnSensitivity = value;
+    }
+
+    public void seedInputChanged(string value)
+    {
+//        Debug.Log(value);
+        Random.seed = int.Parse(value);
     }
 
     public void CamManagement()
@@ -144,7 +144,7 @@ public class GameManager : MonoBehaviour
         CamFollow.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
         CamFollow.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
         
-        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*7,Time.deltaTime*7);
+        CamFollowObject.transform.localPosition = Vector3.MoveTowards(CamFollowObject.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*(TheVehicle as DrivingScriptStraight).turnSensitivity*7,Time.deltaTime*7);
         
     }
 
