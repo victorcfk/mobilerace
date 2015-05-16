@@ -19,7 +19,14 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	public float rotationCorrectionVal = 3;
 
     public float LeftRightAcc { get; private set;}
-	bool isBraking;
+	
+    public Transform backLeft;
+    public Transform backRight;
+    public Transform frontLeft;
+    public Transform frontRight;
+    public LayerMask trackMask;
+
+    bool isBraking;
 
 	Vector3 tempo = Vector3.forward;
 
@@ -27,29 +34,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	void Update () 
 	{
 		ControlUpdates();
-
-//        RaycastHit rch;
-//
-//        Ray ray = new Ray(transform.position,-transform.up);
-//        if(Physics.Raycast(ray,out rch,100))
-//        {
-//            Vectrosity.VectorLine.SetLine3D(Color.white,1,transform.position,rch.point);
-//            Vectrosity.VectorLine.SetLine3D(Color.red,1,rch.point,rch.point + rch.normal);
-//        }
-//
-//        Quaternion q = Quaternion.AngleAxis(Vector3.Angle(transform.up,rch.normal)-90,
-//                             transform.forward);
-//
-//        transform.rotation = Quaternion.RotateTowards(transform.rotation,q,Time.deltaTime*10);
-
-       
 	}
-
-    public Transform backLeft;
-    public Transform backRight;
-    public Transform frontLeft;
-    public Transform frontRight;
-    public LayerMask trackMask;
 
     void MaintainVehOrientation () {
 
@@ -71,9 +56,15 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             Vector3 rightFwd    = rf.point - rr.point;
             Vector3 avgFwd      = (leftFwd + rightFwd)/2;
 
+            rigidBody.MovePosition(
+                (lf.point + lr.point + rf.point +rr.point)/4 +Vector3.up
+                );
+
             rigidBody.MoveRotation(
                     Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(avgFwd,upDir),Time.deltaTime*50)
                 );
+
+           
 
             Debug.DrawRay(rr.point, Vector3.up);
             Debug.DrawRay(lr.point, Vector3.up);
@@ -85,7 +76,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	void FixedUpdate()
 	{
-        MaintainVehOrientation();
+       
 
         rigidBody.angularVelocity = LeftRightAcc * turnSensitivity * turnAngularVelocity * transform.up * Time.deltaTime;
 
@@ -96,23 +87,21 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 			   (rigidBody.velocity,
 			 transform.forward) > 0)
 			{
-				rigidBody.AddForceAtPosition(-rigidBody.transform.forward* accVal,rigidBody.transform.position);
+				rigidBody.AddForceAtPosition(-transform.forward* accVal,transform.position);
 			}
 
 		}
 		else
 		{
-			rigidBody.AddForceAtPosition(rigidBody.transform.forward* accVal,rigidBody.transform.position);
+			rigidBody.AddForceAtPosition(transform.forward* accVal,transform.position);
 		}
 
 		rigidBody.velocity = Vector3.SmoothDamp(rigidBody.velocity,
-		                                    
-		                                    Mathf.Clamp(rigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward + 	//Apply the current velocity artificially towards the vehicle's transform
-		                                    new Vector3(0,Mathf.Clamp(rigidBody.velocity.y,-40,-40),0),														//Add the current downward velocity due to gravity.
-		                                    
+		                                    Mathf.Clamp(rigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward,								//Add the current downward velocity due to gravity
 		                                    ref tempo,
 		                                    Time.fixedDeltaTime*rotationCorrectionVal);
 
+        MaintainVehOrientation();
 	}
 
 	void ControlUpdates()
