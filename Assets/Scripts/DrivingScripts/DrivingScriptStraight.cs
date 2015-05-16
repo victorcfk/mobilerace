@@ -23,19 +23,70 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	Vector3 tempo = Vector3.forward;
 
-	protected override void Awake () {
-		
-		base.Awake();
-	}
-
 	// Update is called once per frame
 	void Update () 
 	{
 		ControlUpdates();
+
+//        RaycastHit rch;
+//
+//        Ray ray = new Ray(transform.position,-transform.up);
+//        if(Physics.Raycast(ray,out rch,100))
+//        {
+//            Vectrosity.VectorLine.SetLine3D(Color.white,1,transform.position,rch.point);
+//            Vectrosity.VectorLine.SetLine3D(Color.red,1,rch.point,rch.point + rch.normal);
+//        }
+//
+//        Quaternion q = Quaternion.AngleAxis(Vector3.Angle(transform.up,rch.normal)-90,
+//                             transform.forward);
+//
+//        transform.rotation = Quaternion.RotateTowards(transform.rotation,q,Time.deltaTime*10);
+
+       
 	}
+
+    public Transform backLeft;
+    public Transform backRight;
+    public Transform frontLeft;
+    public Transform frontRight;
+    public LayerMask trackMask;
+
+    void MaintainVehOrientation () {
+
+        RaycastHit lr;
+        RaycastHit rr;
+        RaycastHit lf;
+        RaycastHit rf;
+
+        if(
+            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,100,trackMask) &&
+            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,100,trackMask) &&
+            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,100,trackMask) &&
+            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,100,trackMask)
+            )
+        {
+            Vector3 upDir       = (lr.normal + rr.normal + lf.normal +rf.normal)/4;
+
+            Vector3 leftFwd     = lf.point - lr.point;
+            Vector3 rightFwd    = rf.point - rr.point;
+            Vector3 avgFwd      = (leftFwd + rightFwd)/2;
+
+            rigidBody.MoveRotation(
+                    Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(avgFwd,upDir),Time.deltaTime*50)
+                );
+
+            Debug.DrawRay(rr.point, Vector3.up);
+            Debug.DrawRay(lr.point, Vector3.up);
+            Debug.DrawRay(lf.point, Vector3.up);
+            Debug.DrawRay(rf.point, Vector3.up);
+            Debug.DrawRay(transform.position,upDir,Color.magenta,1);
+        }
+    }
 
 	void FixedUpdate()
 	{
+        MaintainVehOrientation();
+
         rigidBody.angularVelocity = LeftRightAcc * turnSensitivity * turnAngularVelocity * transform.up * Time.deltaTime;
 
 		if(isBraking)
