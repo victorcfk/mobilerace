@@ -64,11 +64,11 @@ public class TrackManager : MonoBehaviour {
                 straightleftright =2;
             
             if (straightleftright == 0) {
-                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (175, 400), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
             }
             
             if (straightleftright == 1) {
-                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (175, 400), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
             }
             
             if (straightleftright >= 2) {
