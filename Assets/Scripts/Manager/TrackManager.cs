@@ -31,7 +31,7 @@ public class TrackManager : MonoBehaviour {
     Material
         groundMat;
 
-    public int numOfInterval = 50;
+    public int numOfInterval = 26;
     public int trackInterval = 20; //must be even
     public float crownAngle = -5;
     public TrackBuildRTrack track;
@@ -87,7 +87,7 @@ public class TrackManager : MonoBehaviour {
         
         Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
         
-        DropPointsOnArray (generatedPointList, 0.5f, 1f);
+        DropPointsOnArray (generatedPointList, 0.5f, 0.8f);
         
         for (int i =0; i <generatedPointList.Count; i++) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
@@ -178,7 +178,7 @@ public class TrackManager : MonoBehaviour {
             track.AddPoint (bp);
         }
         
-        track.meshResolution = 15;
+        track.meshResolution = 10;
         track.loop = false; 
         track.includeColliderRoof =false;
         track.trackBumpers = false;
@@ -424,7 +424,7 @@ public class TrackManager : MonoBehaviour {
     {
         ParseTrackBoundsAndCreateQuad (generatedPointList);
 
-        for(int i =0; i<50; i++)
+        for(int i =0; i<30; i++)
         {
             SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[Random.Range(0,5)]);
         }

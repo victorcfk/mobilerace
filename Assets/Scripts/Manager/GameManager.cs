@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [Space (10)]
 
     public GameObject menu;
+    public GameObject eventSystem;
     public Button restartButton;
     public InputField seedInputField;
     public Slider tiltSensitivitySlider;
@@ -64,24 +65,26 @@ public class GameManager : MonoBehaviour
 
     void LateUpdate ()
     {
-        MenuManagement(menu);
+        MenuManagement();
 
         CamManagement(CamFollow,CamFollowObject);
     }
 
-    public void MenuManagement(GameObject menuObj)
+    public void MenuManagement()
     {
         if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
         {
             //Application.LoadLevel (0);
-            if(menuObj.activeInHierarchy)
+            if(menu.activeInHierarchy)
             {
-                menuObj.SetActive(false);
+                menu.SetActive(false);
+                eventSystem.SetActive(false);
                 Time.timeScale = 1;
             }
             else
             {
-                menuObj.SetActive(true);
+                menu.SetActive(true);
+                eventSystem.SetActive(true);
                 Time.timeScale = 0;
             }
         }
