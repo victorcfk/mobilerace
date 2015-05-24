@@ -213,7 +213,8 @@ public class TrackBuildRuntime : MonoBehaviour
 		
 		Init();
 
-        TrackManager.instance.PostTrackBuild();
+        TrackManager.instance.PopulateEnvironment();
+
 	}
 	
 	private void UpgradeData()

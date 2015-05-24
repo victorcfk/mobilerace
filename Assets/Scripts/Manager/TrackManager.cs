@@ -30,7 +30,12 @@ public class TrackManager : MonoBehaviour {
     [SerializeField]
     Material
         groundMat;
-    
+
+    public int numOfInterval = 50;
+    public int trackInterval = 20; //must be even
+    public float crownAngle = -5;
+    public TrackBuildRTrack track;
+
     [Space (10)]
     
     int Mat;
@@ -38,31 +43,11 @@ public class TrackManager : MonoBehaviour {
     List<Vector3> generatedPointList    = new List<Vector3> ();
     List<float> StraightLeftRight       = new List<float> ();
 
-    public TrackBuildRTrack track;
-    
     Vector3 UpperBounds;
     Vector3 LowerBounds;
 
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
     public void InitializeTrackPoints (TrackBuildRTrack track)
     {
-        //int trackPointCount = 80;
-        int numOfInterval = 25;
-        int trackInterval = 20; //must be even
-        
-        
-        float crownAngle = -5;
-        
         //===================================================
         //Decide straight or curved
         //===================================================
@@ -192,7 +177,7 @@ public class TrackManager : MonoBehaviour {
             track.AddPoint (bp);
         }
         
-        track.meshResolution = 12;
+        track.meshResolution = 15;
         track.loop = false; 
         track.includeColliderRoof =false;
         track.trackBumpers = false;
@@ -427,7 +412,7 @@ public class TrackManager : MonoBehaviour {
     }
     
     public GameObject[] Buildings;
-    public void PostTrackBuild()
+    public void PopulateEnvironment()
     {
         ParseTrackBoundsAndCreateQuad (generatedPointList);
         
