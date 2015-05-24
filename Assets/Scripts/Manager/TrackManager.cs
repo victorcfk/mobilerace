@@ -87,7 +87,7 @@ public class TrackManager : MonoBehaviour {
         
         Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
         
-        DropPointsOnArray (generatedPointList, 0.25f, 0.25f);
+        DropPointsOnArray (generatedPointList, 0.5f, 1f);
         
         for (int i =0; i <generatedPointList.Count; i++) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
@@ -97,8 +97,7 @@ public class TrackManager : MonoBehaviour {
             
             //bp.generateBumpers= true;
             bp.colliderSides = true;
-            
-            //bp.boundaryHeight = 10;
+
             bp.renderBounds = false;
             bp.width = 75;
             
@@ -168,7 +167,9 @@ public class TrackManager : MonoBehaviour {
             }
             bp.generateBumpers = false;
             bp.extrudeTrackBottom = false;
-            
+
+
+
             if (i > 10 && (i < generatedPointList.Count - 10))
                 bp.crownAngle = crownAngle;
             
@@ -181,6 +182,7 @@ public class TrackManager : MonoBehaviour {
         track.loop = false; 
         track.includeColliderRoof =false;
         track.trackBumpers = false;
+        track.trackColliderWallHeight = 20;
 
         this.track = track;
         
@@ -337,7 +339,13 @@ public class TrackManager : MonoBehaviour {
             LowerBounds.y = Mathf.Min (LowerBounds.y, pointlist [i].y);
             LowerBounds.z = Mathf.Min (LowerBounds.z, pointlist [i].z);
         }
-        
+
+        //Expand the bounds
+        //================================
+        UpperBounds += Vector3.one *50;
+        LowerBounds -= Vector3.one *50;
+        //================================
+
         GameObject.Instantiate (GameObject.CreatePrimitive (PrimitiveType.Cube), UpperBounds, Quaternion.identity);
         GameObject.Instantiate (GameObject.CreatePrimitive (PrimitiveType.Cube), LowerBounds, Quaternion.identity);
         
@@ -415,58 +423,11 @@ public class TrackManager : MonoBehaviour {
     public void PopulateEnvironment()
     {
         ParseTrackBoundsAndCreateQuad (generatedPointList);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
-        
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
-        
+
+        for(int i =0; i<50; i++)
+        {
+            SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[Random.Range(0,5)]);
+        }
     }
     
     void SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius, GameObject obj)
@@ -482,8 +443,8 @@ public class TrackManager : MonoBehaviour {
             float xTestLoc = Random.Range(LowerBounds.x,UpperBounds.x);
             float zTestLoc = Random.Range(LowerBounds.z,UpperBounds.z);
             
-            Vector3 rayStart = new Vector3(xTestLoc,LowerBounds.y-sphereRadius,zTestLoc);   //want to start below the ground for accuracy, spherecast ignores objects it starts in
-            Ray ray = new Ray (rayStart , Vector3.up);
+            Vector3 rayStart = new Vector3(xTestLoc,UpperBounds.y,zTestLoc);   //want to start below the ground for accuracy, spherecast ignores objects it starts in
+            Ray ray = new Ray (rayStart , Vector3.down);
             
             RaycastHit rch;
             
@@ -492,13 +453,13 @@ public class TrackManager : MonoBehaviour {
                 ) 
             {
                 Debug.DrawRay (rayStart, Vector3.up, Color.cyan, 5);
-                GameObject g = GameObject.Instantiate (obj, rayStart, obj.transform.rotation) as GameObject;
+                GameObject g = Instantiate (obj, new Vector3(rayStart.x,LowerBounds.y,rayStart.z), obj.transform.rotation) as GameObject;
                 
-                g.transform.localScale = new Vector3(
-                    
-                    g.transform.localScale.x*Random.Range(1,1.5f),
-                    g.transform.localScale.y*Random.Range(1,1.5f),
-                    g.transform.localScale.z*Random.Range(1,1.5f));
+//                g.transform.localScale = new Vector3(
+//                    
+//                    g.transform.localScale.x*Random.Range(1,1.5f),
+//                    g.transform.localScale.y*Random.Range(1,1.5f),
+//                    g.transform.localScale.z*Random.Range(1,1.5f));
                 return;
             } 
         }
