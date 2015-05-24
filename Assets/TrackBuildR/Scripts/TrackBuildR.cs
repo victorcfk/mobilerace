@@ -195,7 +195,7 @@ public class TrackBuildR : MonoBehaviour
         track.SolveTangents();
     }
 
-    public void OptimseMeshes()
+    public void OptimizeMeshes()
     {
         track.OptimizeMeshes();
     }
