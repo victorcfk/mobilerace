@@ -416,56 +416,56 @@ public class TrackManager : MonoBehaviour {
     {
         ParseTrackBoundsAndCreateQuad (generatedPointList);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[0]);
         
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
         
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
-        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
+        SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[1]);
         
     }
     
