@@ -5,10 +5,8 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	public GameObject objToAccelerate;
 
-	[HideInInspector, System.NonSerialized]
-	public bool Accelerate;
-
-	public float accVal = 75;
+	public float initAccVal = 75;
+    float accVal;
 
     public KeyCode LeftTurnCode;
 	public KeyCode RightTurnCode;
@@ -26,13 +24,32 @@ public class DrivingScriptStraight : DrivingScriptBasic {
     public Transform frontRight;
     public LayerMask trackMask;
 
+    public ParticleSystem CollisionPsys;
+
+    float DisableAccTimer;
+
     bool isBraking;
+    
+    Vector3 tempo = Vector3.forward;
 
-	Vector3 tempo = Vector3.forward;
-
+    protected override void Awake()
+    {
+        base.Awake();
+        accVal = initAccVal;
+    }
 	// Update is called once per frame
 	void Update () 
 	{
+        if(DisableAccTimer > 0)
+        {
+            accVal = -initAccVal;
+            DisableAccTimer -= Time.deltaTime;
+        }
+        else
+        {
+            accVal = initAccVal;
+        }
+
 		ControlUpdates();
 	}
 
@@ -44,10 +61,10 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         RaycastHit rf;
 
         if(
-            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,100,trackMask) &&
-            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,100,trackMask) &&
-            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,100,trackMask) &&
-            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,100,trackMask)
+            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,30,trackMask) &&
+            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,30,trackMask) &&
+            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,30,trackMask) &&
+            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,30,trackMask)
             )
         {
             Vector3 upDir       = (lr.normal + rr.normal + lf.normal +rf.normal)/4;
@@ -57,43 +74,43 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             Vector3 avgFwd      = (leftFwd + rightFwd)/2;
 
             rigidBody.MovePosition(
-                (lf.point + lr.point + rf.point +rr.point)/4 +Vector3.up
+                Vector3.MoveTowards(transform.position,(lf.point + lr.point + rf.point +rr.point)/4 + Vector3.up*4,Time.deltaTime*60)
                 );
 
             rigidBody.MoveRotation(
-                    Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(avgFwd,upDir),Time.deltaTime*50)
+                    Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(avgFwd,upDir),Time.deltaTime*60)
                 );
-
-           
 
             Debug.DrawRay(rr.point, Vector3.up);
             Debug.DrawRay(lr.point, Vector3.up);
             Debug.DrawRay(lf.point, Vector3.up);
             Debug.DrawRay(rf.point, Vector3.up);
             Debug.DrawRay(transform.position,upDir,Color.magenta,1);
+
+            rigidBody.useGravity= false;
         }
+        else
+            rigidBody.useGravity= true;
     }
 
 	void FixedUpdate()
 	{
-       
-
         rigidBody.angularVelocity = LeftRightAcc * turnSensitivity * turnAngularVelocity * transform.up * Time.deltaTime;
 
-		if(isBraking)
+//		if(isBraking)
+//		{
+//			//If the velocity is in any way orthognal to the vehicle's forward. So we are moving
+//			if(Vector3.Dot
+//			   (rigidBody.velocity,
+//			 transform.forward) > 0)
+//			{
+//                rigidBody.AddForceAtPosition(-transform.forward*accVal,transform.position);
+//			}
+//
+//		}
+//		else
 		{
-			//If the velocity is in any way orthognal to the vehicle's forward. So we are moving
-			if(Vector3.Dot
-			   (rigidBody.velocity,
-			 transform.forward) > 0)
-			{
-				rigidBody.AddForceAtPosition(-transform.forward* accVal,transform.position);
-			}
-
-		}
-		else
-		{
-			rigidBody.AddForceAtPosition(transform.forward* accVal,transform.position);
+            rigidBody.AddForceAtPosition(transform.forward*accVal,transform.position);
 		}
 
 		rigidBody.velocity = Vector3.SmoothDamp(rigidBody.velocity,
@@ -103,6 +120,13 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
         MaintainVehOrientation();
 	}
+
+    void OnCollisionEnter()
+    {
+        CollisionPsys.Play();
+
+        DisableAccTimer = Mathf.Clamp(DisableAccTimer+0.5f,0,0.5f);
+    }
 
 	void ControlUpdates()
 	{
