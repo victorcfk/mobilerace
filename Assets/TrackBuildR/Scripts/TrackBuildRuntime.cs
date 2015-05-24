@@ -164,9 +164,9 @@ public class TrackBuildRuntime : MonoBehaviour
 		track.SolveTangents();
 	}
 	
-	public void OptimseMeshes()
+	public void OptimizeMeshes()
 	{
-		track.OptimseMeshes();
+		track.OptimizeMeshes();
 	}
 	
 	void OnDestroy()

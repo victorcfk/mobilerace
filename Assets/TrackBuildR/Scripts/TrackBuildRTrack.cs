@@ -1004,7 +1004,7 @@ public class TrackBuildRTrack : MonoBehaviour
 #endif
     }
 
-    public void OptimseMeshes()
+    public void OptimizeMeshes()
     {
 #if UNITY_EDITOR
         for (int i = 0; i < numberOfCurves; i++)

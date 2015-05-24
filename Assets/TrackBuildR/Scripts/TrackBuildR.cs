@@ -162,6 +162,7 @@ public class TrackBuildR : MonoBehaviour
         track.diagramMaterial = new Material(Shader.Find("Unlit/Texture"));
         track.diagramGO.AddComponent<MeshRenderer>().material = track.diagramMaterial;
         track.diagramGO.AddComponent<MeshCollider>().sharedMesh = track.diagramMesh;
+
     }
 
     public void UpdateRender()
@@ -196,7 +197,7 @@ public class TrackBuildR : MonoBehaviour
 
     public void OptimseMeshes()
     {
-        track.OptimseMeshes();
+        track.OptimizeMeshes();
     }
 
     void OnDestroy()
