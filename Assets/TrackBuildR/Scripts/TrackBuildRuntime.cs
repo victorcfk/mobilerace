@@ -114,7 +114,7 @@ public class TrackBuildRuntime : MonoBehaviour
 		track.InitTextures();
 		track.baseTransform = transform;
 		
-		GameManager.instance.GetTrackPoints(track);
+        TrackManager.instance.InitializeTrackPoints(track);
 
 		generator = gameObject.AddComponent<TrackBuildRGenerator>();
 		
@@ -213,7 +213,7 @@ public class TrackBuildRuntime : MonoBehaviour
 		
 		Init();
 
-		GameManager.instance.PostTrackBuild();
+        TrackManager.instance.PostTrackBuild();
 	}
 	
 	private void UpgradeData()
