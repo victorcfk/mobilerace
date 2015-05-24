@@ -192,8 +192,10 @@ public class TrackManager : MonoBehaviour {
             track.AddPoint (bp);
         }
         
-        track.meshResolution = 10;
-        track.loop = false;
+        track.meshResolution = 12;
+        track.loop = false; 
+        track.includeColliderRoof =false;
+        track.trackBumpers = false;
 
         this.track = track;
         
