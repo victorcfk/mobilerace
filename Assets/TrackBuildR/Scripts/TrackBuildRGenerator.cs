@@ -738,6 +738,8 @@ public class TrackBuildRGenerator : MonoBehaviour
                             PhysicMaterial physMat = track.Texture(curve.boundaryTextureStyleIndex).physicMaterial;
                             if (physMat != null)
                                 meshCollider.sharedMaterial = physMat;
+
+                            meshCollider.gameObject.layer = 2;
                         }
                     }
                     if (!dynamicColliderMesh3.isEmpty)
