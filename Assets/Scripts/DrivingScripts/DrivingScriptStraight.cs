@@ -15,21 +15,26 @@ public class DrivingScriptStraight : DrivingScriptBasic {
     public float turnSensitivity = 1;
 
 	public float rotationCorrectionVal = 3;
-
-    public float LeftRightAcc { get; private set;}
-	
+    	
     public Transform backLeft;
     public Transform backRight;
     public Transform frontLeft;
     public Transform frontRight;
     public LayerMask trackMask;
 
+    //controls
+    //============================
+
+    public float LeftRightAcc { get; private set;}
+    public float LeftPower;
+    public float RightPower;
+
+    //============================
+
     public ParticleSystem CollisionPsys;
 
     float DisableAccTimer;
-
     bool isBraking;
-    
     Vector3 tempo = Vector3.forward;
 
     protected override void Awake()
@@ -50,7 +55,8 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             accVal = initAccVal;
         }
 
-		ControlUpdates();
+		//TiltControlUpdates();
+        LeftRightSlideControlUpdates();
 	}
 
     void MaintainVehOrientation () {
@@ -128,7 +134,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         DisableAccTimer = Mathf.Clamp(DisableAccTimer+0.5f,0,0.5f);
     }
 
-	void ControlUpdates()
+	void TiltControlUpdates()
 	{
 		LeftRightAcc = Input.acceleration.x;
 
@@ -142,4 +148,14 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 			isBraking = Input.anyKey;
 		}
 	}
+
+    void LeftRightSlideControlUpdates()
+    {
+        LeftRightAcc = Mathf.Clamp( LeftPower- RightPower,-1,1);
+    }
+
+    void LeftRightTapControlUpdates()
+    {
+        LeftRightAcc = Mathf.Clamp(RightPower - LeftPower,-1,1);
+    }
 }

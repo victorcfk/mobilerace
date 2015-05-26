@@ -1,18 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TouchActionDecelerate : TouchAction {
-
-    public ApplyPhysics apply;
+public class TouchActionDecelerate : TouchAction 
+{
+    public DrivingScriptStraight drs;
+    public bool isRightSlide;
     
-    float accAmt;
-    
-    public override void onAction(float thing= 0)
+    public override void onAction(float screenY= 0)
     {
-//		return;
-
-        //apply.Accelerate = false;
-        apply.normalizedVal = 0;
-		apply.usingKey = false;
+        if(isRightSlide)
+            drs.RightPower = 0;
+        else
+            drs.LeftPower = 0;
     }
 }

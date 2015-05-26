@@ -3,19 +3,21 @@ using System.Collections;
 
 public class TouchActionAccelerate : TouchAction 
 {
-    public ApplyPhysics apply;
-    
-    float accAmt;
+//    public ApplyPhysics apply;
 
-    public override void onAction(float thing= 0)
+    public DrivingScriptStraight drs;
+    public bool isRightSlide;
+
+    public override void onAction(float screenY= 0)
     {
-//		return;
+//		screenY *= 1.40f;
+//		screenY -= 0.20f;
 
-		thing *= 1.40f;
-		thing -= 0.20f;
+        if(isRightSlide)
+            drs.RightPower = Mathf.Clamp(screenY,0f,1f);
+        else
+            drs.LeftPower = Mathf.Clamp(screenY,0f,1f);
 
-		apply.normalizedVal = Mathf.Clamp(thing,0f,1f);
-		apply.usingKey = false;
     }
 
 }
