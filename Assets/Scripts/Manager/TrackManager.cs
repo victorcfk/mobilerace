@@ -46,6 +46,7 @@ public class TrackManager : MonoBehaviour {
     Vector3 UpperBounds;
     Vector3 LowerBounds;
 
+
     public void InitializeTrackPoints (TrackBuildRTrack track)
     {
         //===================================================
@@ -56,23 +57,31 @@ public class TrackManager : MonoBehaviour {
         Vector3 lastPointAtInterval = Vector3.zero;
         
         int straightleftright = 2;
-        
-        for (int j =0; j <numOfInterval; j++) {
-            
-            straightleftright = Random.Range (0, 10);
+        int straightTrackUpperLimit = 4;
+
+        for (int j =0; j <numOfInterval; j++) 
+        {
+            straightleftright = Random.Range (0, straightTrackUpperLimit);
+
             if(j==0)
                 straightleftright =2;
             
-            if (straightleftright == 0) {
-                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
+            if (straightleftright == 0) 
+            {
+                straightTrackUpperLimit = 5;
+                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 4, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
             }
             
-            if (straightleftright == 1) {
-                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 5, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
+            if (straightleftright == 1) 
+            {
+                straightTrackUpperLimit = 5;
+                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 4, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
             }
             
-            if (straightleftright >= 2) {
-                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval / 2, Random.Range (20, 30)));
+            if (straightleftright >= 2) 
+            {
+                straightTrackUpperLimit = Mathf.Clamp(--straightTrackUpperLimit,2,5);
+                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval / 4, Random.Range (200, 300)));
             }
             
             lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
@@ -426,7 +435,7 @@ public class TrackManager : MonoBehaviour {
 
         for(int i =0; i<30; i++)
         {
-            SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,200,Buildings[Random.Range(0,5)]);
+            SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,50,Buildings[Random.Range(0,5)]);
         }
     }
     
@@ -438,21 +447,22 @@ public class TrackManager : MonoBehaviour {
         Vector3 btmCent = (UpperBounds + LowerBounds) / 2;
         btmCent.y = LowerBounds.y;
         
-        while (true) 
+//        while (true) 
         {
             float xTestLoc = Random.Range(LowerBounds.x,UpperBounds.x);
             float zTestLoc = Random.Range(LowerBounds.z,UpperBounds.z);
             
-            Vector3 rayStart = new Vector3(xTestLoc,UpperBounds.y,zTestLoc);   //want to start below the ground for accuracy, spherecast ignores objects it starts in
-            Ray ray = new Ray (rayStart , Vector3.down);
+            Vector3 rayStart = new Vector3(xTestLoc,UpperBounds.y + sphereRadius*2,zTestLoc);   //want to start below the ground for accuracy, spherecast ignores objects it starts in
+            Ray ray = new Ray (rayStart, Vector3.down);   //We start the spherecast someway above the upperbounds, and cast downwards
             
             RaycastHit rch;
             
             if (
-                !Physics.SphereCast (ray,sphereRadius,out rch,(UpperBounds.y - LowerBounds.y) + sphereRadius)
+                !Physics.SphereCast (ray,sphereRadius,out rch,(UpperBounds.y - LowerBounds.y) + sphereRadius*2)
                 ) 
             {
-                Debug.DrawRay (rayStart, Vector3.up, Color.cyan, 5);
+                //Debug.Log("have place to put");
+                Debug.DrawRay (rayStart, Vector3.down*100, Color.cyan, 5);
                 GameObject g = Instantiate (obj, new Vector3(rayStart.x,LowerBounds.y,rayStart.z), obj.transform.rotation) as GameObject;
                 
 //                g.transform.localScale = new Vector3(
