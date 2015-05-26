@@ -55,8 +55,14 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             accVal = initAccVal;
         }
 
-		//TiltControlUpdates();
-        LeftRightSlideControlUpdates();
+        if(GameManager.instance.controlScheme == ControlSchemes.TILT)
+        {
+		    TiltControlUpdates();
+        }
+        else
+        {
+            LeftRightSlideControlUpdates();
+        }
 	}
 
     void MaintainVehOrientation () {

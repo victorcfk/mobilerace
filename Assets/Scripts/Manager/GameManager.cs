@@ -3,6 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum ControlSchemes
+{
+    TILT,
+    SLIDER,
+    BUTTON
+}
+
 public class GameManager : MonoBehaviour
 {
 
@@ -31,6 +38,8 @@ public class GameManager : MonoBehaviour
     public Button restartButton;
     public InputField seedInputField;
     public Slider tiltSensitivitySlider;
+
+    public ControlSchemes controlScheme;
 
 	[Range (1,100)]
 	public float
@@ -113,6 +122,16 @@ public class GameManager : MonoBehaviour
     {
 //        Debug.Log(value);
         (TheVehicle as DrivingScriptStraight).turnSensitivity = value;
+    }
+
+    public void controlSchemeChanged(float value)
+    {
+        Debug.Log(value);
+
+        if(value == 1)
+            controlScheme = (ControlSchemes.TILT);
+        else
+            controlScheme = (ControlSchemes.SLIDER);
     }
 
     public void seedInputChanged(string value)

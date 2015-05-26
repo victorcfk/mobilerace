@@ -31,8 +31,8 @@ public class TrackManager : MonoBehaviour {
     Material
         groundMat;
 
-    public int numOfInterval = 26;
-    public int trackInterval = 20; //must be even
+    public int numOfInterval = 20;
+    public int trackInterval = 24; //must be even
     public float crownAngle = -5;
     public TrackBuildRTrack track;
 
@@ -96,7 +96,7 @@ public class TrackManager : MonoBehaviour {
         
         Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
         
-        DropPointsOnArray (generatedPointList, 0.5f, 0.8f);
+        DropPointsOnArray (generatedPointList, 0.5f, 0.5f);
         
         for (int i =0; i <generatedPointList.Count; i++) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
@@ -131,13 +131,13 @@ public class TrackManager : MonoBehaviour {
                 
                 if (StraightLeftRight [i] < 0.5f) { //left turn
                     bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-                    bp.position += new Vector3 (0, StraightLeftRight [i] * 40f, 0);
+                    bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
                     bp.width += StraightLeftRight [i] * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                 } else {
                     bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-                    bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 40f, 0);
+                    bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
                     bp.width += (1 - StraightLeftRight [i]) * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
@@ -158,16 +158,16 @@ public class TrackManager : MonoBehaviour {
                 
                 if (StraightLeftRight [i] > -0.5f) {
                     bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-                    bp.position += new Vector3 (0, -StraightLeftRight [i] * 30f, 0);
-                    bp.width += (-StraightLeftRight [i]) * 100;
+                    bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
+                    bp.width += (-StraightLeftRight [i]) * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                     
                 } else {
                     
                     bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
-                    bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 30f, 0);
-                    bp.width += (1 - (-StraightLeftRight [i])) * 100;
+                    bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
+                    bp.width += (1 - (-StraightLeftRight [i])) * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                 }
