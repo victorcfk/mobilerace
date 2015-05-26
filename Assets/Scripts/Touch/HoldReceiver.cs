@@ -24,12 +24,6 @@ public class HoldReceiver : MonoBehaviour {
         OnEnable();
     }
 
-
-    void Update()
-    {
-        Debug.Log(listOfTouchActionsPressed.Length);
-    }
-
     private void OnEnable()
     {
         if(hasBeenEnabled) return;
