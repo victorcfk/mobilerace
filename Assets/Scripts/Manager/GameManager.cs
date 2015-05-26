@@ -105,7 +105,7 @@ public class GameManager : MonoBehaviour
     public void restartButtonPressed()
     {
         Time.timeScale = 1;
-        Application.LoadLevel(0);
+        Application.LoadLevel(Application.loadedLevel);
         Time.timeScale = 1;
     }
 

@@ -12,8 +12,29 @@ public class HoldReceiver : MonoBehaviour {
     public TouchAction[] listOfTouchActionsPanContinue;
     public TouchAction[] listOfTouchActionsPanEnd;
 
+    bool hasBeenEnabled =false;
+
+    private void Awake()
+    {
+        OnEnable();
+    }
+
+    private void Start()
+    {
+        OnEnable();
+    }
+
+
+    void Update()
+    {
+        Debug.Log(listOfTouchActionsPressed.Length);
+    }
+
     private void OnEnable()
     {
+        if(hasBeenEnabled) return;
+        hasBeenEnabled = true;
+
         foreach (var tap in GetComponents<PressGesture>())
             tap.Pressed += pressedHandler;
 
@@ -39,6 +60,9 @@ public class HoldReceiver : MonoBehaviour {
     
     private void OnDisable()
     {
+        if(!hasBeenEnabled) return;
+        hasBeenEnabled = false;
+
         foreach (var tap in GetComponents<PressGesture>())
             tap.Pressed -= pressedHandler;
         
@@ -60,6 +84,11 @@ public class HoldReceiver : MonoBehaviour {
         {
             tap.PanCompleted -= panCompletedHandler;
         }
+    }
+
+    void onDestroy()
+    {
+        OnDisable();
     }
 
     private void pressedHandler(object sender, EventArgs eventArgs)
