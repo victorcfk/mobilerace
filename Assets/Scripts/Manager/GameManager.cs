@@ -68,8 +68,20 @@ public class GameManager : MonoBehaviour
         CamFollowObjectOrigPosition = CamFollowObject.transform.localPosition;  //register the original location of the camObj
 
         menu.SetActive(false);
-        seedInputField.text = Random.seed.ToString();
+
+        //=========================================================
+        if(PlayerPrefs.GetInt("ControlScheme",1) == 1)
+            controlScheme = (ControlSchemes.TILT);
+        else
+            controlScheme = (ControlSchemes.SLIDER);
+
+        seedInputField.text = PlayerPrefs.GetInt("Seed",1).ToString();
+
+        (TheVehicle as DrivingScriptStraight).turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
+
         tiltSensitivitySlider.normalizedValue = (TheVehicle as DrivingScriptStraight).turnSensitivity;
+        //=========================================================
+        //seedInputField.text = Random.seed.ToString();
 	}
 
     void LateUpdate ()
@@ -122,6 +134,8 @@ public class GameManager : MonoBehaviour
     {
 //        Debug.Log(value);
         (TheVehicle as DrivingScriptStraight).turnSensitivity = value;
+
+        PlayerPrefs.SetFloat("Sensitivity",value);
     }
 
     public void controlSchemeChanged(float value)
@@ -129,15 +143,23 @@ public class GameManager : MonoBehaviour
         Debug.Log(value);
 
         if(value == 1)
+        {
             controlScheme = (ControlSchemes.TILT);
+            PlayerPrefs.SetInt("ControlScheme",1);
+        }
         else
+        {
             controlScheme = (ControlSchemes.SLIDER);
+            PlayerPrefs.SetInt("ControlScheme",2);
+        }
     }
 
     public void seedInputChanged(string value)
     {
 //        Debug.Log(value);
         Random.seed = int.Parse(value);
+
+        PlayerPrefs.SetInt("Seed",Random.seed);
     }
 
 }
