@@ -69,23 +69,24 @@ public class TrackManager : MonoBehaviour {
             if (straightleftright == 0) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 3, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
+                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval, Random.Range (200, 200), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright == 1) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 3, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
+                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval , Random.Range (200, 200), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright >= 2) 
             {
                 straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
-                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval / 5, Random.Range (200, 200)));
+                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/5, Random.Range (40, 40)));
             }
             
             lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
-            dirAtEnd = (lastPointAtInterval - generatedPointList [generatedPointList.Count - 2]).normalized;
+            dirAtEnd = (generatedPointList [generatedPointList.Count - 1] - 
+                        generatedPointList [generatedPointList.Count - 2]).normalized;
             
             Debug.DrawRay (lastPointAtInterval, dirAtEnd * 50, Color.white, 5);
             Debug.DrawRay (lastPointAtInterval, Vector3.up * 50, Color.red, 5);
@@ -96,7 +97,7 @@ public class TrackManager : MonoBehaviour {
         
         Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
         
-        DropPointsOnArray (generatedPointList, 0.5f, 0.5f);
+        DropPointsOnArray (generatedPointList, 0.75f, 0.75f);
         
         for (int i =0; i <generatedPointList.Count; i++) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
@@ -132,13 +133,13 @@ public class TrackManager : MonoBehaviour {
                 if (StraightLeftRight [i] < 0.5f) { //left turn
                     bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
                     bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
-                    bp.width += StraightLeftRight [i] * 45;
+//                    bp.width += StraightLeftRight [i] * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                 } else {
                     bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
                     bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
-                    bp.width += (1 - StraightLeftRight [i]) * 45;
+//                    bp.width += (1 - StraightLeftRight [i]) * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                 }
@@ -180,7 +181,7 @@ public class TrackManager : MonoBehaviour {
             if (i > 10 && (i < generatedPointList.Count - 10))
                 bp.crownAngle = crownAngle;
             
-            i += 3; //skip over points
+            i += 4; //skip over points
             
             track.AddPoint (bp);
         }
