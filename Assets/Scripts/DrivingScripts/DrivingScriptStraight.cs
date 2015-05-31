@@ -73,10 +73,10 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         RaycastHit rf;
 
         if(
-            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,30,trackMask) &&
-            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,30,trackMask) &&
-            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,30,trackMask) &&
-            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,30,trackMask)
+            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,50,trackMask) &&
+            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,50,trackMask) &&
+            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,50,trackMask) &&
+            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,50,trackMask)
             )
         {
             Vector3 upDir       = (lr.normal + rr.normal + lf.normal +rf.normal)/4;

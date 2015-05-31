@@ -33,7 +33,7 @@ public class TrackManager : MonoBehaviour {
 
     public int numOfInterval = 20;
     public int trackInterval = 24; //must be even
-    public float crownAngle = -5;
+    public float crownAngle = -4;
     public TrackBuildRTrack track;
 
     [Space (10)]
@@ -69,19 +69,19 @@ public class TrackManager : MonoBehaviour {
             if (straightleftright == 0) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval, Random.Range (200, 200), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval, Random.Range (240, 240), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright == 1) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval , Random.Range (200, 200), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval , Random.Range (240, 240), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright >= 2) 
             {
                 straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
-                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/5, Random.Range (40, 40)));
+                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/6, Random.Range (60, 60)));
             }
             
             lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
@@ -97,7 +97,7 @@ public class TrackManager : MonoBehaviour {
         
         Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
         
-        DropPointsOnArray (generatedPointList, 0.75f, 0.75f);
+        DropPointsOnArray (generatedPointList, 0.5f, 0.5f);
         
         for (int i =0; i <generatedPointList.Count; i++) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
@@ -160,7 +160,7 @@ public class TrackManager : MonoBehaviour {
                 if (StraightLeftRight [i] > -0.5f) {
                     bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
                     bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
-                    bp.width += (-StraightLeftRight [i]) * 45;
+//                    bp.width += (-StraightLeftRight [i]) * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                     
@@ -168,7 +168,7 @@ public class TrackManager : MonoBehaviour {
                     
                     bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
                     bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
-                    bp.width += (1 - (-StraightLeftRight [i])) * 45;
+//                    bp.width += (1 - (-StraightLeftRight [i])) * 45;
                     
                     Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
                 }
