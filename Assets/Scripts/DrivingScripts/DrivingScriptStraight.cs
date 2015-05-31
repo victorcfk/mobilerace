@@ -55,13 +55,19 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             accVal = initAccVal;
         }
 
-        if(GameManager.instance.controlScheme == ControlSchemes.TILT)
+
+        switch(GameManager.instance.controlScheme)
         {
-		    TiltControlUpdates();
-        }
-        else
-        {
-            LeftRightSlideControlUpdates();
+            case ControlSchemes.TILT:
+                TiltControlUpdates();
+                break;
+            case ControlSchemes.SLIDER:
+                LeftRightSlideControlUpdates();
+                break;
+            case ControlSchemes.BUTTON:
+                LeftRightTapControlUpdates();
+                break;
+
         }
 	}
 
@@ -162,6 +168,14 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
     void LeftRightTapControlUpdates()
     {
-        LeftRightAcc = Mathf.Clamp(RightPower - LeftPower,-1,1);
+        if(RightPower == LeftPower)
+            LeftRightAcc = 0;
+
+        if(RightPower > 0 && LeftPower == 0)
+            LeftRightAcc = 1;
+
+        if(RightPower == 0 && LeftPower > 0)
+            LeftRightAcc = -1;
+        
     }
 }

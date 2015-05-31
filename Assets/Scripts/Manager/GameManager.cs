@@ -33,11 +33,18 @@ public class GameManager : MonoBehaviour
 
     [Space (10)]
 
+    //==============================================
+
+    public GameObject[] TouchObjs;
+
     public GameObject menu;
     public GameObject eventSystem;
     public Button restartButton;
     public InputField seedInputField;
     public Slider tiltSensitivitySlider;
+    public Slider controlSchemeSlider;
+
+    //==============================================
 
     public ControlSchemes controlScheme;
 
@@ -70,16 +77,27 @@ public class GameManager : MonoBehaviour
         menu.SetActive(false);
 
         //=========================================================
-        if(PlayerPrefs.GetInt("ControlScheme",1) == 1)
-            controlScheme = (ControlSchemes.TILT);
-        else
-            controlScheme = (ControlSchemes.SLIDER);
 
         seedInputField.text = PlayerPrefs.GetInt("Seed",1).ToString();
 
         (TheVehicle as DrivingScriptStraight).turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
 
         tiltSensitivitySlider.normalizedValue = (TheVehicle as DrivingScriptStraight).turnSensitivity;
+
+        switch(PlayerPrefs.GetInt("ControlScheme",1))
+        {
+            case 1:
+                controlScheme = (ControlSchemes.TILT);
+                break;
+            case 2:
+                controlScheme = (ControlSchemes.SLIDER);
+                break;
+            case 3:
+                controlScheme = (ControlSchemes.BUTTON);
+                break;
+        }
+
+        controlSchemeSlider.value = PlayerPrefs.GetInt("ControlScheme",1);
         //=========================================================
 	}
 
@@ -99,12 +117,22 @@ public class GameManager : MonoBehaviour
                 menu.SetActive(false);
                 eventSystem.SetActive(false);
                 Time.timeScale = 1;
+
+                foreach(GameObject g in TouchObjs)
+                {
+                    g.SetActive(true);
+                }
             }
             else
             {
                 menu.SetActive(true);
                 eventSystem.SetActive(true);
                 Time.timeScale = 0;
+
+                foreach(GameObject g in TouchObjs)
+                {
+                    g.SetActive(false);
+                }
             }
         }
     }
@@ -137,18 +165,21 @@ public class GameManager : MonoBehaviour
 
     public void controlSchemeChanged(float value)
     {
-        Debug.Log(value);
+        switch((int)value)
+        {
+            case 1:
+                controlScheme = (ControlSchemes.TILT);
+                break;
+            case 2:
+                controlScheme = (ControlSchemes.SLIDER);
+                break;
+            case 3:
+                controlScheme = (ControlSchemes.BUTTON);
+                break;
+        }
 
-        if(value == 1)
-        {
-            controlScheme = (ControlSchemes.TILT);
-            PlayerPrefs.SetInt("ControlScheme",1);
-        }
-        else
-        {
-            controlScheme = (ControlSchemes.SLIDER);
-            PlayerPrefs.SetInt("ControlScheme",2);
-        }
+        PlayerPrefs.SetInt("ControlScheme",(int)value);
+
     }
 
     public void seedInputChanged(string value)
