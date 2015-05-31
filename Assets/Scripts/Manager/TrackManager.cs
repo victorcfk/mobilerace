@@ -68,20 +68,20 @@ public class TrackManager : MonoBehaviour {
             
             if (straightleftright == 0) 
             {
-                straightTrackUpperLimit = 5;
-                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 4, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
+                straightTrackUpperLimit = 4;
+                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval * 3, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
             }
             
             if (straightleftright == 1) 
             {
-                straightTrackUpperLimit = 5;
-                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 4, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
+                straightTrackUpperLimit = 4;
+                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval * 3, Random.Range (200, 400), Random.Range (0.5f, 0.75f)));
             }
             
             if (straightleftright >= 2) 
             {
-                straightTrackUpperLimit = Mathf.Clamp(--straightTrackUpperLimit,2,5);
-                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval / 4, Random.Range (200, 300)));
+                straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
+                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval / 5, Random.Range (200, 200)));
             }
             
             lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
@@ -176,8 +176,6 @@ public class TrackManager : MonoBehaviour {
             }
             bp.generateBumpers = false;
             bp.extrudeTrackBottom = false;
-
-
 
             if (i > 10 && (i < generatedPointList.Count - 10))
                 bp.crownAngle = crownAngle;
