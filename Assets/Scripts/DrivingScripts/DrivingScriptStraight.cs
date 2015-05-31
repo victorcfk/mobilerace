@@ -47,7 +47,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	{
         if(DisableAccTimer > 0)
         {
-            accVal = -initAccVal;
+            accVal = 0;
             DisableAccTimer -= Time.deltaTime;
         }
         else
