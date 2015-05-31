@@ -81,7 +81,6 @@ public class GameManager : MonoBehaviour
 
         tiltSensitivitySlider.normalizedValue = (TheVehicle as DrivingScriptStraight).turnSensitivity;
         //=========================================================
-        //seedInputField.text = Random.seed.ToString();
 	}
 
     void LateUpdate ()
@@ -95,7 +94,6 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.Space)) 
         {
-            //Application.LoadLevel (0);
             if(menu.activeInHierarchy)
             {
                 menu.SetActive(false);
@@ -132,7 +130,6 @@ public class GameManager : MonoBehaviour
 
     public void sliderChanged(float value)
     {
-//        Debug.Log(value);
         (TheVehicle as DrivingScriptStraight).turnSensitivity = value;
 
         PlayerPrefs.SetFloat("Sensitivity",value);
@@ -156,7 +153,6 @@ public class GameManager : MonoBehaviour
 
     public void seedInputChanged(string value)
     {
-//        Debug.Log(value);
         Random.seed = int.Parse(value);
 
         PlayerPrefs.SetInt("Seed",Random.seed);
