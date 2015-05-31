@@ -146,6 +146,13 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         DisableAccTimer = Mathf.Clamp(DisableAccTimer+0.5f,0,0.5f);
     }
 
+    void OnCollisionStay()
+    {
+        CollisionPsys.Play();
+        
+        DisableAccTimer = Mathf.Clamp(DisableAccTimer+0.5f,0,0.5f);
+    }
+
 	void TiltControlUpdates()
 	{
 		LeftRightAcc = Input.acceleration.x;
