@@ -109,7 +109,7 @@ public class TrackManager : MonoBehaviour {
             bp.colliderSides = true;
 
             bp.renderBounds = false;
-            bp.width = 75;
+            bp.width = 100;
             
             if (i < generatedPointList.Count - 1) {
                 bp.forwardControlPoint = generatedPointList [i + 1];
