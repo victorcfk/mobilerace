@@ -434,7 +434,7 @@ public class TrackManager : MonoBehaviour {
 
         for(int i =0; i<30; i++)
         {
-            SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,50,Buildings[Random.Range(0,5)]);
+            SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[Random.Range(0,5)]);
         }
     }
     
@@ -462,7 +462,8 @@ public class TrackManager : MonoBehaviour {
             {
                 //Debug.Log("have place to put");
                 Debug.DrawRay (rayStart, Vector3.down*100, Color.cyan, 5);
-                GameObject g = Instantiate (obj, new Vector3(rayStart.x,LowerBounds.y,rayStart.z), obj.transform.rotation) as GameObject;
+               
+                Instantiate (obj, new Vector3(rayStart.x,LowerBounds.y,rayStart.z), obj.transform.rotation);
                 
 //                g.transform.localScale = new Vector3(
 //                    
