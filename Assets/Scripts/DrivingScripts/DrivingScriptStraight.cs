@@ -71,6 +71,11 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         }
 	}
 
+    float MaxDownwardCastDist = 50;
+    float DistFromGround = 4;
+    float RotationCorrectionRate = 60;
+    float PositionCorrectionRate = 80;
+
     void MaintainVehOrientation () {
 
         RaycastHit lr;
@@ -79,10 +84,10 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         RaycastHit rf;
 
         if(
-            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,50,trackMask) &&
-            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,50,trackMask) &&
-            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,50,trackMask) &&
-            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,50,trackMask)
+            Physics.Raycast(backLeft.position + Vector3.up, Vector3.down, out lr,MaxDownwardCastDist,trackMask) &&
+            Physics.Raycast(backRight.position + Vector3.up, Vector3.down, out rr,MaxDownwardCastDist,trackMask) &&
+            Physics.Raycast(frontLeft.position + Vector3.up, Vector3.down, out lf,MaxDownwardCastDist,trackMask) &&
+            Physics.Raycast(frontRight.position + Vector3.up, Vector3.down, out rf,MaxDownwardCastDist,trackMask)
             )
         {
             Vector3 upDir       = (lr.normal + rr.normal + lf.normal +rf.normal)/4;
@@ -92,11 +97,15 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             Vector3 avgFwd      = (leftFwd + rightFwd)/2;
 
             rigidBody.MovePosition(
-                Vector3.MoveTowards(transform.position,(lf.point + lr.point + rf.point +rr.point)/4 + Vector3.up*4,Time.deltaTime*60)
+                Vector3.MoveTowards(transform.position,
+                                (lf.point + lr.point + rf.point +rr.point)/4 + Vector3.up*DistFromGround,
+                                Time.deltaTime*PositionCorrectionRate)
                 );
 
             rigidBody.MoveRotation(
-                    Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(avgFwd,upDir),Time.deltaTime*60)
+                Quaternion.RotateTowards(transform.rotation,
+                                     Quaternion.LookRotation(avgFwd,upDir),
+                                     Time.deltaTime*RotationCorrectionRate)
                 );
 
             Debug.DrawRay(rr.point, Vector3.up);
