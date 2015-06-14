@@ -1,6 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+enum TrackSegmentType
+{
+    STRAIGHT,
+    LEFT,
+    RIGHT
+}
+
+struct TrackSegment
+{
+    public int pointCount
+    {
+        get
+        {
+            return trackPointsPos.Count;
+
+        }
+    }
+    public List<Vector3> trackPointsPos;
+    public List<Vector3> trackPointsRot;
+
+    public TrackSegmentType tst;
+}
+
 public class TrackManager : MonoBehaviour {
 
     static TrackManager _instance;
@@ -59,6 +82,7 @@ public class TrackManager : MonoBehaviour {
         int straightleftright = 2;
         int straightTrackUpperLimit = 4;
 
+        List<TrackSegment> trackSegs = new List<TrackSegment>();
         for (int j =0; j <numOfInterval; j++) 
         {
             straightleftright = Random.Range (0, straightTrackUpperLimit);
@@ -68,19 +92,48 @@ public class TrackManager : MonoBehaviour {
             if (straightleftright == 0) 
             {
                 straightTrackUpperLimit = 4;
+
+//                TrackSegment ts = new TrackSegment();
+//                ts.trackPointsPos.AddRange(
+//                    GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, true, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
+//                ts.tst = TrackSegmentType.RIGHT;
+//
+//                generatedPointList.AddRange(ts.trackPointsPos);
+//                trackSegs.Add(ts);
+
+                ///===========
                 generatedPointList.AddRange (GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, true, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright == 1) 
             {
                 straightTrackUpperLimit = 4;
+//                TrackSegment ts = new TrackSegment();
+//                ts.trackPointsPos.AddRange(
+//                    GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
+//                ts.tst = TrackSegmentType.LEFT;
+//
+//                generatedPointList.AddRange(ts.trackPointsPos);
+//                trackSegs.Add(ts);
+
+                ///===========
                 generatedPointList.AddRange (GenerateCurve(lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright >= 2) 
             {
                 straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
-                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/4, Random.Range (60, 60)));
+//                TrackSegment ts = new TrackSegment();
+//                ts.trackPointsPos.AddRange(
+//                    GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/4, Random.Range (60, 60)));
+//                ts.tst = TrackSegmentType.STRAIGHT;
+//
+//                generatedPointList.AddRange(ts.trackPointsPos);
+//                trackSegs.Add(ts);
+
+                ///===========
+                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/4, Random.Range (20, 20)));
+
             }
             
             lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
@@ -96,7 +149,7 @@ public class TrackManager : MonoBehaviour {
         
         Debug.Log (generatedPointList.Count + " " + StraightLeftRight.Count);
         
-        DropPointsOnArray (generatedPointList, 0.5f, 0.5f);
+        DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
         
         for (int i =0; i <generatedPointList.Count; i+=4) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
@@ -108,73 +161,77 @@ public class TrackManager : MonoBehaviour {
             bp.width = 100;
             //bp.generateBumpers= true;
 
+            //We get the forward control point based on the tiny i intervals for direction
+            //=======================================================
             if (i < generatedPointList.Count - 1) {
                 bp.forwardControlPoint = generatedPointList [i + 1];
             } else {
                 bp.forwardControlPoint = 2 * generatedPointList [i] - generatedPointList [i - 1];
             }
-            
-            if (StraightLeftRight [i] > 0) {
-                
-                //=============================================
-                float angle;
-                Vector3 axis;
-                bp.trackUpQ.ToAngleAxis (out angle, out axis);
-                
-                float multi = 1;
-                if (axis.y < 0) {
-                    multi = -1;
-                }
-                
-                if (StraightLeftRight [i] < 0.5f) { //left turn
-                    bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-                    bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
-//                    bp.width += StraightLeftRight [i] * 45;
-                    
-                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                } else {
-                    bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-                    bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
-//                    bp.width += (1 - StraightLeftRight [i]) * 45;
-                    
-                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                }
-                //=============================================
-            } else
-            if (StraightLeftRight [i] < 0) { //right turn
-                
-                //=============================================
-                float angle;
-                Vector3 axis;
-                bp.trackUpQ.ToAngleAxis (out angle, out axis);
-                
-                float multi = 1;
-                if (axis.y < 0) {
-                    multi = -1;
-                }
-                
-                if (StraightLeftRight [i] > -0.5f) {
-                    bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-                    bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
-//                    bp.width += (-StraightLeftRight [i]) * 45;
-                    
-                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                    
-                } else {
-                    
-                    bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
-                    bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
-//                    bp.width += (1 - (-StraightLeftRight [i])) * 45;
-                    
-                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                }
-                
-                //=============================================
-            }
+            //=======================================================
+
+//            if (StraightLeftRight [i] > 0) {
+//                
+//                //=============================================
+//                float angle;
+//                Vector3 axis;
+//                bp.trackUpQ.ToAngleAxis (out angle, out axis);
+//                
+//                float multi = 1;
+//                if (axis.y < 0) {
+//                    multi = -1;
+//                }
+//                
+//                if (StraightLeftRight [i] < 0.5f) { //left turn
+//                    bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
+//                    bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
+////                    bp.width += StraightLeftRight [i] * 45;
+//                    
+//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                } else {
+//                    bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
+//                    bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
+////                    bp.width += (1 - StraightLeftRight [i]) * 45;
+//                    
+//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                }
+//                //=============================================
+//            } else
+//            if (StraightLeftRight [i] < 0) { //right turn
+//                
+//                //=============================================
+//                float angle;
+//                Vector3 axis;
+//                bp.trackUpQ.ToAngleAxis (out angle, out axis);
+//                
+//                float multi = 1;
+//                if (axis.y < 0) {
+//                    multi = -1;
+//                }
+//                
+//                if (StraightLeftRight [i] > -0.5f) {
+//                    bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
+//                    bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
+////                    bp.width += (-StraightLeftRight [i]) * 45;
+//                    
+//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                    
+//                } else {
+//                    
+//                    bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
+//                    bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
+////                    bp.width += (1 - (-StraightLeftRight [i])) * 45;
+//                    
+//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                }
+//                
+//                //=============================================
+//            }
+
             bp.generateBumpers = false;
             bp.extrudeTrackBottom = false;
 
-            if (i > 10 && (i < generatedPointList.Count - 10))
+//            if (i > 10 && (i < generatedPointList.Count - 10))
                 bp.crownAngle = crownAngle;
 
             track.AddPoint (bp);
