@@ -74,7 +74,7 @@ public class TrackManager : MonoBehaviour {
             if (straightleftright == 1) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateCurve(lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright >= 2) 
@@ -255,8 +255,8 @@ public class TrackManager : MonoBehaviour {
         return vecArray;
         
     }
-    
-    Vector3[] GenerateRightCurve (Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
+
+    Vector3[] GenerateCurve (Vector3 startLoc, Vector3 startDir, int numOfPoints, bool isRight, float intervalBtwnPts, float portionOfCircle = 1)
     {
         Vector3[] vecArray = new Vector3[numOfPoints]; 
         
@@ -269,8 +269,15 @@ public class TrackManager : MonoBehaviour {
                                      new Vector3 (1, 1, 1));
         
         portionOfCircle = Mathf.Clamp (portionOfCircle, 0.1f, 1);
+
+        float sign;
+        if (isRight)
+            sign = 1;
+        else
+            sign = -1;
+
         for (int i=0; i <numOfPoints; i++) {
-            float x = -Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + 1;//requires the float so the parameter multiplication works
+            float x = (-sign) * Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + sign;//requires the float so the parameter multiplication works
             float y = startDir.y * i;
             float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
             
@@ -280,43 +287,12 @@ public class TrackManager : MonoBehaviour {
                         new Vector3 (x, y, z) * 
                         intervalBtwnPts);
             
-            StraightLeftRight.Add (-i / (float)numOfPoints);
-        }
-        
-        return vecArray;
-        
-    }
-    
-    Vector3[] GenerateLeftCurve (Vector3 startLoc, Vector3 startDir, int numOfPoints, float intervalBtwnPts, float portionOfCircle = 1)
-    {
-        Vector3[] vecArray = new Vector3[numOfPoints]; 
-        
-        float angle = Vector3.Angle (Vector3.forward, startDir);
-        Vector3.Cross (Vector3.forward, startDir);
-        
-        //Matrix by which to rotate piece by
-        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
-                                     new Vector3 (1, 1, 1));
-        
-        portionOfCircle = Mathf.Clamp (portionOfCircle, 0.1f, 1);
-        for (int i=0; i <numOfPoints; i++) {
-            float x = Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) - 1;//requires the float so the parameter multiplication works
-            float y = startDir.y * i;
-            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
-            
-            vecArray [i] =
-                startLoc + 
-                    g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) * 
-                        intervalBtwnPts);
-            
-            StraightLeftRight.Add (i / (float)numOfPoints);
+            StraightLeftRight.Add ( (-sign) / (float)numOfPoints);
         }
         
         return vecArray;
     }
-    
+
     /// <summary>
     /// Lowers all the points in the array by a random amount bounded by the provided ranges.
     /// </summary>
