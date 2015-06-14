@@ -63,25 +63,24 @@ public class TrackManager : MonoBehaviour {
         {
             straightleftright = Random.Range (0, straightTrackUpperLimit);
 
-            if(j==0)
-                straightleftright =2;
+            if(j==0)    straightleftright =2;
             
             if (straightleftright == 0) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateRightCurve (lastPointAtInterval, dirAtEnd, trackInterval, Random.Range (240, 240), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, true, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright == 1) 
             {
                 straightTrackUpperLimit = 4;
-                generatedPointList.AddRange (GenerateLeftCurve (lastPointAtInterval, dirAtEnd, trackInterval , Random.Range (240, 240), Random.Range (0.25f, 0.75f)));
+                generatedPointList.AddRange (GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.25f, 0.75f)));
             }
             
             if (straightleftright >= 2) 
             {
                 straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
-                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/6, Random.Range (60, 60)));
+                generatedPointList.AddRange (GenerateStraight (lastPointAtInterval, dirAtEnd, trackInterval/4, Random.Range (60, 60)));
             }
             
             lastPointAtInterval = generatedPointList [generatedPointList.Count - 1];//current last point
@@ -99,23 +98,20 @@ public class TrackManager : MonoBehaviour {
         
         DropPointsOnArray (generatedPointList, 0.5f, 0.5f);
         
-        for (int i =0; i <generatedPointList.Count; i++) {
+        for (int i =0; i <generatedPointList.Count; i+=4) {
             TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
             
             bp.baseTransform = transform;
             bp.position = generatedPointList [i];
-            
-            //bp.generateBumpers= true;
             bp.colliderSides = true;
-
             bp.renderBounds = false;
             bp.width = 100;
-            
+            //bp.generateBumpers= true;
+
             if (i < generatedPointList.Count - 1) {
                 bp.forwardControlPoint = generatedPointList [i + 1];
             } else {
-                bp.forwardControlPoint = 
-                    2 * generatedPointList [i] - generatedPointList [i - 1];
+                bp.forwardControlPoint = 2 * generatedPointList [i] - generatedPointList [i - 1];
             }
             
             if (StraightLeftRight [i] > 0) {
@@ -180,9 +176,7 @@ public class TrackManager : MonoBehaviour {
 
             if (i > 10 && (i < generatedPointList.Count - 10))
                 bp.crownAngle = crownAngle;
-            
-            i += 4; //skip over points
-            
+
             track.AddPoint (bp);
         }
         
@@ -193,22 +187,32 @@ public class TrackManager : MonoBehaviour {
         track.trackColliderWallHeight = 20;
 
         this.track = track;
-        
     }
     
     public Material GetVariedTrackMatToUse ()
     {
-        if (Mat > 7)
-            Mat = 0;
-        
-        if (Mat > 3) {
-            Mat++;
-            
+        if(Mat == 0)
+        {
+            Mat=1;
             return trackMat;
-        } else {
-            Mat++;
+        }
+        else
+        {
+            Mat=0;
             return trackMat2;
         }
+
+//        if (Mat > 7)
+//            Mat = 0;
+//        
+//        if (Mat > 3) {
+//            Mat++;
+//            
+//            return trackMat;
+//        } else {
+//            Mat++;
+//            return trackMat2;
+//        }
     }
     
     public Material GetTrackMatToUse ()
