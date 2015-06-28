@@ -48,7 +48,10 @@ public class GameManager : MonoBehaviour
     //==============================================
 
     public ControlSchemes controlScheme;
-    public TrackBuildRuntime trbrt;
+    public TrackBuildRuntime trbrtPrefab;
+
+    TrackBuildRuntime trbrt;
+    GameObject EnvironmentParent;
 
 	[Range (1,100)]
 	public float
@@ -67,7 +70,7 @@ public class GameManager : MonoBehaviour
     [Space (10)]
     Vector3 CamFollowObjectOrigPosition;
 
-    int lastKnownSeed;
+    public int lastKnownSeed;
 
 	void Awake ()
 	{
@@ -76,16 +79,31 @@ public class GameManager : MonoBehaviour
 		if (CamFollowObject != null)
 			CamFollow.camFollowTarget = CamFollowObject;
 
-        if (trbrt == null)
-            trbrt = GetComponent<TrackBuildRuntime>();
-
         CamFollowObjectOrigPosition = CamFollowObject.transform.localPosition;  //register the original location of the camObj
 
         menu.SetActive(false);
+        Random.seed = PlayerPrefs.GetInt("Seed",1);
+
+        lastKnownSeed = Random.seed;
+
+        trbrt = GameObject.FindObjectOfType<TrackBuildRuntime>();
+        EnvironmentParent = GameObject.Find("EnvironmentParent");
+
+        Debug.Log(Random.seed);
+        if (trbrt == null)
+        {
+            trbrt = Instantiate(trbrtPrefab);
+            EnvironmentParent = new GameObject("EnvironmentParent");
+            
+            trbrt.Init();
+            TrackManager.instance.PopulateEnvironment(EnvironmentParent);
+        }
+
+        Debug.Log(Random.seed);
 
         //=========================================================
 
-        seedInputField.text = PlayerPrefs.GetInt("Seed",1).ToString();
+        seedInputField.text = lastKnownSeed.ToString();
 
         (TheVehicle as DrivingScriptStraight).turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
 
@@ -107,21 +125,6 @@ public class GameManager : MonoBehaviour
         controlSchemeSlider.value = PlayerPrefs.GetInt("ControlScheme",1);
         //=========================================================
 
-        trbrt.Init();
-        TrackManager.instance.PopulateEnvironment();
-
-//        if (lastKnownSeed == Random.seed)
-//        {
-//
-//        } 
-//        else
-//        {
-//            lastKnownSeed = Random.seed;
-//            trbrt.Init();
-//            TrackManager.instance.PopulateEnvironment();
-//        }
-//
-//        DontDestroyOnLoad(this.gameObject);
 	}
 
     void LateUpdate ()
@@ -174,7 +177,19 @@ public class GameManager : MonoBehaviour
 
     public void restartButtonPressed()
     {
-        Time.timeScale = 1;
+        Debug.Log(lastKnownSeed + " " + PlayerPrefs.GetInt("Seed",1));
+
+        if (lastKnownSeed == PlayerPrefs.GetInt("Seed",1))
+        {
+            DontDestroyOnLoad(trbrt.gameObject);
+            DontDestroyOnLoad(EnvironmentParent);
+        } 
+        else
+        {
+            GameObject.Destroy(trbrt.gameObject);
+            GameObject.Destroy(EnvironmentParent);
+        }
+
         Application.LoadLevel(Application.loadedLevel);
         Time.timeScale = 1;
     }
@@ -207,11 +222,9 @@ public class GameManager : MonoBehaviour
 
     public void seedInputChanged(string value)
     {
-        Random.seed = int.Parse(value);
+        int temp = int.Parse(value);
 
-        lastKnownSeed = Random.seed;
-
-        PlayerPrefs.SetInt("Seed",Random.seed);
+        PlayerPrefs.SetInt("Seed", temp);
     }
 
 }

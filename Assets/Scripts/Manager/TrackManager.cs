@@ -375,7 +375,7 @@ public class TrackManager : MonoBehaviour {
     
     #region Functions for creating the ground Quad and buildings
     
-    void ParseTrackBoundsAndCreateQuad (List<Vector3> pointlist)
+    GameObject ParseTrackBoundsAndCreateQuad (List<Vector3> pointlist)
     {
         UpperBounds = Vector3.zero;
         LowerBounds = Vector3.zero;
@@ -415,7 +415,7 @@ public class TrackManager : MonoBehaviour {
             new Vector3 (LowerBounds.x, g.y, LowerBounds.z),
         };
         
-        GetMeshWithTexture (vertices, textureScale);
+        return GetMeshWithTexture (vertices, textureScale);
     }
     
     /// <summary>
@@ -423,9 +423,8 @@ public class TrackManager : MonoBehaviour {
     /// </summary>
     /// <param name="vertices">Vertices.</param>
     /// <param name="textureScale">Texture scale.</param>
-    void GetMeshWithTexture (Vector3[] vertices, Vector2 textureScale)
+    GameObject GetMeshWithTexture (Vector3[] vertices, Vector2 textureScale)
     {  
-        
         // Create object
         Mesh _m1 = CreateMeshFromVertices (vertices);
         var item = (GameObject)new GameObject (
@@ -438,7 +437,8 @@ public class TrackManager : MonoBehaviour {
         item.GetComponent<MeshRenderer> ().material = (groundMat);
         
         item.GetComponent<MeshRenderer> ().material.SetTextureScale ("_MainTex", textureScale);
-        
+
+        return item;
     }
     
     // Create a quad mesh
@@ -470,17 +470,20 @@ public class TrackManager : MonoBehaviour {
     }
     
     public GameObject[] Buildings;
-    public void PopulateEnvironment()
+    public void PopulateEnvironment( GameObject ParentObj)
     {
-        ParseTrackBoundsAndCreateQuad (generatedPointList);
+        ParseTrackBoundsAndCreateQuad (generatedPointList).transform.parent = ParentObj.transform;
 
         for(int i =0; i<30; i++)
         {
-            SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[Random.Range(0,5)]);
+            GameObject temp = SphereCastWithinBoundaryForRoom (UpperBounds,LowerBounds,100,Buildings[Random.Range(0,5)]);
+
+            if(temp)
+                temp.transform.parent = ParentObj.transform;
         }
     }
     
-    void SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius, GameObject obj)
+    GameObject SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius, GameObject obj)
     {
         Vector3 topCent = (UpperBounds + LowerBounds) / 2;
         topCent.y = UpperBounds.y;
@@ -497,7 +500,7 @@ public class TrackManager : MonoBehaviour {
             Ray ray = new Ray (rayStart, Vector3.down);   //We start the spherecast someway above the upperbounds, and cast downwards
             
             RaycastHit rch;
-            
+
             if (
                 !Physics.SphereCast (ray,sphereRadius,out rch,(UpperBounds.y - LowerBounds.y) + sphereRadius*2)
                 ) 
@@ -505,15 +508,16 @@ public class TrackManager : MonoBehaviour {
                 //Debug.Log("have place to put");
                 Debug.DrawRay (rayStart, Vector3.down*100, Color.cyan, 5);
                
-                Instantiate (obj, new Vector3(rayStart.x,LowerBounds.y,rayStart.z), obj.transform.rotation);
+                return Instantiate (obj, new Vector3(rayStart.x,LowerBounds.y,rayStart.z), obj.transform.rotation) as GameObject;
                 
 //                g.transform.localScale = new Vector3(
 //                    
 //                    g.transform.localScale.x*Random.Range(1,1.5f),
 //                    g.transform.localScale.y*Random.Range(1,1.5f),
 //                    g.transform.localScale.z*Random.Range(1,1.5f));
-                return;
             } 
+
+            return null;
         }
     }
     
