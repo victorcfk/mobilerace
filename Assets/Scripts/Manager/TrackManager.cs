@@ -54,9 +54,14 @@ public class TrackManager : MonoBehaviour {
     Material
         groundMat;
 
+    [Range (0,50)]
     public int numOfInterval = 20;
+    [Range (0,50)]
     public int trackInterval = 24; //must be even
+    [Range (0,50)]
     public float crownAngle = -4;
+
+    [HideInInspector]
     public TrackBuildRTrack track;
 
     [Space (10)]

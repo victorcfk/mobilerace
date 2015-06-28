@@ -210,11 +210,6 @@ public class TrackBuildRuntime : MonoBehaviour
 			//only update the models when we're editing.
 			UpgradeData();
 		}
-		
-		Init();
-
-        TrackManager.instance.PopulateEnvironment();
-
 	}
 	
 	private void UpgradeData()

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using TrackBuildRUtil;
 
 public enum ControlSchemes
 {
@@ -47,6 +48,7 @@ public class GameManager : MonoBehaviour
     //==============================================
 
     public ControlSchemes controlScheme;
+    public TrackBuildRuntime trbrt;
 
 	[Range (1,100)]
 	public float
@@ -65,12 +67,17 @@ public class GameManager : MonoBehaviour
     [Space (10)]
     Vector3 CamFollowObjectOrigPosition;
 
+    int lastKnownSeed;
+
 	void Awake ()
 	{
 		_instance = this;
 
 		if (CamFollowObject != null)
 			CamFollow.camFollowTarget = CamFollowObject;
+
+        if (trbrt == null)
+            trbrt = GetComponent<TrackBuildRuntime>();
 
         CamFollowObjectOrigPosition = CamFollowObject.transform.localPosition;  //register the original location of the camObj
 
@@ -99,6 +106,22 @@ public class GameManager : MonoBehaviour
 
         controlSchemeSlider.value = PlayerPrefs.GetInt("ControlScheme",1);
         //=========================================================
+
+        trbrt.Init();
+        TrackManager.instance.PopulateEnvironment();
+
+//        if (lastKnownSeed == Random.seed)
+//        {
+//
+//        } 
+//        else
+//        {
+//            lastKnownSeed = Random.seed;
+//            trbrt.Init();
+//            TrackManager.instance.PopulateEnvironment();
+//        }
+//
+//        DontDestroyOnLoad(this.gameObject);
 	}
 
     void LateUpdate ()
@@ -185,6 +208,8 @@ public class GameManager : MonoBehaviour
     public void seedInputChanged(string value)
     {
         Random.seed = int.Parse(value);
+
+        lastKnownSeed = Random.seed;
 
         PlayerPrefs.SetInt("Seed",Random.seed);
     }
