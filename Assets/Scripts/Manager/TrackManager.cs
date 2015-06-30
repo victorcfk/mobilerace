@@ -135,183 +135,100 @@ public class TrackManager : MonoBehaviour {
         //===================================================
         DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
         //===================================================
-        
-        for (int i =0; i <generatedPointList.Count; i+=4) {
-            TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint> ();
-            
-            bp.baseTransform = transform;
-            bp.position = generatedPointList [i];
-            bp.colliderSides = true;
-            bp.renderBounds = false;
-            bp.width = 100;
-            //bp.generateBumpers= true;
 
-            //We get the forward control point based on the tiny i intervals for direction
-            //=======================================================
-            if (i < generatedPointList.Count - 1) {
-                bp.forwardControlPoint = generatedPointList [i + 1];
-            } else {
-                bp.forwardControlPoint = 2 * generatedPointList [i] - generatedPointList [i - 1];
-            }
-            //=======================================================
+        //Rotation bits
+        //=======================================================
+        lastDirOnGeneratedTrackSements = Vector3.forward;
+        lastPointOnGeneratedTrackSegments = Vector3.zero;
+        int temp=0;
+        for (int i =0; i <trackSegs.Count; i++)
+        {   
+            TrackSegment CurrTrackSeg = trackSegs[i];
+            List<Vector3> CurrTrackSegTrackpts = CurrTrackSeg.trackPointsPos;
+           
+            DropPointsOnArray (CurrTrackSegTrackpts, 0.6f, 0.6f,temp*0.6f);
 
-//            if (StraightLeftRight [i] > 0) {
-//                
-//                //=============================================
-//                float angle;
-//                Vector3 axis;
-//                bp.trackUpQ.ToAngleAxis (out angle, out axis);
-//                
-//                float multi = 1;
-//                if (axis.y < 0) {
-//                    multi = -1;
-//                }
-//                
-//                if (StraightLeftRight [i] < 0.5f) { //left turn
-//                    bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-//                    bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
-////                    bp.width += StraightLeftRight [i] * 45;
-//                    
-//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                } else {
-//                    bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-//                    bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
-////                    bp.width += (1 - StraightLeftRight [i]) * 45;
-//                    
-//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                }
-//                //=============================================
-//            } else
-//            if (StraightLeftRight [i] < 0) { //right turn
-//                
-//                //=============================================
-//                float angle;
-//                Vector3 axis;
-//                bp.trackUpQ.ToAngleAxis (out angle, out axis);
-//                
-//                float multi = 1;
-//                if (axis.y < 0) {
-//                    multi = -1;
-//                }
-//                
-//                if (StraightLeftRight [i] > -0.5f) {
-//                    bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-//                    bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
-////                    bp.width += (-StraightLeftRight [i]) * 45;
-//                    
-//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    
-//                } else {
-//                    
-//                    bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
-//                    bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
-////                    bp.width += (1 - (-StraightLeftRight [i])) * 45;
-//                    
-//                    Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                }
-//                
-//                //=============================================
-//            }
+            temp+=CurrTrackSegTrackpts.Count;
+            for (int j =0; j <CurrTrackSegTrackpts.Count; j+=4)
+            {
+                TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
+                
+                bp.baseTransform = transform;
+                bp.position = CurrTrackSegTrackpts [j];
+                bp.width = 100;
 
-            bp.generateBumpers = false;
-            bp.extrudeTrackBottom = false;
-
-//            if (i > 10 && (i < generatedPointList.Count - 10))
+                bp.colliderSides = true;
+                bp.renderBounds = false;
+                bp.generateBumpers = false;
+                bp.extrudeTrackBottom = false;
                 bp.crownAngle = crownAngle;
 
-            track.AddPoint (bp);
-        }
+                //We get the forward control point based on the tiny i intervals for direction
+                //=======================================================
+                if (j < CurrTrackSegTrackpts.Count - 1) {
+                    bp.forwardControlPoint = CurrTrackSegTrackpts [j + 1];
+                } else {
+                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
+                }
+                //=======================================================
 
-//        //Rotation bits
-//        //=======================================================
-//        lastDirOnGeneratedTrackSements = Vector3.forward;
-//        lastPointOnGeneratedTrackSegments = Vector3.zero;
-//        for (int i =0; i <trackSegs.Count; i++)
-//        {            
-//
-//            TrackSegment CurrTrackSeg = trackSegs[i];
-//            List<Vector3> CurrTrackSegTrackpts = CurrTrackSeg.trackPointsPos;
-//           
-//            for (int j =0; j <CurrTrackSegTrackpts.Count; j++)
-//            {
-//                TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
-//                
-//                bp.baseTransform = transform;
-//                bp.position = CurrTrackSegTrackpts [j];
-//                bp.colliderSides = true;
-//                bp.renderBounds = false;
-//                bp.width = 100;
-//                bp.generateBumpers = false;
-//                bp.extrudeTrackBottom = false;
-//                bp.crownAngle = crownAngle;
-//
-//
-//                //We get the forward control point based on the tiny i intervals for direction
-//                //=======================================================
-//                if (j < CurrTrackSegTrackpts.Count - 1) {
-//                    bp.forwardControlPoint = CurrTrackSegTrackpts [j + 1];
-//                } else {
-//                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
-//                }
-//                //=======================================================
-//
-//                /*
-//                if (CurrTrackSeg.type == TrackSegmentType.LEFT) {
-//                    
-//                    //=============================================
-//                    float angle;
-//                    Vector3 axis;
-//                    bp.trackUpQ.ToAngleAxis (out angle, out axis);
-//                    
-//                    float multi;
-//                    if (axis.y < 0) multi = -1;
-//                    else            multi = 1;
-//
-//                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
-//                        bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-//                        //bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
-//                        
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    } else {
-//                        bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-//                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
-//                        
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    }
-//                    //=============================================
-//                } else
-//                if (CurrTrackSeg.type == TrackSegmentType.RIGHT) { //right turn
-//                    
-//                    //=============================================
-//                    float angle;
-//                    Vector3 axis;
-//                    bp.trackUpQ.ToAngleAxis (out angle, out axis);
-//                    
-//                    float multi = 1;
-//                    if (axis.y < 0) {
-//                        multi = -1;
-//                    }
-//                    
-//                    if (StraightLeftRight [i] > -0.5f) {
-//                        bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-//                        //bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
-//                        
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                        
-//                    } else {
-//                        
-//                        bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
-//                        //bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
-//                        
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    }
-//                    
-//                    //=============================================
-//                } 
-//                */
-//                track.AddPoint (bp);
-//            }
-//        }
+                /*
+                if (CurrTrackSeg.type == TrackSegmentType.LEFT) {
+                    
+                    //=============================================
+                    float angle;
+                    Vector3 axis;
+                    bp.trackUpQ.ToAngleAxis (out angle, out axis);
+                    
+                    float multi;
+                    if (axis.y < 0) multi = -1;
+                    else            multi = 1;
+
+                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
+                        bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
+                        //bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
+                        
+                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+                    } else {
+                        bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
+                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
+                        
+                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+                    }
+                    //=============================================
+                } else
+                if (CurrTrackSeg.type == TrackSegmentType.RIGHT) { //right turn
+                    
+                    //=============================================
+                    float angle;
+                    Vector3 axis;
+                    bp.trackUpQ.ToAngleAxis (out angle, out axis);
+                    
+                    float multi = 1;
+                    if (axis.y < 0) {
+                        multi = -1;
+                    }
+                    
+                    if (StraightLeftRight [i] > -0.5f) {
+                        bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
+                        //bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
+                        
+                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+                        
+                    } else {
+                        
+                        bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
+                        //bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
+                        
+                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+                    }
+                    
+                    //=============================================
+                } 
+                */
+                track.AddPoint (bp);
+            }
+        }
         
         track.meshResolution = 10;
         track.loop = false; 
@@ -471,13 +388,13 @@ public class TrackManager : MonoBehaviour {
     /// <param name="pointlist">Pointlist.</param>
     /// <param name="dropLowerRange">Drop lower range.</param>
     /// <param name="dropUpperRange">Drop upper range.</param>
-    void DropPointsOnArray (List<Vector3> pointlist, float dropLowerRange, float dropUpperRange)
+    void DropPointsOnArray (List<Vector3> pointlist, float dropLowerRange, float dropUpperRange,  float initDropAmount = 0)
     {
         float dropAmount = 0;
         for (int i =0; i <pointlist.Count; i++) {
             dropAmount += Random.Range (-dropLowerRange, -dropUpperRange);
             
-            pointlist [i] += new Vector3 (0, dropAmount, 0); //DropPointOnArray(pointlist[i],i,0.1f); 
+            pointlist [i] += new Vector3 (0, -initDropAmount + dropAmount, 0); //DropPointOnArray(pointlist[i],i,0.1f); 
         }
     }
     
