@@ -151,6 +151,8 @@ public class TrackBuildRPoint : MonoBehaviour
     public int bumperTextureStyleIndex = 3;
     public int bottomTextureStyleIndex = 4;
 
+    public TrackSegmentType type;
+
     public void Reset()
     {
         hideFlags = HideFlags.HideInInspector;

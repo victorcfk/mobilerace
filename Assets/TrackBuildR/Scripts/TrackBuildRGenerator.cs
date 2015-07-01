@@ -46,6 +46,15 @@ public class TrackBuildRGenerator : MonoBehaviour
         {
             TrackBuildRPoint curve = track[i];
 
+            Debug.Log("meshes "+numberOfCurves);
+            if(curve.type == TrackSegmentType.LEFT)
+                TrackManager.instance.Mat = 0;
+            else
+                if(curve.type == TrackSegmentType.RIGHT)
+                TrackManager.instance.Mat = 0;
+            else
+                TrackManager.instance.Mat = 1;
+
             bool generateCollider = curve.trackCollider;
 
             DynamicMeshGenericMultiMaterialMesh dynamicTrackMesh = curve.dynamicTrackMesh;
@@ -623,6 +632,7 @@ public class TrackBuildRGenerator : MonoBehaviour
                 {
                     dynamicTrackMesh.name = "Curve " + i + " Track Mesh";
                     dynamicTrackMesh.Build();
+
                     numberOfMeshes = dynamicTrackMesh.meshCount;
                     for (int m = 0; m < numberOfMeshes; m++)
                     {
@@ -641,7 +651,8 @@ public class TrackBuildRGenerator : MonoBehaviour
 							{
 
 								newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetVariedTrackMatToUse());
-									
+
+
 								//newMeshHolder.AddComponent<MeshRenderer>().material =  new Material(Shader.Find("Specular"));//track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
 							}
 

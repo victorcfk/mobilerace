@@ -76,15 +76,13 @@ public class TrackManager : MonoBehaviour {
     Vector3 UpperBounds;
     Vector3 LowerBounds;
 
-    int Mat;
+    public int Mat;
 
     public void InitializeTrackPoints (TrackBuildRTrack track)
     {
         //===================================================
         //Decide straight or curved
         //===================================================
-        
-
         
         int straightleftright = 2;
         int straightTrackUpperLimit = 4;
@@ -105,6 +103,8 @@ public class TrackManager : MonoBehaviour {
 
                 trackSegs.Add(
                     GenerateRightCurveTrackSegment(lastPointOnGeneratedTrackSegments,lastDirOnGeneratedTrackSements,trackInterval,generatedPointList));
+
+
             }
             
             if (straightleftright == 1) 
@@ -113,6 +113,8 @@ public class TrackManager : MonoBehaviour {
 
                 trackSegs.Add(
                     GenerateLeftCurveTrackSegment(lastPointOnGeneratedTrackSegments,lastDirOnGeneratedTrackSements,trackInterval,generatedPointList));
+
+
             }
             
             if (straightleftright >= 2) 
@@ -121,6 +123,8 @@ public class TrackManager : MonoBehaviour {
 
                 trackSegs.Add(
                     GenerateStraightTrackSegment(lastPointOnGeneratedTrackSegments,lastDirOnGeneratedTrackSements,trackInterval,generatedPointList));
+
+
             }
             
             lastPointOnGeneratedTrackSegments = generatedPointList [generatedPointList.Count - 1];//current last point
@@ -151,6 +155,7 @@ public class TrackManager : MonoBehaviour {
             temp+=CurrTrackSegTrackpts.Count;
             for (int j =0; j <CurrTrackSegTrackpts.Count; j+=4)
             {
+//                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
                 
                 bp.baseTransform = transform;
@@ -172,60 +177,78 @@ public class TrackManager : MonoBehaviour {
                 }
                 //=======================================================
 
-                /*
+
                 if (CurrTrackSeg.type == TrackSegmentType.LEFT) {
                     
                     //=============================================
                     float angle;
                     Vector3 axis;
                     bp.trackUpQ.ToAngleAxis (out angle, out axis);
-                    
-                    float multi;
-                    if (axis.y < 0) multi = -1;
-                    else            multi = 1;
 
-                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
-                        bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-                        //bp.position += new Vector3 (0, StraightLeftRight [i] * 35f, 0);
-                        
-                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                    } else {
-                        bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [i]) * multi * 90f, axis);
-                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [i]) * 35f, 0);
-                        
-                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                    }
+                    bp.trackUpQ = Quaternion.AngleAxis (
+                        30, 
+                        axis) * bp.trackUpQ;
+
+                    bp.type = TrackSegmentType.LEFT;
+                    //                    float multi;
+                    //                    if (axis.y < 0) multi = -1;
+//                    else            multi = 1;
+
+//                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
+//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [j] * multi * 90f, axis);
+//                        //bp.position += new Vector3 (0, StraightLeftRight [j] * 35f, 0);
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                                                            Mathf.Lerp(0,90,j/(CurrTrackSegTrackpts.Count/2)), 
+//                                                            axis) * bp.trackUpQ;
+//
+//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                    } else {
+//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [j]) * multi * 90f, axis);
+//                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [j]) * 35f, 0);
+//
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                                                            Mathf.Lerp(90,0,(j- CurrTrackSegTrackpts.Count/2)/(CurrTrackSegTrackpts.Count/2)), 
+//                                                            axis) * bp.trackUpQ;
+//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                    }
                     //=============================================
                 } else
                 if (CurrTrackSeg.type == TrackSegmentType.RIGHT) { //right turn
-                    
+
                     //=============================================
                     float angle;
                     Vector3 axis;
                     bp.trackUpQ.ToAngleAxis (out angle, out axis);
-                    
-                    float multi = 1;
-                    if (axis.y < 0) {
-                        multi = -1;
-                    }
-                    
-                    if (StraightLeftRight [i] > -0.5f) {
-                        bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [i] * multi * 90f, axis);
-                        //bp.position += new Vector3 (0, -StraightLeftRight [i] * 35f, 0);
-                        
-                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                        
-                    } else {
-                        
-                        bp.trackUpQ = Quaternion.AngleAxis (angle + (-1 - StraightLeftRight [i]) * multi * 90f, axis);
-                        //bp.position += new Vector3 (0, -(-1 - StraightLeftRight [i]) * 35f, 0);
-                        
-                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-                    }
-                    
+
+                    bp.trackUpQ = Quaternion.AngleAxis (
+                        -30, 
+                        axis) * bp.trackUpQ;
+
+                    bp.type = TrackSegmentType.RIGHT;
+//                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
+//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [j] * multi * 90f, axis);
+//                        //bp.position += new Vector3 (0, StraightLeftRight [j] * 35f, 0);
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                            -Mathf.Lerp(0,90,j/(CurrTrackSegTrackpts.Count/2)), 
+//                            axis) * bp.trackUpQ;
+//                        
+//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                    } else {
+//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [j]) * multi * 90f, axis);
+//                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [j]) * 35f, 0);
+//                        
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                            -Mathf.Lerp(90,0,(j- CurrTrackSegTrackpts.Count/2)/(CurrTrackSegTrackpts.Count/2)), 
+//                            axis) * bp.trackUpQ;
+//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
+//                    }
                     //=============================================
                 } 
-                */
+                else
+                {
+                    bp.type = TrackSegmentType.STRAIGHT;
+                }
+
                 track.AddPoint (bp);
             }
         }
@@ -282,26 +305,13 @@ public class TrackManager : MonoBehaviour {
     {
         if(Mat == 0)
         {
-            Mat=1;
             return trackMat;
         }
         else
         {
-            Mat=0;
+
             return trackMat2;
         }
-
-//        if (Mat > 7)
-//            Mat = 0;
-//        
-//        if (Mat > 3) {
-//            Mat++;
-//            
-//            return trackMat;
-//        } else {
-//            Mat++;
-//            return trackMat2;
-//        }
     }
     
     public Material GetTrackMatToUse ()
