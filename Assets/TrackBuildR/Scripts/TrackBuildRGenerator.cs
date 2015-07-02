@@ -806,7 +806,7 @@ public class TrackBuildRGenerator : MonoBehaviour
 //							}
 //							else
 							{
-                                newMeshHolder.AddComponent<MeshRenderer>().material = new Material(TrackManager.instance.GetTrackMatToUse());
+                                newMeshHolder.AddComponent<MeshRenderer>().material = new Material(TrackManager.instance.GetBorderMatToUse());
 									//new Material(Shader.Find("Specular"));//track.Texture(curve.bumperTextureStyleIndex).GetMaterial();
 							}
 
