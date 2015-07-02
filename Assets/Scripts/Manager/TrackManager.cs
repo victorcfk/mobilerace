@@ -184,7 +184,6 @@ public class TrackManager : MonoBehaviour {
                 }
                 //=======================================================
 
-
                 if (CurrTrackSeg.type == TrackSegmentType.LEFT) {
                     
                     //=============================================
@@ -195,13 +194,22 @@ public class TrackManager : MonoBehaviour {
                     Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
 
                     if(axis.y > 0 )
+                    {
                         bp.trackUpQ = Quaternion.AngleAxis (
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant), 
                             axis) * bp.trackUpQ;
+                    }
                     else
+                    {
                         bp.trackUpQ = Quaternion.AngleAxis (
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant), 
                             axis) * bp.trackUpQ;
+                    }
+
+                    //bp.position += Vector3.up * GetPosChangeCurveValue(100,GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant));
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant);
+
+                    CurrTrackSegTrackpts [j] = bp.position;
 
                     bp.type = TrackSegmentType.LEFT;
                     //=============================================
@@ -223,6 +231,11 @@ public class TrackManager : MonoBehaviour {
                         bp.trackUpQ = Quaternion.AngleAxis (
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant), 
                             axis) * bp.trackUpQ;
+
+                    
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant);
+
+                    CurrTrackSegTrackpts [j] = bp.position;
 
                     bp.type = TrackSegmentType.RIGHT;
                     //=============================================
@@ -254,6 +267,16 @@ public class TrackManager : MonoBehaviour {
     }
 
     TrackSegment GenerateLeftCurveTrackSegment(Vector3 lastPointAtInterval, Vector3 dirAtEnd, int trackInterval, List<Vector3> generatedPointList)
+    float GetPosChangeCurveValue(float point, float totalCurvePointCount, float trackWidth, float angle)
+    {
+        float x = trackWidth/4; //width/2
+        
+//        return x * Mathf.Cos(angle);
+
+        return 
+            Mathf.Lerp(0, -x * Mathf.Cos(angle),
+                       curve.Evaluate(point / totalCurvePointCount));
+    }
     {
         List<Vector3> vec3points = GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.1f, 0.6f));
         
