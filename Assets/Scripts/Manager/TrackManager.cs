@@ -71,10 +71,15 @@ public class TrackManager : MonoBehaviour {
     public List<TrackSegment> trackSegs;
 
     List<Vector3> generatedPointList    = new List<Vector3> ();
-    public List<float> StraightLeftRight       = new List<float> ();
+    List<float> StraightLeftRight       = new List<float> ();
 
     Vector3 UpperBounds;
     Vector3 LowerBounds;
+
+    [Range (0,90)]
+    public float MaxLeftTurnCant = 30;
+    [Range (0,90)]
+    public float MaxRightTurnCant = 30;
 
     public int Mat;
 
@@ -185,14 +190,14 @@ public class TrackManager : MonoBehaviour {
                     Vector3 axis;
                     bp.trackUpQ.ToAngleAxis (out angle, out axis);
 
-                    bp.trackUpQ = Quaternion.AngleAxis (
-                        30, 
-                        axis) * bp.trackUpQ;
+                    Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
+
+                    if(axis.y > 0 )
+                        bp.trackUpQ = Quaternion.AngleAxis (MaxLeftTurnCant, axis) * bp.trackUpQ;
+                    else
+                        bp.trackUpQ = Quaternion.AngleAxis (-MaxLeftTurnCant, axis) * bp.trackUpQ;
 
                     bp.type = TrackSegmentType.LEFT;
-                    //                    float multi;
-                    //                    if (axis.y < 0) multi = -1;
-//                    else            multi = 1;
 
 //                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
 //                        //bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [j] * multi * 90f, axis);
@@ -220,9 +225,12 @@ public class TrackManager : MonoBehaviour {
                     Vector3 axis;
                     bp.trackUpQ.ToAngleAxis (out angle, out axis);
 
-                    bp.trackUpQ = Quaternion.AngleAxis (
-                        -30, 
-                        axis) * bp.trackUpQ;
+                    Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
+
+                    if(axis.y > 0 )
+                        bp.trackUpQ = Quaternion.AngleAxis (-MaxRightTurnCant, axis) * bp.trackUpQ;
+                    else
+                        bp.trackUpQ = Quaternion.AngleAxis (MaxRightTurnCant, axis) * bp.trackUpQ;
 
                     bp.type = TrackSegmentType.RIGHT;
 //                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
