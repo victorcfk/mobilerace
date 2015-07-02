@@ -98,7 +98,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
             rigidBody.MovePosition(
                 Vector3.MoveTowards(transform.position,
-                                (lf.point + lr.point + rf.point +rr.point)/4 + Vector3.up*DistFromGround,
+                                (lf.point + lr.point + rf.point +rr.point)/4 + upDir*DistFromGround,
                                 Time.deltaTime*PositionCorrectionRate)
                 );
 
