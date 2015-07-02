@@ -81,6 +81,7 @@ public class TrackManager : MonoBehaviour {
     public float MaxRightTurnCant = 30;
 
     public AnimationCurve curve;
+    public Vector2 textureUnitSize = new Vector2(50, 50);
 
     public int Mat;
 
@@ -268,6 +269,7 @@ public class TrackManager : MonoBehaviour {
         }
         
         track.meshResolution = 10;
+        //track.Texture(0).textureUnitSize
         track.loop = false; 
         track.includeColliderRoof =false;
         track.trackBumpers = false;

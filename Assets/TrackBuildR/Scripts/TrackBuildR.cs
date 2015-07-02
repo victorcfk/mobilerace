@@ -146,6 +146,7 @@ public class TrackBuildR : MonoBehaviour
         track.AddPoint(p1);
         track.AddPoint(p2);
         track.AddPoint(p3);
+//        TrackManager.instance.InitializeTrackPoints(track);
 
         generator = gameObject.AddComponent<TrackBuildRGenerator>();
 
