@@ -105,6 +105,7 @@ public class TrackManager : MonoBehaviour {
             
             if (straightleftright == 0) 
             {
+                float prop = Random.Range(0.2f,0.6f);
                 //straightTrackUpperLimit = 4;
                 straightleftright = 2;
                 trackSegs.Add(
@@ -113,14 +114,13 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
-                    480,
-                    Random.Range(0.2f,0.6f)));
-
-
+                    Random.Range(200,400),
+                    prop));
             }
             else
             if (straightleftright == 1) 
             {
+                float prop = Random.Range(0.2f,0.6f);
                 //straightTrackUpperLimit = 4;
                 straightleftright = 2;
                 trackSegs.Add(
@@ -129,10 +129,8 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
-                    480,
-                    Random.Range(0.2f,0.6f)));
-
-
+                    Random.Range(200,400),
+                    prop));
             }
             else
             if (straightleftright >= 2) 
@@ -145,7 +143,7 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
-                    40));
+                    5));
 
 
             }
@@ -175,7 +173,7 @@ public class TrackManager : MonoBehaviour {
             TrackSegment CurrTrackSeg = trackSegs[i];
             List<Vector3> CurrTrackSegTrackpts = CurrTrackSeg.trackPointsPos;
            
-            DropPointsOnArray (CurrTrackSegTrackpts, 1, 1,temp*1);
+            DropPointsOnArray (CurrTrackSegTrackpts, 0.75f, 0.75f,temp*0.75f);
             temp+=CurrTrackSegTrackpts.Count;
 
             for (int j =0; j <CurrTrackSegTrackpts.Count; j+=4)
@@ -212,17 +210,13 @@ public class TrackManager : MonoBehaviour {
                     Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
 
                     if(axis.y > 0 )
-                    {
                         bp.trackUpQ = Quaternion.AngleAxis (
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant), 
                             axis) * bp.trackUpQ;
-                    }
                     else
-                    {
                         bp.trackUpQ = Quaternion.AngleAxis (
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant), 
                             axis) * bp.trackUpQ;
-                    }
 
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant);
 
