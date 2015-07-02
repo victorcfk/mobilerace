@@ -93,34 +93,34 @@ public class TrackManager : MonoBehaviour {
         Vector3 lastPointOnGeneratedTrackSegments = Vector3.zero;
         for (int j =0; j <numOfTrackSegments; j++) 
         {
-            straightleftright = Random.Range (0, straightTrackUpperLimit);
+//            straightleftright = Random.Range (0, straightTrackUpperLimit);
 
             if(j==0)    straightleftright =2;
             
             if (straightleftright == 0) 
             {
-                straightTrackUpperLimit = 4;
-
+                //straightTrackUpperLimit = 4;
+                straightleftright = 2;
                 trackSegs.Add(
                     GenerateRightCurveTrackSegment(lastPointOnGeneratedTrackSegments,lastDirOnGeneratedTrackSements,trackInterval,generatedPointList));
 
 
             }
-            
+            else
             if (straightleftright == 1) 
             {
-                straightTrackUpperLimit = 4;
-
+                //straightTrackUpperLimit = 4;
+                straightleftright = 2;
                 trackSegs.Add(
                     GenerateLeftCurveTrackSegment(lastPointOnGeneratedTrackSegments,lastDirOnGeneratedTrackSements,trackInterval,generatedPointList));
 
 
             }
-            
+            else
             if (straightleftright >= 2) 
             {
-                straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
-
+                //straightTrackUpperLimit = Mathf.Clamp(straightTrackUpperLimit-1,2,4);
+                straightleftright = Random.Range(0,2);
                 trackSegs.Add(
                     GenerateStraightTrackSegment(lastPointOnGeneratedTrackSegments,lastDirOnGeneratedTrackSements,trackInterval,generatedPointList));
 
@@ -264,7 +264,7 @@ public class TrackManager : MonoBehaviour {
 
     TrackSegment GenerateLeftCurveTrackSegment(Vector3 lastPointAtInterval, Vector3 dirAtEnd, int trackInterval, List<Vector3> generatedPointList)
     {
-        List<Vector3> vec3points = GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.25f, 0.75f));
+        List<Vector3> vec3points = GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, false, Random.Range (480, 480), Random.Range (0.1f, 0.6f));
         
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
@@ -277,7 +277,7 @@ public class TrackManager : MonoBehaviour {
 
     TrackSegment GenerateRightCurveTrackSegment(Vector3 lastPointAtInterval, Vector3 dirAtEnd, int trackInterval, List<Vector3> generatedPointList)
     {
-        List<Vector3> vec3points = GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, true, Random.Range (480, 480), Random.Range (0.25f, 0.75f));
+        List<Vector3> vec3points = GenerateCurve (lastPointAtInterval, dirAtEnd, trackInterval, true, Random.Range (480, 480), Random.Range (0.1f, 0.6f));
         
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
