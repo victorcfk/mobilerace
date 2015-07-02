@@ -1,4 +1,6 @@
 // Track BuildR
+
+using System;
 // Available on the Unity3D Asset Store
 // Copyright (c) 2013 Jasper Stocker http://support.jasperstocker.com
 // For support contact email@jasperstocker.com
@@ -18,7 +20,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class TrackBuildR : MonoBehaviour
 {
-    public static float VERSION_NUMBER = 1.3f;
+    public static float VERSION_NUMBER = 1.33f;
     public float version = VERSION_NUMBER;
     public TrackBuildRTrack track;
     public TrackBuildRGenerator generator;
@@ -94,7 +96,6 @@ public class TrackBuildR : MonoBehaviour
     public bool copyTexturesIntoExportFolder = true;
     public bool exportCollider = true;
     public bool createPrefabOnExport = true;
-    public bool includeTangents = false;
 
     //preview
     public float previewPercentage = 0;
@@ -111,42 +112,40 @@ public class TrackBuildR : MonoBehaviour
         track.InitTextures();
         track.baseTransform = transform;
 
-//        TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-//        TrackBuildRPoint p1 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-//        TrackBuildRPoint p2 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-//        TrackBuildRPoint p3 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-//
-//        p0.baseTransform = transform;
-//        p1.baseTransform = transform;
-//        p2.baseTransform = transform;
-//        p3.baseTransform = transform;
-//
-//        p0.position = new Vector3(-20, 0, -20);
-//        p1.position = new Vector3(20, 0, -20);
-//        p2.position = new Vector3(20, 0, 20);
-//        p3.position = new Vector3(-20, 0, 20);
-//
-//        p0.forwardControlPoint = new Vector3(0, 0, -20);
-//        p1.forwardControlPoint = new Vector3(40, 0, -20);
-//        p2.forwardControlPoint = new Vector3(0, 0, 20);
-//        p3.forwardControlPoint = new Vector3(-40, 0, 20);
-//
-//        p0.leftForwardControlPoint = new Vector3(-15, 0, -20);
-//        p1.leftForwardControlPoint = new Vector3(25, 0, -20);
-//        p2.leftForwardControlPoint = new Vector3(5, 0, 20);
-//        p3.leftForwardControlPoint = new Vector3(-35, 0, 20);
-//
-//        p0.rightForwardControlPoint = new Vector3(15, 0, -20);
-//        p1.rightForwardControlPoint = new Vector3(55, 0, -20);
-//        p2.rightForwardControlPoint = new Vector3(-5, 0, 20);
-//        p3.rightForwardControlPoint = new Vector3(-45, 0, 20);
-//
-//        track.AddPoint(p0);
-//        track.AddPoint(p1);
-//        track.AddPoint(p2);
-//        track.AddPoint(p3);
+        TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
+        TrackBuildRPoint p1 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
+        TrackBuildRPoint p2 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
+        TrackBuildRPoint p3 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
 
-        TrackManager.instance.InitializeTrackPoints(track);
+        p0.baseTransform = transform;
+        p1.baseTransform = transform;
+        p2.baseTransform = transform;
+        p3.baseTransform = transform;
+
+        p0.position = new Vector3(-20, 0, -20);
+        p1.position = new Vector3(20, 0, -20);
+        p2.position = new Vector3(20, 0, 20);
+        p3.position = new Vector3(-20, 0, 20);
+
+        p0.forwardControlPoint = new Vector3(0, 0, -20);
+        p1.forwardControlPoint = new Vector3(40, 0, -20);
+        p2.forwardControlPoint = new Vector3(0, 0, 20);
+        p3.forwardControlPoint = new Vector3(-40, 0, 20);
+
+        p0.leftForwardControlPoint = new Vector3(-15, 0, -20);
+        p1.leftForwardControlPoint = new Vector3(25, 0, -20);
+        p2.leftForwardControlPoint = new Vector3(5, 0, 20);
+        p3.leftForwardControlPoint = new Vector3(-35, 0, 20);
+
+        p0.rightForwardControlPoint = new Vector3(15, 0, -20);
+        p1.rightForwardControlPoint = new Vector3(55, 0, -20);
+        p2.rightForwardControlPoint = new Vector3(-5, 0, 20);
+        p3.rightForwardControlPoint = new Vector3(-45, 0, 20);
+
+        track.AddPoint(p0);
+        track.AddPoint(p1);
+        track.AddPoint(p2);
+        track.AddPoint(p3);
 
         generator = gameObject.AddComponent<TrackBuildRGenerator>();
 
@@ -164,7 +163,6 @@ public class TrackBuildR : MonoBehaviour
         track.diagramMaterial = new Material(Shader.Find("Unlit/Texture"));
         track.diagramGO.AddComponent<MeshRenderer>().material = track.diagramMaterial;
         track.diagramGO.AddComponent<MeshCollider>().sharedMesh = track.diagramMesh;
-
     }
 
     public void UpdateRender()
@@ -181,9 +179,12 @@ public class TrackBuildR : MonoBehaviour
     public void ForceFullRecalculation()
     {
         int numberOfPoints = track.realNumberOfPoints;
-        for (int i = 0; i < numberOfPoints; i++)
+        for(int i = 0; i < numberOfPoints; i++)
+        {
             track[i].isDirty = true;
-        track.RecalculateCurves();
+            track[i].shouldReRender = true;
+        }
+//        track.RecalculateCurves();
         UpdateRender();
     }
 
@@ -192,14 +193,9 @@ public class TrackBuildR : MonoBehaviour
         track.GenerateSecondaryUVSet();
     }
 
-    public void GenerateTangents()
+    public void OptimseMeshes()
     {
-        track.SolveTangents();
-    }
-
-    public void OptimizeMeshes()
-    {
-        track.OptimizeMeshes();
+        track.OptimseMeshes();
     }
 
     void OnDestroy()
@@ -261,6 +257,15 @@ public class TrackBuildR : MonoBehaviour
             Debug.LogWarning("Warning - There is no upgrade path to this version - sorry.");
         }
 
+//        if(dataVersion < 1.3f)
+//        {
+//            int trackSize = track.numberOfCurves;
+//            for(int c = 0; c < trackSize; c++)
+//            {
+//                track[c].DynamicMeshCheck();
+//            }
+//        }
+
         version = currentVersion;
     }
 
@@ -283,7 +288,6 @@ public class TrackBuildR : MonoBehaviour
         sb.AppendLine("<copyTexturesIntoExportFolder>"+copyTexturesIntoExportFolder+"</copyTexturesIntoExportFolder>");
         sb.AppendLine("<exportCollider>"+exportCollider+"</exportCollider>");
         sb.AppendLine("<createPrefabOnExport>"+createPrefabOnExport+"</createPrefabOnExport>");
-        sb.AppendLine("<includeTangents>"+includeTangents+"</includeTangents>");
         
         sb.Append(track.ToXML());
 
@@ -319,7 +323,6 @@ public class TrackBuildR : MonoBehaviour
             copyTexturesIntoExportFolder = bool.Parse(trackNode["copyTexturesIntoExportFolder"].FirstChild.Value);
             exportCollider = bool.Parse(trackNode["exportCollider"].FirstChild.Value);
             createPrefabOnExport = bool.Parse(trackNode["createPrefabOnExport"].FirstChild.Value);
-            includeTangents = bool.Parse(trackNode["includeTangents"].FirstChild.Value);
         }
         //send data to track
         track.FromXML(trackNode.SelectSingleNode("track"));
@@ -331,32 +334,62 @@ public class TrackBuildR : MonoBehaviour
     /// <param name="KMLPath">An Google Earth KML file path</param>
     public void FromKML(string KMLPath)
     {
-        Debug.Log("Import Google Earth KML " + KMLPath);
+        Debug.Log("Track BuildR KML Import: Import Google Earth KML at " + KMLPath);
         Clear();
-        XmlDocument xml = new XmlDocument();
-        using (StreamReader sr = new StreamReader(KMLPath))
-        {
-            xml.LoadXml(sr.ReadToEnd());
-        }
-        name = xml["kml"]["Document"]["Placemark"]["name"].FirstChild.Value;
 
-        int nodes = xml["kml"]["Document"].ChildNodes.Count;
-        for(int i = 0; i < nodes; i++)
+        try
         {
-            XmlNode node = xml["kml"]["Document"].ChildNodes[i];
-            if(node.Name == "Placemark")
+            XmlDocument xml = new XmlDocument();
+            using(StreamReader sr = new StreamReader(KMLPath))
             {
-                if(node["LineString"] != null)
+                xml.LoadXml(sr.ReadToEnd());
+            }
+
+            if(xml["kml"] == null)
+            {
+                Debug.LogError("Track BuildR KML Import Error: Invlaid KML Document, no KML node entry");
+                return;
+            }
+
+            if(xml["kml"]["Document"] == null)
+            {
+                Debug.LogError("Track BuildR KML Import Error: Invlaid KML Document, no Document node entry");
+                return;
+            }
+
+            if(xml["kml"]["Document"]["Placemark"] == null)
+            {
+                Debug.LogError("Track BuildR KML Import Error: Invlaid KML Document, no Placemark node entry");
+                return;
+            }
+
+            if(xml["kml"]["Document"]["Placemark"]["name"] != null && xml["kml"]["Document"]["Placemark"]["name"].FirstChild != null)
+                name = xml["kml"]["Document"]["Placemark"]["name"].FirstChild.Value;
+            else
+                name = "KML Import";
+
+            int nodes = xml["kml"]["Document"].ChildNodes.Count;
+            for(int i = 0; i < nodes; i++)
+            {
+                XmlNode node = xml["kml"]["Document"].ChildNodes[i];
+                if(node.Name == "Placemark")
                 {
-                    if(node["LineString"]["coordinates"] != null)
+                    if(node["LineString"] != null)
                     {
-                        track.FromKML(node["LineString"]["coordinates"].FirstChild.Value);
-                        return;
+                        if(node["LineString"]["coordinates"] != null)
+                        {
+                            track.FromKML(node["LineString"]["coordinates"].FirstChild.Value);
+                            return;
+                        }
                     }
                 }
             }
+            Debug.LogError("Track BuildR could not convert KML file, contact email@jasperstocker.com and I'll sort this out. Thanks");
         }
-        Debug.LogError("Track BuildR could not convert KML file, contact email@jasperstocker.com and I'll sort this out. Thanks");
+        catch(Exception e)
+        {
+            Debug.LogError("Track BuildR could not convert KML file, contact email@jasperstocker.com and I'll sort this out. ERROR: "+e);
+        }
     }
 #endif
 }

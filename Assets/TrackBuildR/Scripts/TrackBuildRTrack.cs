@@ -608,16 +608,16 @@ public class TrackBuildRTrack : MonoBehaviour
         }
 
         //calculate approx bezier arc length per curve
+        float roughArcLength = 0;
         for (int i = 0; i < realNumberOfPoints; i++)
         {
             TrackBuildRPoint pointA = GetPoint(i);
             TrackBuildRPoint pointB = GetPoint(i+1);
-            float thisArcLength = 0;
-            thisArcLength += Vector3.Distance(pointA.position, pointA.forwardControlPoint);
-            thisArcLength += Vector3.Distance(pointA.forwardControlPoint, pointB.backwardControlPoint);
-            thisArcLength += Vector3.Distance(pointB.backwardControlPoint, pointB.position);
-            _points[i].arcLength = thisArcLength;
-            if(thisArcLength == 0)
+            roughArcLength += Vector3.Distance(pointA.position, pointA.forwardControlPoint);
+            roughArcLength += Vector3.Distance(pointA.forwardControlPoint, pointB.backwardControlPoint);
+            roughArcLength += Vector3.Distance(pointB.backwardControlPoint, pointB.position);
+            _points[i].arcLength = roughArcLength;
+            if(roughArcLength == 0)
             {
                 DestroyImmediate(pointA);
                 i--;
@@ -646,69 +646,65 @@ public class TrackBuildRTrack : MonoBehaviour
 
                 //Build accurate arc length data into curve
                 curve.center = Vector3.zero;
-                int arcLengthResolution = Mathf.Max(Mathf.RoundToInt(curve.arcLength * 10), 1);
-                float alTime = 1.0f / arcLengthResolution;
-                float calculatedTotalArcLength = 0;
-                curve.storedArcLengthsFull = new float[arcLengthResolution];
-                curve.storedArcLengthsFull[0] = 0.0f;
-                Vector3 pA = curve.position;
-                for (int i = 0; i < arcLengthResolution - 1; i++)
+                Vector3 curveA = pointA.position;
+                Vector3 curveP = pointA.forwardControlPoint;
+                Vector3 curveQ = pointB.backwardControlPoint;
+                Vector3 curveB = pointB.position;
+                Vector3 curveALTB = pointA.leftTrackBoundary;
+                Vector3 curveARTB = pointA.rightTrackBoundary;
+                Vector3 curveBLTB = pointB.leftTrackBoundary;
+                Vector3 curveBRTB = pointB.rightTrackBoundary;
+                Vector3 curveALFCP = pointA.leftForwardControlPoint;
+//                Vector3 curveALBCP = pointA.leftBackwardControlPoint;
+                Vector3 curveARFCP = pointA.rightForwardControlPoint;
+//                Vector3 curveARBCP = pointA.rightBackwardControlPoint;
+//                Vector3 curveBLFCP = pointB.leftForwardControlPoint;
+                Vector3 curveBLBCP = pointB.leftBackwardControlPoint;
+//                Vector3 curveBRFCP = pointB.rightForwardControlPoint;
+                Vector3 curveBRBCP = pointB.rightBackwardControlPoint;
+
+                int _dataSize = Mathf.Max(Mathf.RoundToInt(curve.arcLength / meshResolution), 1);
+                float normilisePercentAmount = 1.0f / (_dataSize * 10);
+                float normalisePercent = 0;
+                float targetMovement = curve.arcLength / (_dataSize - 1);
+
+                List<float> normValues = new List<float>();
+                normValues.Add(0);
+
+                float currentLength = 0;
+                float targetLength = targetMovement;
+                float totalArcLength = 0;
+
+                Vector3 pA = curveA, pB;
+                for(; normalisePercent < 1.0f - normilisePercentAmount; normalisePercent += normilisePercentAmount)
                 {
-                    curve.center += pA;
-                    float altB = alTime * (i + 1) + alTime;
-                    Vector3 pB = SplineMaths.CalculateBezierPoint(altB, curve.position, curve.forwardControlPoint, pointB.backwardControlPoint, pointB.position);
+                    pB = SplineMaths.CalculateBezierPoint(normalisePercent, curveA, curveP, curveQ, curveB);
                     float arcLength = Vector3.Distance(pA, pB);
-                    calculatedTotalArcLength += arcLength;
-                    curve.storedArcLengthsFull[i + 1] = calculatedTotalArcLength;
-                    pA = pB;//switch over values so we only calculate the bezier once
-                }
-                curve.arcLength = calculatedTotalArcLength;
-                curve.center /= arcLengthResolution;
 
-                int storedPointSize = Mathf.RoundToInt(calculatedTotalArcLength / meshResolution);
-                curve.storedPointSize = storedPointSize;
-                curve.normalisedT = new float[storedPointSize];
-                curve.targetSize = new float[storedPointSize];
-                curve.midPointPerc = new float[storedPointSize];
-                curve.prevNormIndex = new int[storedPointSize];
-                curve.nextNormIndex = new int[storedPointSize];
-                curve.clipArrayLeft = new bool[storedPointSize];
-                curve.clipArrayRight = new bool[storedPointSize];
-
-                //calculate normalised spline data
-                int normalisedIndex = 0;
-                curve.normalisedT[0] = 0;
-                for (int p = 1; p < storedPointSize; p++)
-                {
-                    float t = p / (float)(storedPointSize - 1);
-                    float targetLength = t * calculatedTotalArcLength;
-                    curve.targetSize[p] = targetLength;
-                    int it = 1000;
-                    while (targetLength > curve.storedArcLengthsFull[normalisedIndex])
+                    if(currentLength + arcLength > targetLength)
                     {
-                        normalisedIndex++;
-                        it--;
-                        if (it < 0)
-                        {
-                            curve.normalisedT[p] = 0;
-                            break;
-                        }
+                        float lerpPoint = (targetLength - currentLength) / arcLength;
+                        float normValue = Mathf.Lerp(normalisePercent, normalisePercent + normilisePercentAmount, lerpPoint);
+                        normValues.Add(normValue);
+                        curve.center += pB;
+
+                        currentLength = targetLength;
+                        targetLength += targetMovement;
                     }
 
-                    normalisedIndex = Mathf.Min(normalisedIndex, arcLengthResolution);//ensure we've not exceeded the length
-
-                    int prevNormIndex = Mathf.Max((normalisedIndex - 1), 0);
-                    int nextNormIndex = normalisedIndex;
-
-                    float lengthBefore = curve.storedArcLengthsFull[prevNormIndex];
-                    float lengthAfter = curve.storedArcLengthsFull[nextNormIndex];
-                    float midPointPercentage = (targetLength - lengthBefore) / (lengthAfter - lengthBefore);
-                    curve.midPointPerc[p] = midPointPercentage;
-                    curve.prevNormIndex[p] = prevNormIndex;
-                    curve.nextNormIndex[p] = nextNormIndex;
-                    float normalisedT = (normalisedIndex + midPointPercentage) / arcLengthResolution;//lerp between the values to get the exact normal T
-                    curve.normalisedT[p] = normalisedT;
+                    currentLength += arcLength;
+                    totalArcLength += arcLength;
+                    pA = pB;
                 }
+                normValues.Add(1);
+
+                int storedPointSize = normValues.Count;
+                curve.normalisedT = normValues.ToArray();
+                curve.arcLength = totalArcLength;
+                curve.center /= (storedPointSize-2);
+                curve.storedPointSize = storedPointSize;
+                curve.clipArrayLeft = new bool[storedPointSize];
+                curve.clipArrayRight = new bool[storedPointSize];
 
                 curve.sampledPoints = new Vector3[storedPointSize];
                 curve.sampledLeftBoundaryPoints = new Vector3[storedPointSize];
@@ -723,12 +719,13 @@ public class TrackBuildRTrack : MonoBehaviour
                 {
                     float tN = curve.normalisedT[p];
                     float tH = SplineMaths.CalculateHermite(tN);
-                    curve.sampledPoints[p] = SplineMaths.CalculateBezierPoint(tN, pointA.position, pointA.forwardControlPoint, pointB.backwardControlPoint, pointB.position);
-                    curve.sampledLeftBoundaryPoints[p] = SplineMaths.CalculateBezierPoint(tN, pointA.leftTrackBoundary, pointA.leftForwardControlPoint, pointB.leftBackwardControlPoint, pointB.leftTrackBoundary);
-                    curve.sampledRightBoundaryPoints[p] = SplineMaths.CalculateBezierPoint(tN, pointA.rightTrackBoundary, pointA.rightForwardControlPoint, pointB.rightBackwardControlPoint, pointB.rightTrackBoundary);
+                    curve.sampledPoints[p] = SplineMaths.CalculateBezierPoint(tN, curveA, curveP, curveQ, curveB);
+                    curve.sampledLeftBoundaryPoints[p] = SplineMaths.CalculateBezierPoint(tN, curveALTB, curveALFCP, curveBLBCP, curveBLTB);
+                    curve.sampledRightBoundaryPoints[p] = SplineMaths.CalculateBezierPoint(tN, curveARTB, curveARFCP, curveBRBCP, curveBRTB);
                     curve.sampledWidths[p] = Mathf.LerpAngle(pointA.width, pointB.width, tH);
                     curve.sampledCrowns[p] = Mathf.LerpAngle(pointA.crownAngle, pointB.crownAngle, tH);
-                    curve.sampledTrackUps[p] = Quaternion.Slerp(pointA.trackUpQ, pointB.trackUpQ, tH) * Vector3.forward; 
+                    curve.sampledTrackUps[p] = Quaternion.Slerp(pointA.trackUpQ, pointB.trackUpQ, tH) * Vector3.forward;
+
                     curve.clipArrayLeft[p] = true;
                     curve.clipArrayRight[p] = true;
                 }
@@ -967,21 +964,6 @@ public class TrackBuildRTrack : MonoBehaviour
 //        }
 //    }
 
-
-    public void SolveTangents()
-    {
-        for (int i = 0; i < numberOfCurves; i++)
-        {
-            TrackBuildRPoint curve = _points[i];
-            curve.dynamicTrackMesh.SolveTangents();
-            curve.dynamicOffroadMesh.SolveTangents();
-            curve.dynamicBumperMesh.SolveTangents();
-            curve.dynamicBoundaryMesh.SolveTangents();
-            curve.dynamicBottomMesh.SolveTangents();
-        }
-        _tangentsGenerated = true;
-    }
-
     public void GenerateSecondaryUVSet()
     {
 #if UNITY_EDITOR
@@ -989,38 +971,51 @@ public class TrackBuildRTrack : MonoBehaviour
         {
             TrackBuildRPoint curve = _points[i];
 
-            for (int m = 0; m < curve.dynamicTrackMesh.meshCount; m++)
-                Unwrapping.GenerateSecondaryUVSet(curve.dynamicTrackMesh[m].mesh);
-            for (int m = 0; m < curve.dynamicOffroadMesh.meshCount; m++)
-                Unwrapping.GenerateSecondaryUVSet(curve.dynamicOffroadMesh[m].mesh);
-            for (int m = 0; m < curve.dynamicBumperMesh.meshCount; m++)
-                Unwrapping.GenerateSecondaryUVSet(curve.dynamicBumperMesh[m].mesh);
-            for (int m = 0; m < curve.dynamicBoundaryMesh.meshCount; m++)
-                Unwrapping.GenerateSecondaryUVSet(curve.dynamicBoundaryMesh[m].mesh);
-            for (int m = 0; m < curve.dynamicBottomMesh.meshCount; m++)
-                Unwrapping.GenerateSecondaryUVSet(curve.dynamicBottomMesh[m].mesh);
+            List<Mesh> unwrapList = new List<Mesh>();
+            unwrapList.AddRange(curve.dynamicTrackMesh.meshes);
+            unwrapList.AddRange(curve.dynamicOffroadMesh.meshes);
+            unwrapList.AddRange(curve.dynamicBumperMesh.meshes);
+            unwrapList.AddRange(curve.dynamicBoundaryMesh.meshes);
+            unwrapList.AddRange(curve.dynamicBottomMesh.meshes);
+
+            int count = unwrapList.Count;
+            for(int m = 0; m < count; m++)
+            {
+                if (unwrapList[m].vertexCount==0)
+                    continue;
+                Unwrapping.GenerateSecondaryUVSet(unwrapList[m]);
+            }
         }
         _lightmapGenerated = true;
 #endif
     }
 
-    public void OptimizeMeshes()
+    public void OptimseMeshes()
     {
 #if UNITY_EDITOR
         for (int i = 0; i < numberOfCurves; i++)
         {
             TrackBuildRPoint curve = _points[i];
 
+            Mesh[] meshes = curve.dynamicTrackMesh.meshes;
             for (int m = 0; m < curve.dynamicTrackMesh.meshCount; m++)
-                MeshUtility.Optimize(curve.dynamicTrackMesh[m].mesh);
+                MeshUtility.Optimize(meshes[m]);
+
+            meshes = curve.dynamicOffroadMesh.meshes;
             for (int m = 0; m < curve.dynamicOffroadMesh.meshCount; m++)
-                MeshUtility.Optimize(curve.dynamicOffroadMesh[m].mesh);
+                MeshUtility.Optimize(meshes[m]);
+
+            meshes = curve.dynamicBumperMesh.meshes;
             for (int m = 0; m < curve.dynamicBumperMesh.meshCount; m++)
-                MeshUtility.Optimize(curve.dynamicBumperMesh[m].mesh);
+                MeshUtility.Optimize(meshes[m]);
+
+            meshes = curve.dynamicBoundaryMesh.meshes;
             for (int m = 0; m < curve.dynamicBoundaryMesh.meshCount; m++)
-                MeshUtility.Optimize(curve.dynamicBoundaryMesh[m].mesh);
+                MeshUtility.Optimize(meshes[m]);
+
+            meshes = curve.dynamicBottomMesh.meshes;
             for (int m = 0; m < curve.dynamicBottomMesh.meshCount; m++)
-                MeshUtility.Optimize(curve.dynamicBottomMesh[m].mesh);
+                MeshUtility.Optimize(meshes[m]);
         }
         _optimised = true;
 #endif
@@ -1107,11 +1102,13 @@ public class TrackBuildRTrack : MonoBehaviour
     public void FromKML(string coordinates)
     {
         Clear();
-        string[] coorArray = coordinates.Split(new []{" "}, StringSplitOptions.RemoveEmptyEntries);
+        string[] coorArray = coordinates.Split(new []{" ","\n","\t"}, StringSplitOptions.RemoveEmptyEntries);
         List<Vector3> kmlpoints = new List<Vector3>();
         Vector3 xyCenter = new Vector3();
         Vector3 lastCoord = Vector3.zero;
         int numberOfCoords = coorArray.Length;
+        if (numberOfCoords == 0)
+            Debug.LogError("Track BuildR KML Import Error: Unable to extract a Track from this KML, please contact Jasper at email@jasperstocker.com for assistance");
         for (int i = 0; i < numberOfCoords; i++)
         {
             string coord = coorArray[i];

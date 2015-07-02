@@ -13,6 +13,8 @@ using UnityEngine;
 using UnityEditor;
 #endif
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using TrackBuildRUtil;
 
 public class TrackBuildRGenerator : MonoBehaviour
@@ -46,26 +48,19 @@ public class TrackBuildRGenerator : MonoBehaviour
         {
             TrackBuildRPoint curve = track[i];
 
-            Debug.Log("meshes "+numberOfCurves);
-            if(curve.type == TrackSegmentType.LEFT)
-                TrackManager.instance.Mat = 0;
-            else
-                if(curve.type == TrackSegmentType.RIGHT)
-                TrackManager.instance.Mat = 0;
-            else
-                TrackManager.instance.Mat = 1;
-
             bool generateCollider = curve.trackCollider;
 
-            DynamicMeshGenericMultiMaterialMesh dynamicTrackMesh = curve.dynamicTrackMesh;
-            DynamicMeshGenericMultiMaterialMesh dynamicBoundaryMesh = curve.dynamicBoundaryMesh;
-            DynamicMeshGenericMultiMaterialMesh dynamicOffroadMesh = curve.dynamicOffroadMesh;
-            DynamicMeshGenericMultiMaterialMesh dynamicBumperMesh = curve.dynamicBumperMesh;
-            DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh1 = curve.dynamicColliderMesh1;
-            DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh2 = curve.dynamicColliderMesh2;
-            DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh3 = curve.dynamicColliderMesh3;
-            DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh4 = curve.dynamicColliderMesh4;
-            DynamicMeshGenericMultiMaterialMesh dynamicBottomMesh = curve.dynamicBottomMesh;
+            curve.DynamicMeshCheck();
+
+            DynamicMesh dynamicTrackMesh = curve.dynamicTrackMesh;
+            DynamicMesh dynamicBoundaryMesh = curve.dynamicBoundaryMesh;
+            DynamicMesh dynamicOffroadMesh = curve.dynamicOffroadMesh;
+            DynamicMesh dynamicBumperMesh = curve.dynamicBumperMesh;
+            DynamicMesh dynamicColliderMesh1 = curve.dynamicColliderMesh1;//track surface
+            DynamicMesh dynamicColliderMesh2 = curve.dynamicColliderMesh2;//walls and roof
+            DynamicMesh dynamicColliderMesh3 = curve.dynamicColliderMesh3;//track bottom and offroad
+            DynamicMesh dynamicColliderMesh4 = curve.dynamicColliderMesh4;//bumpers
+            DynamicMesh dynamicBottomMesh = curve.dynamicBottomMesh;
 
             if (!curve.render || !renderTrack)
             {
@@ -83,23 +78,14 @@ public class TrackBuildRGenerator : MonoBehaviour
             if (curve.shouldReRender && curve.render && renderTrack)
             {
                 dynamicTrackMesh.Clear();
-                dynamicTrackMesh.subMeshCount = 1;
                 dynamicBoundaryMesh.Clear();
-                dynamicBoundaryMesh.subMeshCount = 1;
                 dynamicColliderMesh1.Clear();
                 dynamicColliderMesh2.Clear();
                 dynamicColliderMesh3.Clear();
                 dynamicColliderMesh4.Clear();
-                dynamicColliderMesh1.subMeshCount = 1;
-                dynamicColliderMesh2.subMeshCount = 1;
-                dynamicColliderMesh3.subMeshCount = 1;
-                dynamicColliderMesh4.subMeshCount = 1;
                 dynamicOffroadMesh.Clear();
-                dynamicOffroadMesh.subMeshCount = 1;
                 dynamicBumperMesh.Clear();
-                dynamicBumperMesh.subMeshCount = 1;
                 dynamicBottomMesh.Clear();
-                dynamicBottomMesh.subMeshCount = 1;
 
                 dynamicTrackMesh.name = "curve " + i + " track mesh";
                 dynamicBoundaryMesh.name = "curve " + i + " boundary mesh";
@@ -116,6 +102,8 @@ public class TrackBuildRGenerator : MonoBehaviour
                 bool bumperTextureFlip = (track.numberOfTextures > 0) ? track.Texture(curve.bumperTextureStyleIndex).flipped : false;
                 bool bottomTextureFlip = (track.numberOfTextures > 0) ? track.Texture(curve.bottomTextureStyleIndex).flipped : false;
 
+                Vector2 trackTextureSize = track.Texture(curve.trackTextureStyleIndex).textureUnitSize;
+
                 int storedPointSize = curve.storedPointSize;
                 float curveLength = curve.arcLength;
                 //Store these points so we can use previous values when Bezier clips itself
@@ -130,8 +118,10 @@ public class TrackBuildRGenerator : MonoBehaviour
                     if (!track.loop && track[track.numberOfPoints - 2] == curve && p == storedPointSize - 2)//skip very last section of the last curve
                         continue;
 
-                    float tA = curve.normalisedT[p];
-                    float tB = curve.normalisedT[p + 1];
+                    float pA = p / (float)storedPointSize;
+                    float pB = (p+1f) / (float)storedPointSize;
+//                    float tA = curve.normalisedT[p];
+//                    float tB = curve.normalisedT[p + 1];
                     int sampleIndexA = p;
                     int sampleIndexB = sampleIndexA + 1;
                     Vector3 pointA = curve.sampledPoints[sampleIndexA];
@@ -146,6 +136,21 @@ public class TrackBuildRGenerator : MonoBehaviour
                     Vector3 trackCrossB = curve.sampledTrackCrosses[sampleIndexB];
                     float trackAngle = curve.sampledAngles[sampleIndexA];
 
+                    Vector3 tangentADirection = trackCrossA.normalized;
+                    Vector4 tangent = new Vector4();
+                    tangent.x = tangentADirection.x;
+                    tangent.y = tangentADirection.y;
+                    tangent.z = tangentADirection.z;
+                    tangent.w = -1;//TODO: Check whether we need to flip the bi normal - I don't think we do with these planes
+                    Vector4 trackTangentA = tangent;
+
+                    Vector3 tangentBDirection = trackCrossB.normalized;
+                    tangent.x = tangentBDirection.x;
+                    tangent.y = tangentBDirection.y;
+                    tangent.z = tangentBDirection.z;
+                    tangent.w = -1;//TODO: Check whether we need to flip the bi normal - I don't think we do with these planes
+                    Vector4 trackTangentB = tangent;
+
                     if (trackUpA == Vector3.zero || trackUpB == Vector3.zero)
                         return;
 
@@ -156,14 +161,16 @@ public class TrackBuildRGenerator : MonoBehaviour
                     Vector3[] uncrownedVerts = new Vector3[numberOfNewVerts];
                     if (curve.clipArrayLeft[sampleIndexA]) leftPointA = (pointA + (trackCrossA * -trackWidthA));
                     if (curve.clipArrayRight[sampleIndexA]) rightPointA = (pointA + (trackCrossA * trackWidthA));
-                    float curveLengthA = (curveLength * tA) / trackWidthA + UVOffset;
-                    float curveLengthB = (curveLength * tB) / trackWidthB + UVOffset;
+                    float curveLengthA = (curveLength * pA) / (trackTextureSize.y * 2f) + UVOffset;
+                    float curveLengthB = (curveLength * pB) / (trackTextureSize.y * 2f) + UVOffset;
                     float lerpASize = 1.0f / (pointANumber - 1);
 
                     //track vertex/uv data for point nextNormIndex
                     Vector3[] newAPoints = new Vector3[pointANumber];
                     Vector3[] newTrackPoints = new Vector3[pointANumber + pointBNumber];
                     Vector2[] newTrackUVs = new Vector2[pointANumber + pointBNumber];
+                    Vector3[] newTrackNormals = new Vector3[pointANumber + pointBNumber];
+                    Vector4[] newTrackTangents = new Vector4[pointANumber + pointBNumber];
                     for (int pa = 0; pa < pointANumber; pa++)
                     {
                         float lerpValue = lerpASize * pa;
@@ -173,8 +180,10 @@ public class TrackBuildRGenerator : MonoBehaviour
                         Vector3 newVert = uncrownedVert + crownVector;
                         newAPoints[pa] = newVert;
                         newTrackPoints[pa] = newVert;
-                        Vector2 newUV = (!trackTextureFlip) ? new Vector2(lerpValue, curveLengthA) : new Vector2(curveLengthA, lerpValue);
+                        Vector2 newUV = (!trackTextureFlip) ? new Vector2(lerpValue * trackWidthA / trackTextureSize.x, curveLengthA) : new Vector2(curveLengthA, lerpValue * trackWidthA / trackTextureSize.x);
                         newTrackUVs[pa] = newUV;
+                        newTrackNormals[pa] = trackUpA;
+                        newTrackTangents[pa] = trackTangentA;
                     }
 
                     //track vertex/uv data for point prevNormIndex
@@ -191,8 +200,10 @@ public class TrackBuildRGenerator : MonoBehaviour
                         Vector3 newVert = uncrownedVert + crownVector;
                         newBPoints[pb] = newVert;
                         newTrackPoints[pb + pointANumber] = newVert;
-                        Vector2 newUV = (!trackTextureFlip) ? new Vector2(lerpValue, curveLengthB) : new Vector2(curveLengthB, lerpValue);
+                        Vector2 newUV = (!trackTextureFlip) ? new Vector2(lerpValue * trackWidthB / trackTextureSize.x, curveLengthB) : new Vector2(curveLengthB, lerpValue * trackWidthB / trackTextureSize.x);
                         newTrackUVs[pb + pointANumber] = newUV;
+                        newTrackNormals[pb + pointANumber] = trackUpB;
+                        newTrackTangents[pb + pointANumber] = trackTangentB;
                     }
                     int baseTriPointA = 0;
                     int baseTriPointB = pointANumber;
@@ -234,8 +245,8 @@ public class TrackBuildRGenerator : MonoBehaviour
                             newTriPointCountB++;
                         }
                     }
-                    dynamicTrackMesh.AddData(newTrackPoints, newTrackUVs, newTrackTris, 0);
-                    dynamicColliderMesh1.AddData(newTrackPoints, newTrackUVs, newTrackTris, 0);
+                    dynamicTrackMesh.AddData(newTrackPoints, newTrackUVs, newTrackTris, newTrackNormals, newTrackTangents, 0);
+                    dynamicColliderMesh1.AddData(newTrackPoints, newTrackUVs, newTrackTris, newTrackNormals, newTrackTangents, 0);
 
                     //Boundary
                     float trackBoundaryWallHeight = curve.boundaryHeight;// track.boundaryHeight;
@@ -273,12 +284,12 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newWallTris = new[] { 1, 0, 2, 1, 2, 3 };
                         //                    newWallTris = (boundaryTextureFlip) ? (new[] { 1, 0, 2, 1, 2, 3 }) : (new[] { 0,2,1,2,3,1 });
                         //                    newWallTris = (!track.renderBoundaryWallReverse) ? new[] { 1, 0, 2, 1, 2, 3 } : new[] { 1, 0, 2, 1, 2, 3, 0, 1, 2, 2, 1, 3 };
-                        dynamicBoundaryMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                        dynamicBoundaryMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         if (track.renderBoundaryWallReverse)
                         {
                             newWallTris = new[] { 0, 1, 2, 2, 1, 3 };
                             //                        newWallTris = (boundaryTextureFlip) ? (new[] { 0, 1, 2, 2, 1, 3 }) : (new[] { 0, 2, 1, 2, 3, 1 });
-                            dynamicBoundaryMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBoundaryMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
 
                         //RIGHT
@@ -291,11 +302,11 @@ public class TrackBuildRGenerator : MonoBehaviour
 
                         newWallTris = new[] { 0, 1, 2, 2, 1, 3 };
                         //newWallTris = (!track.renderBoundaryWallReverse) ? new[] { 0, 1, 2, 2, 1, 3 } : new[] { 1, 0, 2, 1, 2, 3, 0, 1, 2, 2, 1, 3 };
-                        dynamicBoundaryMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                        dynamicBoundaryMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         if (track.renderBoundaryWallReverse)
                         {
                             newWallTris = new[] { 1, 0, 2, 1, 2, 3 };
-                            dynamicBoundaryMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBoundaryMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
                     }
 
@@ -308,11 +319,11 @@ public class TrackBuildRGenerator : MonoBehaviour
                             newWallVerts = (new[] { leftBoundaryPointA, leftBoundaryPointB, leftBoundaryPointA + trackUpA * trackColliderWallHeight, leftBoundaryPointB + trackUpB * trackColliderWallHeight });
                             newWallUVs = (new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero });
                             newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
-                            dynamicColliderMesh2.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh2.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             newWallVerts = (new[] { rightBoundaryPointA, rightBoundaryPointB, rightBoundaryPointA + trackUpA * trackColliderWallHeight, rightBoundaryPointB + trackUpB * trackColliderWallHeight });
                             newWallUVs = (new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero });
                             newWallTris = (new[] { 0, 1, 2, 2, 1, 3 });
-                            dynamicColliderMesh2.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh2.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
 
                         //offroad bits
@@ -324,21 +335,21 @@ public class TrackBuildRGenerator : MonoBehaviour
                             newWallVerts = (new[] { leftPointA, leftPointB, leftBoundaryPointA, leftBoundaryPointB });
                             newWallUVs = (new[] { new Vector2(leftPointA.x / offroadTextureSize.x, leftPointA.z / offroadTextureSize.y), new Vector2(leftPointB.x / offroadTextureSize.x, leftPointB.z / offroadTextureSize.y), new Vector2(leftBoundaryPointA.x / offroadTextureSize.x, leftBoundaryPointA.z / offroadTextureSize.y), new Vector2(leftBoundaryPointB.x / offroadTextureSize.x, leftBoundaryPointB.z / offroadTextureSize.y) });
                             newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
-                            dynamicOffroadMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicOffroadMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
 
                             newWallVerts = (new[] { rightPointA, rightPointB, rightBoundaryPointA, rightBoundaryPointB });
                             newWallUVs = (new[] { new Vector2(rightPointA.x / offroadTextureSize.x, rightPointA.z / offroadTextureSize.y), new Vector2(rightPointB.x / offroadTextureSize.x, rightPointB.z / offroadTextureSize.y), new Vector2(rightBoundaryPointA.x / offroadTextureSize.x, rightBoundaryPointA.z / offroadTextureSize.y), new Vector2(rightBoundaryPointB.x / offroadTextureSize.x, rightBoundaryPointB.z / offroadTextureSize.y) });
                             newWallTris = (new[] { 0, 1, 2, 2, 1, 3 });
-                            dynamicOffroadMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicOffroadMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
 
                             newWallVerts = (new[] { leftPointA, leftPointB, leftBoundaryPointA, leftBoundaryPointB });
                             newWallUVs = (new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero });
                             newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
-                            dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh3.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             newWallVerts = (new[] { rightPointA, rightPointB, rightBoundaryPointA, rightBoundaryPointB });
                             newWallUVs = (new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero });
                             newWallTris = (new[] { 0, 1, 2, 2, 1, 3 });
-                            dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh3.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
 
                         if (track.includeColliderRoof)
@@ -346,7 +357,7 @@ public class TrackBuildRGenerator : MonoBehaviour
                             newWallVerts = (new[] { leftBoundaryPointA + trackUpA * trackColliderWallHeight, leftBoundaryPointB + trackUpB * trackColliderWallHeight, rightBoundaryPointA + trackUpA * trackColliderWallHeight, rightBoundaryPointB + trackUpB * trackColliderWallHeight });
                             newWallUVs = (new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero });
                             newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
-                            dynamicColliderMesh2.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh2.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
                     }
 
@@ -402,13 +413,13 @@ public class TrackBuildRGenerator : MonoBehaviour
                             else
                                 newWallUVs = (new[] { new Vector2(1, uvStartA), new Vector2(0, uvStartA), new Vector2(1, uvEndA), new Vector2(0, uvEndA) });
                             newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
-                            dynamicBumperMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBumperMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             bumperDistanceA += bumperSegmentDistanceA;
 
                             newWallVerts = (new[] { bumperLeft0, bumperLeft1, bumperLeft2, bumperLeft3 });
                             newWallUVs = (new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero });
                             newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
-                            dynamicColliderMesh4.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh4.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
 
                         //Right bumpers
@@ -452,8 +463,8 @@ public class TrackBuildRGenerator : MonoBehaviour
                                 newWallUVs = (new[] { new Vector2(1, uvStartB), new Vector2(0, uvStartB), new Vector2(1, uvEndB), new Vector2(0, uvEndB) });
                             //                            newWallTris = (new[] { 1, 0, 2, 1, 2, 3 });
                             newWallTris = (new[] { 0, 1, 2, 1, 3, 2 });
-                            dynamicBumperMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
-                            dynamicColliderMesh4.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBumperMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicColliderMesh4.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             bumperDistanceB += bumperSegmentDistanceB;
                         }
                     }
@@ -492,9 +503,9 @@ public class TrackBuildRGenerator : MonoBehaviour
                             else
                                 newWallUVs = new[] { new Vector2(1, curveLengthA), new Vector2(1, curveLengthB), new Vector2(0, curveLengthA), new Vector2(0, curveLengthB), };
                             newWallTris = new[] { 1, 0, 2, 1, 2, 3 };
-                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBottomMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             if (curve.trackCollider)
-                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                                dynamicColliderMesh3.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
 
                             //RIGHT
                             newWallVerts = (new[] { pr0, pr1, pr2b, pr3b });
@@ -504,9 +515,9 @@ public class TrackBuildRGenerator : MonoBehaviour
                                 newWallUVs = new[] { new Vector2(1, curveLengthA), new Vector2(1, curveLengthB), new Vector2(0, curveLengthA), new Vector2(0, curveLengthB), };
 
                             newWallTris = new[] { 0, 1, 2, 2, 1, 3 };
-                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBottomMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             if (curve.trackCollider)
-                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                                dynamicColliderMesh3.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
 
                         if (curve.extrudeTrackBottom)
@@ -522,24 +533,26 @@ public class TrackBuildRGenerator : MonoBehaviour
                                 newWallUVs = new[] { new Vector2(1, curveLengthA), new Vector2(1, curveLengthB), new Vector2(0, curveLengthA), new Vector2(0, curveLengthB), };
 
                             newWallTris = new[] { 1, 0, 2, 1, 2, 3 };
-                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBottomMesh.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                             if (curve.trackCollider)
-                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                                dynamicColliderMesh3.AddPlane(newWallVerts, newWallUVs, newWallTris, 0);
                         }
                     }
 
                     //track end renders
                     bool renderCurveEnds = (curve.extrudeTrack || curve.extrudeTrackBottom) && curve.extrudeCurveEnd && curve.extrudeTrack;
 //                    if () renderCurveEnds = true;
-                    if ((i == 0 || i == numberOfCurves-1) && !track.loop) renderCurveEnds = true;
+                    if ((i == 0 || i == numberOfCurves - 1) && !track.loop) renderCurveEnds = true;
                     if (renderCurveEnds)
                     {
                         //Ends
-                        if (p == 0 || (i==0 && p==1))
+                        if (p == 0 && i!=0 || (i==0 && p==1))
                         {
                             newWallVerts = new Vector3[pointANumber+2];
                             newWallUVs = new Vector2[pointANumber+2];
                             newWallTris = new int[(pointANumber+1)*3];
+                            Vector3[] norms = new Vector3[pointANumber + 2];
+                            Vector4[] tan = new Vector4[pointANumber + 2];
                             for (int pa = 0; pa < pointANumber; pa++)
                             {
                                 newWallVerts[pa] = newAPoints[pa];
@@ -555,6 +568,9 @@ public class TrackBuildRGenerator : MonoBehaviour
                                     else
                                         newWallTris[pa * 3 + 2] = pointANumber + 1;
                                 }
+
+                                norms[pa] = (pointA - pointB).normalized;
+                                tan[pa] = tangentBDirection;
                             }
 
                             newWallVerts[pointANumber] = pl2b;
@@ -567,15 +583,17 @@ public class TrackBuildRGenerator : MonoBehaviour
                             newWallTris[pointANumber * 3 + 1] = pointANumber + 1;
                             newWallTris[pointANumber * 3 + 2] = pointANumber;
 
-                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, norms, tan, 0);
                             if (curve.trackCollider)
-                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, norms, tan, 0);
                         }
                         if (p == storedPointSize - 2 || (i==numberOfCurves-1 && p == storedPointSize -3))
                         {
                             newWallVerts = new Vector3[pointBNumber + 2];
                             newWallUVs = new Vector2[pointBNumber + 2];
                             newWallTris = new int[(pointBNumber + 1) * 3];
+                            Vector3[] norms = new Vector3[pointBNumber + 2];
+                            Vector4[] tan = new Vector4[pointBNumber + 2];
                             for (int pb = 0; pb < pointBNumber; pb++)
                             {
                                 newWallVerts[pb] = newBPoints[pb];
@@ -591,6 +609,9 @@ public class TrackBuildRGenerator : MonoBehaviour
                                     else
                                         newWallTris[pb * 3 + 2] = pointBNumber + 1;
                                 }
+
+                                norms[pb] = (pointB - pointA).normalized;
+                                tan[pb] = tangentADirection;
                             }
 
                             newWallVerts[pointBNumber] = pl3b;
@@ -610,9 +631,9 @@ public class TrackBuildRGenerator : MonoBehaviour
 //                            else
 //                                newWallUVs = new[] { new Vector2(1, curveLengthA), new Vector2(1, curveLengthB), new Vector2(0, curveLengthA), new Vector2(0, curveLengthB), };
 //                            newWallTris = new[] { 0, 1, 2, 2, 1, 3 };
-                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                            dynamicBottomMesh.AddData(newWallVerts, newWallUVs, newWallTris, norms, tan, 0);
                             if (curve.trackCollider)
-                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, 0);
+                                dynamicColliderMesh3.AddData(newWallVerts, newWallUVs, newWallTris, norms, tan, 0);
                         }
                     }
 
@@ -632,32 +653,16 @@ public class TrackBuildRGenerator : MonoBehaviour
                 {
                     dynamicTrackMesh.name = "Curve " + i + " Track Mesh";
                     dynamicTrackMesh.Build();
-
                     numberOfMeshes = dynamicTrackMesh.meshCount;
+                    Mesh[] meshes = dynamicTrackMesh.meshes;
                     for (int m = 0; m < numberOfMeshes; m++)
                     {
                         GameObject newMeshHolder = new GameObject("model " + (m + 1));
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
-                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicTrackMesh[m].mesh;
-
+                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
-						{
-//							if(!Application.isPlaying || !Application.isMobilePlatform)
-//							{
-//								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
-//							}
-//							else
-							{
-
-								newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetVariedTrackMatToUse());
-
-
-								//newMeshHolder.AddComponent<MeshRenderer>().material =  new Material(Shader.Find("Specular"));//track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
-							}
-
-
-						}
+                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.trackTextureStyleIndex).GetMaterial();// track.trackTexture.material;
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -669,30 +674,15 @@ public class TrackBuildRGenerator : MonoBehaviour
                 {
                     dynamicBoundaryMesh.Build();
                     numberOfMeshes = dynamicBoundaryMesh.meshCount;
+                    Mesh[] meshes = dynamicBoundaryMesh.meshes;
                     for (int m = 0; m < numberOfMeshes; m++)
                     {
                         GameObject newMeshHolder = new GameObject("boundary " + (m + 1));
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
-                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBoundaryMesh[m].mesh;
+                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
-						{
-//							if(!Application.isPlaying || !Application.isMobilePlatform)
-//							{
-//								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
-//							}
-//							else
-							{
-
-                                newMeshHolder.AddComponent<MeshRenderer>().material = new Material(TrackManager.instance.GetBorderMatToUse());
-
-//								Material mr = newMeshHolder.AddComponent<MeshRenderer>().material;
-//								mr = new Material(Shader.Find("Specular"));
-//								mr.color = Color.green;
-
-							}
-
-						}
+                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -703,12 +693,13 @@ public class TrackBuildRGenerator : MonoBehaviour
                 {
                     dynamicOffroadMesh.Build();
                     numberOfMeshes = dynamicOffroadMesh.meshCount;
+                    Mesh[] meshes = dynamicOffroadMesh.meshes;
                     for (int m = 0; m < numberOfMeshes; m++)
                     {
                         GameObject newMeshHolder = new GameObject("offroad " + (m + 1));
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
-                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicOffroadMesh[m].mesh;
+                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
                             newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.offroadTextureStyleIndex).GetMaterial();// track.offroadTexture.material;
 #if UNITY_EDITOR
@@ -723,13 +714,14 @@ public class TrackBuildRGenerator : MonoBehaviour
                     {
                         dynamicColliderMesh1.Build();
                         int numberOfColliderMeshes = dynamicColliderMesh1.meshCount;
+                        Mesh[] meshes = dynamicColliderMesh1.meshes;
                         for (int m = 0; m < numberOfColliderMeshes; m++)
                         {
                             GameObject newMeshHolder = new GameObject("trackCollider Road " + (m + 1));
                             newMeshHolder.transform.parent = curve.holder.transform;
                             newMeshHolder.transform.localPosition = Vector3.zero;
                             MeshCollider meshCollider = newMeshHolder.AddComponent<MeshCollider>();
-                            meshCollider.sharedMesh = dynamicColliderMesh1[m].mesh;
+                            meshCollider.sharedMesh = meshes[m];
                             PhysicMaterial physMat = track.Texture(curve.trackTextureStyleIndex).physicMaterial;
                             if (physMat != null)
                                 meshCollider.sharedMaterial = physMat;
@@ -739,31 +731,31 @@ public class TrackBuildRGenerator : MonoBehaviour
                     {
                         dynamicColliderMesh2.Build();
                         int numberOfColliderMeshes = dynamicColliderMesh2.meshCount;
+                        Mesh[] meshes = dynamicColliderMesh2.meshes;
                         for (int m = 0; m < numberOfColliderMeshes; m++)
                         {
                             GameObject newMeshHolder = new GameObject("trackCollider Wall " + (m + 1));
                             newMeshHolder.transform.parent = curve.holder.transform;
                             newMeshHolder.transform.localPosition = Vector3.zero;
                             MeshCollider meshCollider = newMeshHolder.AddComponent<MeshCollider>();
-                            meshCollider.sharedMesh = dynamicColliderMesh2[m].mesh;
+                            meshCollider.sharedMesh = meshes[m];
                             PhysicMaterial physMat = track.Texture(curve.boundaryTextureStyleIndex).physicMaterial;
                             if (physMat != null)
                                 meshCollider.sharedMaterial = physMat;
-
-                            meshCollider.gameObject.layer = 2;
                         }
                     }
                     if (!dynamicColliderMesh3.isEmpty)
                     {
                         dynamicColliderMesh3.Build();
                         int numberOfColliderMeshes = dynamicColliderMesh3.meshCount;
+                        Mesh[] meshes = dynamicColliderMesh3.meshes;
                         for (int m = 0; m < numberOfColliderMeshes; m++)
                         {
                             GameObject newMeshHolder = new GameObject("trackCollider Offroad " + (m + 1));
                             newMeshHolder.transform.parent = curve.holder.transform;
                             newMeshHolder.transform.localPosition = Vector3.zero;
                             MeshCollider meshCollider = newMeshHolder.AddComponent<MeshCollider>();
-                            meshCollider.sharedMesh = dynamicColliderMesh3[m].mesh;
+                            meshCollider.sharedMesh = meshes[m];
                             PhysicMaterial physMat = track.Texture(curve.offroadTextureStyleIndex).physicMaterial;
                             if (physMat != null)
                                 meshCollider.sharedMaterial = physMat;
@@ -773,13 +765,14 @@ public class TrackBuildRGenerator : MonoBehaviour
                     {
                         dynamicColliderMesh4.Build();
                         int numberOfColliderMeshes = dynamicColliderMesh4.meshCount;
+                        Mesh[] meshes = dynamicColliderMesh4.meshes;
                         for (int m = 0; m < numberOfColliderMeshes; m++)
                         {
                             GameObject newMeshHolder = new GameObject("trackCollider Bumper " + (m + 1));
                             newMeshHolder.transform.parent = curve.holder.transform;
                             newMeshHolder.transform.localPosition = Vector3.zero;
                             MeshCollider meshCollider = newMeshHolder.AddComponent<MeshCollider>();
-                            meshCollider.sharedMesh = dynamicColliderMesh4[m].mesh;
+                            meshCollider.sharedMesh = meshes[m];
                             PhysicMaterial physMat = track.Texture(curve.bumperTextureStyleIndex).physicMaterial;
                             if (physMat != null)
                                 meshCollider.sharedMaterial = physMat;
@@ -791,26 +784,15 @@ public class TrackBuildRGenerator : MonoBehaviour
                 {
                     dynamicBumperMesh.Build();
                     numberOfMeshes = dynamicBumperMesh.meshCount;
+                    Mesh[] meshes = dynamicBumperMesh.meshes;
                     for (int m = 0; m < numberOfMeshes; m++)
                     {
                         GameObject newMeshHolder = new GameObject("bumper " + (m + 1));
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
-                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBumperMesh[m].mesh;
-                       
-						if (track.numberOfTextures > 0)
-						{
-//							if(!Application.isPlaying || !Application.isMobilePlatform)
-//							{
-//								newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bumperTextureStyleIndex).GetMaterial();// track.bumperTexture.material;
-//							}
-//							else
-							{
-                                newMeshHolder.AddComponent<MeshRenderer>().material = new Material(TrackManager.instance.GetBorderMatToUse());
-									//new Material(Shader.Find("Specular"));//track.Texture(curve.bumperTextureStyleIndex).GetMaterial();
-							}
-
-						}
+                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
+                        if (track.numberOfTextures > 0)
+                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bumperTextureStyleIndex).GetMaterial();// track.bumperTexture.material;
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -821,12 +803,13 @@ public class TrackBuildRGenerator : MonoBehaviour
                 {
                     dynamicBottomMesh.Build();
                     numberOfMeshes = dynamicBottomMesh.meshCount;
+                    Mesh[] meshes = dynamicBottomMesh.meshes;
                     for (int m = 0; m < numberOfMeshes; m++)
                     {
                         GameObject newMeshHolder = new GameObject("bottom " + (m + 1));
                         newMeshHolder.transform.parent = curve.holder.transform;
                         newMeshHolder.transform.localPosition = Vector3.zero;
-                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = dynamicBottomMesh[m].mesh;
+                        newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
                             newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bottomTextureStyleIndex).GetMaterial();// track.trackTexture.material;
 #if UNITY_EDITOR

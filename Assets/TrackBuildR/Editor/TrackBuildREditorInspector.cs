@@ -412,8 +412,8 @@ public class TrackBuildREditorInspector
                 EditorGUILayout.BeginHorizontal();
                 switch(pointTrackSelection)
                 {
-                    default:
-                        selectedCurves = new TrackBuildRPoint[]{_track[selectedCurveIndex]};
+                    default://selected point
+                        selectedCurves = new []{_track[selectedCurveIndex]};//select the single track point to modify
                         Undo.RecordObjects(selectedCurves, "Curve Details Modified");
 
                         EditorGUILayout.LabelField("Selected Curve: " + selectedCurves[0].pointName);
@@ -421,8 +421,8 @@ public class TrackBuildREditorInspector
                             GotoScenePoint(selectedCurves[0].center);
                         break;
 
-                    case 1:
-                        selectedCurves = _track.points;
+                    case 1://track wide
+                        selectedCurves = _track.points;//select all track points to modify
                         Undo.RecordObjects(selectedCurves, "Curve Details Modified");
                         break;
                 }
@@ -538,35 +538,40 @@ public class TrackBuildREditorInspector
                     int trackTextureStyleIndex = CurveTextureSelector(_track, selectedCurve.trackTextureStyleIndex, "Track Texture");
                     if(trackTextureStyleIndex != selectedCurve.trackTextureStyleIndex)
                     {
-                        selectedCurve.trackTextureStyleIndex = trackTextureStyleIndex;
+                        foreach (TrackBuildRPoint selectedCurveArray in selectedCurves)
+                            selectedCurveArray.trackTextureStyleIndex = trackTextureStyleIndex;
                         GUI.changed = true;
                         _track.ReRenderTrack();
                     }
                     int offroadTextureStyleIndex = CurveTextureSelector(_track, selectedCurve.offroadTextureStyleIndex, "Offroad Texture");
                     if(offroadTextureStyleIndex != selectedCurve.offroadTextureStyleIndex)
                     {
-                        selectedCurve.offroadTextureStyleIndex = offroadTextureStyleIndex;
+                        foreach (TrackBuildRPoint selectedCurveArray in selectedCurves)
+                            selectedCurveArray.offroadTextureStyleIndex = offroadTextureStyleIndex;
                         GUI.changed = true;
                         _track.ReRenderTrack();
                     }
                     int boundaryTextureStyleIndex = CurveTextureSelector(_track, selectedCurve.boundaryTextureStyleIndex, "Boundary Texture");
                     if(boundaryTextureStyleIndex != selectedCurve.boundaryTextureStyleIndex)
                     {
-                        selectedCurve.boundaryTextureStyleIndex = boundaryTextureStyleIndex;
+                        foreach (TrackBuildRPoint selectedCurveArray in selectedCurves)
+                            selectedCurveArray.boundaryTextureStyleIndex = boundaryTextureStyleIndex;
                         GUI.changed = true;
                         _track.ReRenderTrack();
                     }
                     int bumperTextureStyleIndex = CurveTextureSelector(_track, selectedCurve.bumperTextureStyleIndex, "Bumper Texture");
                     if(bumperTextureStyleIndex != selectedCurve.bumperTextureStyleIndex)
                     {
-                        selectedCurve.bumperTextureStyleIndex = bumperTextureStyleIndex;
+                        foreach (TrackBuildRPoint selectedCurveArray in selectedCurves)
+                            selectedCurveArray.bumperTextureStyleIndex = bumperTextureStyleIndex;
                         GUI.changed = true;
                         _track.ReRenderTrack();
                     }
                     int extrudeTextureStyleIndex = CurveTextureSelector(_track, selectedCurve.bottomTextureStyleIndex, "Track Extrude Texture");
                     if(extrudeTextureStyleIndex != selectedCurve.bottomTextureStyleIndex)
                     {
-                        selectedCurve.bottomTextureStyleIndex = extrudeTextureStyleIndex;
+                        foreach (TrackBuildRPoint selectedCurveArray in selectedCurves)
+                            selectedCurveArray.bottomTextureStyleIndex = extrudeTextureStyleIndex;
                         GUI.changed = true;
                         _track.ReRenderTrack();
                     }
@@ -619,6 +624,8 @@ public class TrackBuildREditorInspector
 
                 Title("Terrain", TrackBuildRColours.RED);
 
+                EditorGUILayout.HelpBox("I'd love to hear feedback on this new feature.\nWhat works? What doesn't.\nLet me know!", MessageType.Info);
+
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Terrain Mode", GUILayout.Width(90));
                 EditorGUI.BeginDisabledGroup(_trackBuildR.terrainMode == TrackBuildR.terrainModes.mergeTerrain);
@@ -659,7 +666,7 @@ public class TrackBuildREditorInspector
 
                         EditorGUILayout.BeginVertical("box");
                         EditorGUILayout.LabelField("Terrain Match Margin");
-                        _track.terrainMergeMargin = EditorGUILayout.Slider(_track.terrainMergeMargin, 1, 20);
+                        _track.terrainMergeMargin = EditorGUILayout.Slider(_track.terrainMergeMargin, 1, 5);
                         EditorGUILayout.EndVertical();
 
                         EditorGUILayout.BeginVertical("box");
@@ -953,7 +960,7 @@ public class TrackBuildREditorInspector
                 if(GUILayout.Button("Optimise Mesh For Runtime", GUILayout.Height(38)))
                 {
                     Undo.RecordObject(_trackBuildR, "Optimise Meshes");
-                    _trackBuildR.OptimizeMeshes();
+                    _trackBuildR.OptimseMeshes();
                     GUI.changed = false;
                 }
                 EditorGUI.EndDisabledGroup();
@@ -1154,52 +1161,7 @@ public class TrackBuildREditorInspector
                 if(texture.texture == null)
                     return isModified;
 
-                bool textureflipped = EditorGUILayout.Toggle("Flip Clockwise", texture.flipped);
-                if(textureflipped != texture.flipped)
-                {
-                    isModified = true;
-                    texture.flipped = textureflipped;
-                }
-
-                Vector2 textureUnitSize = texture.textureUnitSize;
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("trackTexture width", GUILayout.Width(75));//, GUILayout.Width(42));
-                float textureUnitSizex = EditorGUILayout.FloatField(texture.textureUnitSize.x, GUILayout.Width(25));
-                if(textureUnitSizex != textureUnitSize.x)
-                {
-                    isModified = true;
-                    textureUnitSize.x = textureUnitSizex;
-                }
-                EditorGUILayout.LabelField("metres", GUILayout.Width(40));//, GUILayout.Width(42));
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("trackTexture height", GUILayout.Width(75));//, GUILayout.Width(42));
-                float textureUnitSizey = EditorGUILayout.FloatField(texture.textureUnitSize.y, GUILayout.Width(25));
-                if(textureUnitSizey != textureUnitSize.y)
-                {
-                    isModified = true;
-                    textureUnitSize.y = textureUnitSizey;
-                }
-                EditorGUILayout.LabelField("metres", GUILayout.Width(40));
-                EditorGUILayout.EndHorizontal();
-                texture.textureUnitSize = textureUnitSize;
-
-                const int previewTextureUnitSize = 120;
-                const int previewPadding = 25;
-
-                EditorGUILayout.LabelField("1 Metre Squared", GUILayout.Width(previewTextureUnitSize));
-                GUILayout.Space(previewPadding);
-                EditorGUILayout.Space();
-
-                Rect texturePreviewPostion = new Rect(0, 0, 0, 0);
-                if(Event.current.type == EventType.Repaint)
-                    texturePreviewPostion = GUILayoutUtility.GetLastRect();
-
-                Rect previewRect = new Rect(texturePreviewPostion.x, texturePreviewPostion.y, previewTextureUnitSize, previewTextureUnitSize);
-                Rect sourceRect = new Rect(0, 0, (1.0f / textureUnitSize.x), (1.0f / textureUnitSize.y));
-
-                Graphics.DrawTexture(previewRect, texture.texture, sourceRect, 0, 0, 0, 0);
-                GUILayout.Space(previewTextureUnitSize);
+                
             break;
 
             case TrackBuildRTexture.Types.Substance:
@@ -1208,8 +1170,8 @@ public class TrackBuildREditorInspector
 
                 if (texture.proceduralMaterial != null)
                 {
-                    ProceduralMaterial pMat = texture.proceduralMaterial;
-                    GUILayout.Label(pMat.GetGeneratedTexture(pMat.mainTexture.name), GUILayout.Width(400));
+//                    ProceduralMaterial pMat = texture.proceduralMaterial;
+//                    GUILayout.Label(pMat.GetGeneratedTexture(pMat.mainTexture.name), GUILayout.Width(400));
                 }
                 else
                     EditorGUILayout.HelpBox("There is no substance material set.", MessageType.Error);
@@ -1220,12 +1182,89 @@ public class TrackBuildREditorInspector
 
                 if (texture.userMaterial != null)
                 {
-                    Material mat = texture.userMaterial;
-                    GUILayout.Label(mat.mainTexture, GUILayout.Width(400));
+//                    Material mat = texture.userMaterial;
+//                    GUILayout.Label(mat.mainTexture, GUILayout.Width(400));
                 }
                 else
                     EditorGUILayout.HelpBox("There is no substance material set.", MessageType.Error);
             break;
+        }
+
+        bool textureflipped = EditorGUILayout.Toggle("Flip Clockwise", texture.flipped);
+        if (textureflipped != texture.flipped)
+        {
+            isModified = true;
+            texture.flipped = textureflipped;
+        }
+
+        Vector2 textureUnitSize = texture.textureUnitSize;
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("trackTexture width", GUILayout.Width(175));//, GUILayout.Width(42));
+        float textureUnitSizex = EditorGUILayout.FloatField(texture.textureUnitSize.x, GUILayout.Width(25));
+        if (textureUnitSizex != textureUnitSize.x)
+        {
+            isModified = true;
+            textureUnitSize.x = textureUnitSizex;
+        }
+        EditorGUILayout.LabelField("metres", GUILayout.Width(40));//, GUILayout.Width(42));
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("trackTexture height", GUILayout.Width(175));//, GUILayout.Width(42));
+        float textureUnitSizey = EditorGUILayout.FloatField(texture.textureUnitSize.y, GUILayout.Width(25));
+        if (textureUnitSizey != textureUnitSize.y)
+        {
+            isModified = true;
+            textureUnitSize.y = textureUnitSizey;
+        }
+        EditorGUILayout.LabelField("metres", GUILayout.Width(40));
+        EditorGUILayout.EndHorizontal();
+        texture.textureUnitSize = textureUnitSize;
+
+        const int previewTextureUnitSize = 120;
+        const int previewPadding = 25;
+
+        EditorGUILayout.LabelField("1 Metre Squared", GUILayout.Width(previewTextureUnitSize));
+        GUILayout.Space(previewPadding);
+        EditorGUILayout.Space();
+
+        Rect texturePreviewPostion = new Rect(0, 0, 0, 0);
+        if (Event.current.type == EventType.Repaint)
+            texturePreviewPostion = GUILayoutUtility.GetLastRect();
+
+        Rect previewRect = new Rect(texturePreviewPostion.x, texturePreviewPostion.y, previewTextureUnitSize, previewTextureUnitSize);
+        Rect sourceRect = new Rect(0, 0, (1.0f / textureUnitSize.x), (1.0f / textureUnitSize.y));
+
+        GUILayout.Space(previewTextureUnitSize);
+
+        switch(texture.type)
+        {
+            case TrackBuildRTexture.Types.Basic:
+                Graphics.DrawTexture(previewRect, texture.texture, sourceRect, 0, 0, 0, 0);
+                break;
+
+            case TrackBuildRTexture.Types.Substance:
+
+                if(texture.proceduralMaterial != null)
+                {
+                    ProceduralMaterial pMat = texture.proceduralMaterial;
+//                    GUILayout.Label(pMat.GetGeneratedTexture(pMat.mainTexture.name), GUILayout.Width(400));
+                    Graphics.DrawTexture(previewRect, pMat.mainTexture, sourceRect, 0, 0, 0, 0);
+                }
+                else
+                    EditorGUILayout.HelpBox("There is no substance material set.", MessageType.Error);
+                break;
+
+            case TrackBuildRTexture.Types.User:
+
+                if(texture.userMaterial != null)
+                {
+                    Material mat = texture.userMaterial;
+//                    GUILayout.Label(mat.mainTexture, GUILayout.Width(400));
+                    Graphics.DrawTexture(previewRect, mat.mainTexture, sourceRect, 0, 0, 0, 0);
+                }
+                else
+                    EditorGUILayout.HelpBox("There is no substance material set.", MessageType.Error);
+                break;
         }
         if (isModified)
             GUI.changed = true;

@@ -50,11 +50,11 @@ public class TrackBuildRCurve : ScriptableObject
     public bool[] clipArrayRight;
 
     public GameObject holder = null;
-    public DynamicMeshGenericMultiMaterialMesh dynamicTrackMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicBoundaryMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicOffroadMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicBumperMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh = new DynamicMeshGenericMultiMaterialMesh();
+    public DynamicMesh dynamicTrackMesh = new DynamicMesh();
+    public DynamicMesh dynamicBoundaryMesh = new DynamicMesh();
+    public DynamicMesh dynamicOffroadMesh = new DynamicMesh();
+    public DynamicMesh dynamicBumperMesh = new DynamicMesh();
+    public DynamicMesh dynamicColliderMesh = new DynamicMesh();
 
     //texture values
     public int trackTextureStyleIndex = 0;
@@ -84,5 +84,14 @@ public class TrackBuildRCurve : ScriptableObject
     {
         pointA.shouldReRender = true;
         pointB.shouldReRender = true;
+    }
+
+    public void DynamicMeshCheck()
+    {
+        dynamicTrackMesh = new DynamicMesh();
+        dynamicBoundaryMesh = new DynamicMesh();
+        dynamicOffroadMesh = new DynamicMesh();
+        dynamicBumperMesh = new DynamicMesh();
+        dynamicColliderMesh = new DynamicMesh();
     }
 }

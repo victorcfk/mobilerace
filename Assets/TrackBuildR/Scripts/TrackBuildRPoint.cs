@@ -18,6 +18,7 @@ using UnityEngine;
 /// It also holds a few precalculations to speed up track generation
 /// </summary>
 
+[ExecuteInEditMode]
 public class TrackBuildRPoint : MonoBehaviour
 {
     public string pointName = "point";
@@ -28,12 +29,12 @@ public class TrackBuildRPoint : MonoBehaviour
 
     [SerializeField]
     private float _width = 15;//FIA Starting Grid regulation numberOfPoints
-//    [SerializeField]
-//    private float _cant = 0;//track tilt
+    //    [SerializeField]
+    //    private float _cant = 0;//track tilt
     [SerializeField]
     private float _crownAngle = 0;//track camber
-//    public TrackBuildRCurve curveA;
-//    public TrackBuildRCurve curveB;
+    //    public TrackBuildRCurve curveA;
+    //    public TrackBuildRCurve curveB;
 
     //Bezier Control Points
     [SerializeField]
@@ -87,7 +88,6 @@ public class TrackBuildRPoint : MonoBehaviour
     private bool _renderBounds = true;
     [SerializeField]
     private bool _trackCollider = true;
-
     [SerializeField]
     private bool _colliderSides = true;
 
@@ -129,20 +129,21 @@ public class TrackBuildRPoint : MonoBehaviour
     public Vector3[] sampledTrackDirections;
     public Vector3[] sampledTrackUps;
     public Vector3[] sampledTrackCrosses;
+    public Vector4[] sampledTrackTangents;
     public float[] sampledAngles;
     public bool[] clipArrayLeft;
     public bool[] clipArrayRight;
 
     public GameObject holder = null;
-    public DynamicMeshGenericMultiMaterialMesh dynamicTrackMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicBoundaryMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicOffroadMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicBumperMesh = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh1 = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh2 = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh3 = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicColliderMesh4 = new DynamicMeshGenericMultiMaterialMesh();
-    public DynamicMeshGenericMultiMaterialMesh dynamicBottomMesh = new DynamicMeshGenericMultiMaterialMesh();
+    public DynamicMesh dynamicTrackMesh;
+    public DynamicMesh dynamicBoundaryMesh;
+    public DynamicMesh dynamicOffroadMesh;
+    public DynamicMesh dynamicBumperMesh;
+    public DynamicMesh dynamicColliderMesh1;
+    public DynamicMesh dynamicColliderMesh2;
+    public DynamicMesh dynamicColliderMesh3;
+    public DynamicMesh dynamicColliderMesh4;
+    public DynamicMesh dynamicBottomMesh;
 
     //texture values
     public int trackTextureStyleIndex = 0;
@@ -151,7 +152,10 @@ public class TrackBuildRPoint : MonoBehaviour
     public int bumperTextureStyleIndex = 3;
     public int bottomTextureStyleIndex = 4;
 
-    public TrackSegmentType type;
+    private void Awake()
+    {
+        DynamicMeshCheck();
+    }
 
     public void Reset()
     {
@@ -173,6 +177,7 @@ public class TrackBuildRPoint : MonoBehaviour
             _position = newValue;
         }
     }
+
     public Vector3 worldPosition
     {
         get
@@ -362,7 +367,7 @@ public class TrackBuildRPoint : MonoBehaviour
         {
             if (value != _leftSplitControlPoints)
                 _leftBackwardControlPoint = -_leftForwardControlPoint;
-            if(_leftSplitControlPoints!=value)
+            if (_leftSplitControlPoints != value)
             {
                 _isDirty = true;
                 _leftSplitControlPoints = value;
@@ -384,7 +389,7 @@ public class TrackBuildRPoint : MonoBehaviour
             Vector3 newValue = value;
             newValue = Quaternion.Inverse(baseTransform.rotation) * newValue;
             newValue += -(_position + (trackCross * _width / 2));
-            if(_rightTrackBoundary!=newValue)
+            if (_rightTrackBoundary != newValue)
             {
                 _isDirty = true;
                 _rightTrackBoundary = newValue;
@@ -424,7 +429,7 @@ public class TrackBuildRPoint : MonoBehaviour
             Vector3 newValue = value;
             newValue = Quaternion.Inverse(baseTransform.rotation) * newValue;
             newValue += -(_position + _rightTrackBoundary + (trackCross * _width / 2));
-            if(_rightForwardControlPoint!=newValue)
+            if (_rightForwardControlPoint != newValue)
             {
                 _isDirty = true;
                 _rightForwardControlPoint = newValue;
@@ -447,7 +452,7 @@ public class TrackBuildRPoint : MonoBehaviour
             newValue += -(_position + _rightTrackBoundary + (trackCross * _width / 2));
             if (_rightSplitControlPoints)
             {
-                if(_rightBackwardControlPoint!=newValue)
+                if (_rightBackwardControlPoint != newValue)
                 {
                     _isDirty = true;
                     _rightBackwardControlPoint = newValue;
@@ -455,12 +460,14 @@ public class TrackBuildRPoint : MonoBehaviour
                 }
             }
             else
-            {  if(_rightForwardControlPoint!=-newValue)
             {
-                _isDirty = true;
-                _rightForwardControlPoint = -newValue;
-                RecalculateStoredValues();
-            }}
+                if (_rightForwardControlPoint != -newValue)
+                {
+                    _isDirty = true;
+                    _rightForwardControlPoint = -newValue;
+                    RecalculateStoredValues();
+                }
+            }
         }
     }
 
@@ -469,12 +476,12 @@ public class TrackBuildRPoint : MonoBehaviour
         get { return _rightSplitControlPoints; }
         set
         {
-            if(value != _rightSplitControlPoints)
+            if (value != _rightSplitControlPoints)
             {
                 _rightBackwardControlPoint = -_rightForwardControlPoint;
                 RecalculateStoredValues();
             }
-            if(_rightSplitControlPoints!=value)
+            if (_rightSplitControlPoints != value)
             {
                 _isDirty = true;
                 _rightSplitControlPoints = value;
@@ -489,15 +496,15 @@ public class TrackBuildRPoint : MonoBehaviour
         {
             return _trackDirection;
         }
-//        set
-//        {
-//            if (value == Vector3.zero)
-//                return;
-//            _trackDirection = value.normalized;
-//            Vector3 trackUpV = _trackUpQ * Vector3.forward;
-//            _trackUpQ = Quaternion.LookRotation(trackUpV, _trackDirection);
-//            _trackCross = Vector3.Cross(trackUpV, _trackDirection).normalized;
-//        }
+        //        set
+        //        {
+        //            if (value == Vector3.zero)
+        //                return;
+        //            _trackDirection = value.normalized;
+        //            Vector3 trackUpV = _trackUpQ * Vector3.forward;
+        //            _trackUpQ = Quaternion.LookRotation(trackUpV, _trackDirection);
+        //            _trackCross = Vector3.Cross(trackUpV, _trackDirection).normalized;
+        //        }
     }
 
     public float width
@@ -513,23 +520,23 @@ public class TrackBuildRPoint : MonoBehaviour
             _width = value;
         }
     }
-//
-//    public float cant
-//    {
-//        get { return _cant; }
-//        set
-//        {
-//            if(_cant != value)
-//            {
-//                isDirty = true;
-//                _cant = value;
-//                RecalculateTrackUpQ();
-//                _trackCross = Vector3.Cross(trackUpQ * Vector3.forward, _trackDirection).normalized;
-////                _cant = SplineMaths.ClampAngle(value);
-//            }
-////            Debug.Log("cant cahnged "+value);
-//        }
-//    }
+    //
+    //    public float cant
+    //    {
+    //        get { return _cant; }
+    //        set
+    //        {
+    //            if(_cant != value)
+    //            {
+    //                isDirty = true;
+    //                _cant = value;
+    //                RecalculateTrackUpQ();
+    //                _trackCross = Vector3.Cross(trackUpQ * Vector3.forward, _trackDirection).normalized;
+    ////                _cant = SplineMaths.ClampAngle(value);
+    //            }
+    ////            Debug.Log("cant cahnged "+value);
+    //        }
+    //    }
 
     public float crownAngle
     {
@@ -557,32 +564,32 @@ public class TrackBuildRPoint : MonoBehaviour
         }
         set
         {
-            if(_trackUpQ != value)
+            if (_trackUpQ != value)
             {
 
                 _trackUpQ = value;
                 RecalculateStoredValues();
-//                Vector3 trackUpV = value * Vector3.forward;
-//                _trackUpQ = Quaternion.LookRotation(trackUpV, _trackDirection);
-//                _trackCross = Vector3.Cross(trackUpV, _trackDirection).normalized;
+                //                Vector3 trackUpV = value * Vector3.forward;
+                //                _trackUpQ = Quaternion.LookRotation(trackUpV, _trackDirection);
+                //                _trackCross = Vector3.Cross(trackUpV, _trackDirection).normalized;
                 _isDirty = true;
             }
 
         }
     }
 
-    public Vector3 trackCross {get {return _trackCross;}}
+    public Vector3 trackCross { get { return _trackCross; } }
 
     public void MatchBoundaryValues()
     {
-        leftForwardControlPoint = forwardControlPoint+(leftTrackBoundary-worldPosition);
-        rightForwardControlPoint = forwardControlPoint+(rightTrackBoundary-worldPosition);
+        leftForwardControlPoint = forwardControlPoint + (leftTrackBoundary - worldPosition);
+        rightForwardControlPoint = forwardControlPoint + (rightTrackBoundary - worldPosition);
     }
 
     public void RecalculateStoredValues()
     {
         _trackDirection = (_forwardControlPoint.normalized - _backwardControlPoint.normalized).normalized;
-        if(_trackDirection == Vector3.zero)
+        if (_trackDirection == Vector3.zero)
             _trackDirection = (nextPoint.worldPosition - worldPosition).normalized;
         Vector3 trackUpV = _trackUpQ * Vector3.forward;
         _trackUpQ = Quaternion.LookRotation(trackUpV, _trackDirection);
@@ -590,11 +597,11 @@ public class TrackBuildRPoint : MonoBehaviour
         isDirty = true;
     }
 
-//    public void RecalculateTrackUpQ()
-//    {
-//        float cantRad = _cant * Mathf.Deg2Rad;
-//        _trackUpQ = Quaternion.LookRotation(Quaternion.LookRotation(_trackDirection) * new Vector3(Mathf.Sin(cantRad), Mathf.Cos(cantRad), 0).normalized);
-//    }
+    //    public void RecalculateTrackUpQ()
+    //    {
+    //        float cantRad = _cant * Mathf.Deg2Rad;
+    //        _trackUpQ = Quaternion.LookRotation(Quaternion.LookRotation(_trackDirection) * new Vector3(Mathf.Sin(cantRad), Mathf.Cos(cantRad), 0).normalized);
+    //    }
 
     //Curve methods
     public bool curveIsDirty
@@ -731,13 +738,13 @@ public class TrackBuildRPoint : MonoBehaviour
 
     public bool isDirty
     {
-        get {return _isDirty;} 
+        get { return _isDirty; }
         set
         {
-            if(_isDirty != value)
+            if (_isDirty != value)
             {
-//                if(value)
-//                    Debug.Log("isDirty "+pointName);
+                //                if(value)
+                //                    Debug.Log("isDirty "+pointName);
                 _isDirty = value;
             }
         }
@@ -745,10 +752,10 @@ public class TrackBuildRPoint : MonoBehaviour
 
     public float boundaryHeight
     {
-        get {return _boundaryHeight;} 
+        get { return _boundaryHeight; }
         set
         {
-            if(_boundaryHeight != value)
+            if (_boundaryHeight != value)
             {
                 _boundaryHeight = value;
                 SetReRender();
@@ -772,17 +779,38 @@ public class TrackBuildRPoint : MonoBehaviour
     public void SetReRender()
     {
         shouldReRender = true;
-        if(nextPoint)
+        if (nextPoint)
             nextPoint.shouldReRender = true;
     }
 
+    public void DynamicMeshCheck()
+    {
+        if (dynamicTrackMesh == null)
+            dynamicTrackMesh = new DynamicMesh();
+        if (dynamicBoundaryMesh == null)
+            dynamicBoundaryMesh = new DynamicMesh();
+        if (dynamicOffroadMesh == null)
+            dynamicOffroadMesh = new DynamicMesh();
+        if (dynamicBumperMesh == null)
+            dynamicBumperMesh = new DynamicMesh();
+        if (dynamicColliderMesh1 == null)
+            dynamicColliderMesh1 = new DynamicMesh();
+        if (dynamicColliderMesh2 == null)
+            dynamicColliderMesh2 = new DynamicMesh();
+        if (dynamicColliderMesh3 == null)
+            dynamicColliderMesh3 = new DynamicMesh();
+        if (dynamicColliderMesh4 == null)
+            dynamicColliderMesh4 = new DynamicMesh();
+        if (dynamicBottomMesh == null)
+            dynamicBottomMesh = new DynamicMesh();
+    }
 
     public virtual string ToXML()
     {
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("<trackpoint>");
-            sb.AppendLine("<pointName>" + pointName + "</pointName>");
-            sb.AppendLine("<baseTransform>" + baseTransform.name + "</baseTransform>");
+        sb.AppendLine("<pointName>" + pointName + "</pointName>");
+        sb.AppendLine("<baseTransform>" + baseTransform.name + "</baseTransform>");
         sb.AppendLine(XMLVariableConverter.ToXML(_position, "position"));//  "<RENAME>" + _position + "<RENAME>");
         sb.AppendLine("<_width>" + _width + "</_width>");
         sb.AppendLine("<_crownAngle>" + _crownAngle + "</_crownAngle>");
@@ -801,7 +829,7 @@ public class TrackBuildRPoint : MonoBehaviour
         sb.AppendLine(XMLVariableConverter.ToXML(_trackUpQ, "_trackUpQ"));//+ _trackUpQ + "<RENAME>");
         sb.AppendLine(XMLVariableConverter.ToXML(_trackCross, "_trackCross"));// _trackCross + "<RENAME>");
         sb.AppendLine("<shouldReRender>" + shouldReRender + "</shouldReRender>");
-            //Curve Variables
+        //Curve Variables
         sb.AppendLine("<lastPoint>" + lastPoint.pointName + "</lastPoint>");
         sb.AppendLine("<nextPoint>" + nextPoint.pointName + "</nextPoint>");
         sb.AppendLine("<arcLength>" + arcLength + "</arcLength>");
@@ -828,7 +856,7 @@ public class TrackBuildRPoint : MonoBehaviour
     {
         if (node["pointName"] != null)
             pointName = node["pointName"].FirstChild.Value;
-//        baseTransform = GameObject.Find(node["baseTransform"].FirstChild.Value).transform;
+        //        baseTransform = GameObject.Find(node["baseTransform"].FirstChild.Value).transform;
         _position = XMLVariableConverter.FromXMLVector3(node["position"]);
         _width = float.Parse(node["_width"].FirstChild.Value);
         _crownAngle = float.Parse(node["_crownAngle"].FirstChild.Value);
@@ -847,10 +875,10 @@ public class TrackBuildRPoint : MonoBehaviour
         if (node["_trackUpQ"] != null)
             _trackUpQ = XMLVariableConverter.FromXMLQuaternion(node["_trackUpQ"]);
         _trackCross = XMLVariableConverter.FromXMLVector3(node["_trackCross"]);
-        shouldReRender = bool.Parse(node["shouldReRender"].FirstChild.Value);
+        shouldReRender = true;
         //lastPoint and nextPoint are set in track class
         arcLength = float.Parse(node["arcLength"].FirstChild.Value);
-        if(node["_render"] != null)
+        if (node["_render"] != null)
         {
             _render = bool.Parse(node["_render"].FirstChild.Value);
             _renderBounds = bool.Parse(node["_renderBounds"].FirstChild.Value);
@@ -867,7 +895,7 @@ public class TrackBuildRPoint : MonoBehaviour
         offroadTextureStyleIndex = int.Parse(node["offroadTextureStyleIndex"].FirstChild.Value);
         boundaryTextureStyleIndex = int.Parse(node["boundaryTextureStyleIndex"].FirstChild.Value);
         bumperTextureStyleIndex = int.Parse(node["bumperTextureStyleIndex"].FirstChild.Value);
-        if (node["bottomTextureStyleIndex"] != null) 
+        if (node["bottomTextureStyleIndex"] != null)
             bottomTextureStyleIndex = int.Parse(node["bottomTextureStyleIndex"].FirstChild.Value);
     }
 }

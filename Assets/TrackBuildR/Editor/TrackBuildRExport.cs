@@ -85,21 +85,6 @@ public class TrackBuildRExport
         }
         EditorGUILayout.EndHorizontal();
 
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Export with tangents", GUILayout.Width(textWidth));
-        track.includeTangents = EditorGUILayout.Toggle(track.includeTangents, GUILayout.Width(toggleWidth));
-        if (GUILayout.Button("?", GUILayout.Width(helpWidth)))
-        {
-            string helpTitle = "Help - with tangents";
-            string helpBody = "Export the models with calculated tangents." + 
-                "\nSome shaders require tangents to be calculated on the model." + 
-                "\nUnity will do this automatically on all imported meshes so it's not neccessary here." + 
-                "/nBut you might want them if you're taking them to another program.";
-            EditorUtility.DisplayDialog(helpTitle, helpBody, "close");
-        }
-        EditorGUILayout.EndHorizontal();
-
         EditorGUILayout.Space();
 
         bool usingSubstances = false;
@@ -190,16 +175,16 @@ public class TrackBuildRExport
             {
                 TrackBuildRPoint curve = trackData[c];
 
-                DynamicMeshGenericMultiMaterialMesh[] dynMeshes = new DynamicMeshGenericMultiMaterialMesh[numberOfDynMeshes];
+                DynamicMesh[] dynMeshes = new DynamicMesh[numberOfDynMeshes];
                 dynMeshes[0] = curve.dynamicTrackMesh;
                 dynMeshes[1] = curve.dynamicBumperMesh;
                 dynMeshes[2] = curve.dynamicBoundaryMesh;
                 dynMeshes[3] = curve.dynamicBottomMesh;
                 dynMeshes[4] = curve.dynamicOffroadMesh;
-                dynMeshes[5] = curve.dynamicColliderMesh1;
-                dynMeshes[6] = curve.dynamicColliderMesh2;
-                dynMeshes[7] = curve.dynamicColliderMesh3;
-                dynMeshes[8] = curve.dynamicColliderMesh4;
+                dynMeshes[5] = curve.dynamicColliderMesh1;//track surface
+                dynMeshes[6] = curve.dynamicColliderMesh2;//walls and roof
+                dynMeshes[7] = curve.dynamicColliderMesh3;//track bottom and offroad
+                dynMeshes[8] = curve.dynamicColliderMesh4;//bumpers
 
                 int[] textureIndeices = new int[] { curve.trackTextureStyleIndex ,curve.bumperTextureStyleIndex, curve.boundaryTextureStyleIndex, curve.bottomTextureStyleIndex, curve.offroadTextureStyleIndex, 0};
 
@@ -212,9 +197,9 @@ public class TrackBuildRExport
                         return;
                     }
 
-                    DynamicMeshGenericMultiMaterialMesh exportDynMesh = dynMeshes[d];
-                    if(track.includeTangents || exportDynMesh.isEmpty)
-                        exportDynMesh.Build(track.includeTangents);//rebuild with tangents
+                    DynamicMesh exportDynMesh = dynMeshes[d];
+//                    if(track.includeTangents || exportDynMesh.isEmpty)
+//                        exportDynMesh.Build();//rebuild with tangents
 
                     TrackBuildRTexture texture = trackData.Texture(textureIndeices[textureIndex]);
                     exportTexture.name = texture.customName;
@@ -224,11 +209,14 @@ public class TrackBuildRExport
                     exportMaterials[0] = exportTexture;
 
                     int meshCount = exportDynMesh.meshCount;
+                    Mesh[] meshes = exportDynMesh.meshes;
                     for (int i = 0; i < meshCount; i++)
                     {
-                        Mesh exportMesh = exportDynMesh[i].mesh;
+                        Mesh exportMesh = meshes[i];
                         MeshUtility.Optimize(exportMesh);
                         string filenameSuffix = trackModelName(dynNames[textureIndex], c, (meshCount > 1) ? i : -1);// "trackCurve" + c + ((meshCount > 1) ? "_" + i.ToString() : "");
+                        if(d > 4)//colliders
+                            filenameSuffix = string.Format("{0}_{1}", filenameSuffix, (d % 5));
                         string filename = track.exportFilename + filenameSuffix;
                         Export(filename, ROOT_FOLDER + track.exportFilename + "/", track, exportMesh, exportMaterials);
 
@@ -284,11 +272,11 @@ public class TrackBuildRExport
 
     private static void ExportCollider(TrackBuildR data)
     {
-        DynamicMeshGenericMultiMaterialMesh COL_MESH = new DynamicMeshGenericMultiMaterialMesh();
+        DynamicMesh COL_MESH = new DynamicMesh();
 //        COL_MESH.subMeshCount = data.textures.Count;
 //        BuildrBuildingCollider.Build(COL_MESH, data);
 //        COL_MESH.CollapseSubmeshes();
-        COL_MESH.Build(false);
+        COL_MESH.Build();
 
         ExportMaterial[] exportTextures = new ExportMaterial[1];
         ExportMaterial newTexture = new ExportMaterial();
@@ -298,13 +286,14 @@ public class TrackBuildRExport
         exportTextures[0] = newTexture;
 
         int numberOfColliderMeshes = COL_MESH.meshCount;
+        Mesh[] meshes = COL_MESH.meshes;
         for (int i = 0; i < numberOfColliderMeshes; i++)
         {
-            MeshUtility.Optimize(COL_MESH[i].mesh);
+            MeshUtility.Optimize(meshes[i]);
             string ColliderSuffixIndex = ((numberOfColliderMeshes > 1) ? "_" + i : "");
             string ColliderFileName = data.exportFilename + COLLIDER_SUFFIX + ColliderSuffixIndex;
             string ColliderFolder = ROOT_FOLDER + data.exportFilename + "/";
-            Export(ColliderFileName, ColliderFolder, data, COL_MESH[i].mesh, exportTextures);
+            Export(ColliderFileName, ColliderFolder, data, meshes[i], exportTextures);
         }
 
         //string newDirectory = rootFolder+track.exportFilename;
@@ -324,7 +313,6 @@ public class TrackBuildRExport
 
     private static void Export(string filename, string folder, TrackBuildR data, Mesh exportMesh, ExportMaterial[] exportTextures)
     {
-//        Debug.Log("Export "+filename+" "+folder);
         switch (data.fileType)
         {
             case TrackBuildR.fileTypes.Obj:
