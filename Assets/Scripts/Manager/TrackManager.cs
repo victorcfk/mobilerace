@@ -60,7 +60,7 @@ public class TrackManager : MonoBehaviour {
     public int numOfTrackSegments = 20;
     [Range (0,200)]
     public int pointsInSegment = 24; //must be even
-    [Range (0,50)]
+    [Range (-20,20)]
     public float crownAngle = -4;
 
     [HideInInspector]
@@ -70,8 +70,7 @@ public class TrackManager : MonoBehaviour {
     [SerializeField]
     public List<TrackSegment> trackSegs;
 
-    List<Vector3> generatedPointList    = new List<Vector3> ();
-    List<float> StraightLeftRight       = new List<float> ();
+    List<Vector3> GeneratedPointList    = new List<Vector3> ();
 
     Vector3 UpperBounds;
     Vector3 LowerBounds;
@@ -110,7 +109,7 @@ public class TrackManager : MonoBehaviour {
                 straightleftright = 2;
                 trackSegs.Add(
                     GenerateRightCircularCurveTrackSegment(
-                    generatedPointList,
+                    GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
@@ -126,7 +125,7 @@ public class TrackManager : MonoBehaviour {
                 straightleftright = 2;
                 trackSegs.Add(
                     GenerateLeftCircularCurveTrackSegment(
-                    generatedPointList,
+                    GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
@@ -142,7 +141,7 @@ public class TrackManager : MonoBehaviour {
                 straightleftright = Random.Range(0,2);
                 trackSegs.Add(
                     GenerateStraightTrackSegment(
-                    generatedPointList,
+                    GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
@@ -151,9 +150,9 @@ public class TrackManager : MonoBehaviour {
 
             }
             
-            lastPointOnGeneratedTrackSegments = generatedPointList [generatedPointList.Count - 1];//current last point
-            lastDirOnGeneratedTrackSements = (generatedPointList [generatedPointList.Count - 1] - 
-                                                generatedPointList [generatedPointList.Count - 2]).normalized;
+            lastPointOnGeneratedTrackSegments = GeneratedPointList [GeneratedPointList.Count - 1];//current last point
+            lastDirOnGeneratedTrackSements = (GeneratedPointList [GeneratedPointList.Count - 1] - 
+                                                GeneratedPointList [GeneratedPointList.Count - 2]).normalized;
             
             Debug.DrawRay (lastPointOnGeneratedTrackSegments, lastDirOnGeneratedTrackSements * 50, Color.white, 5);
             Debug.DrawRay (lastPointOnGeneratedTrackSegments, Vector3.up * 50, Color.red, 5);
@@ -161,9 +160,11 @@ public class TrackManager : MonoBehaviour {
         }
 
         //===================================================
-        DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
+       // DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
         //===================================================
 
+
+        //float temp = 0;
         //Rotation bits
         //=======================================================
         lastDirOnGeneratedTrackSements = Vector3.forward;
@@ -174,9 +175,9 @@ public class TrackManager : MonoBehaviour {
             TrackSegment CurrTrackSeg = trackSegs[i];
             List<Vector3> CurrTrackSegTrackpts = CurrTrackSeg.trackPointsPos;
            
-            DropPointsOnArray (CurrTrackSegTrackpts, 0.6f, 0.6f,temp*0.6f);
-
+            DropPointsOnArray (CurrTrackSegTrackpts, 1, 1,temp*1);
             temp+=CurrTrackSegTrackpts.Count;
+
             for (int j =0; j <CurrTrackSegTrackpts.Count; j+=4)
             {
 //                Debug.Log("dasdas");
@@ -223,7 +224,6 @@ public class TrackManager : MonoBehaviour {
                             axis) * bp.trackUpQ;
                     }
 
-                    //bp.position += Vector3.up * GetPosChangeCurveValue(100,GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant));
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant);
 
                     CurrTrackSegTrackpts [j] = bp.position;
@@ -249,7 +249,6 @@ public class TrackManager : MonoBehaviour {
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant), 
                             axis) * bp.trackUpQ;
 
-                    
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant);
 
                     CurrTrackSegTrackpts [j] = bp.position;
@@ -262,6 +261,14 @@ public class TrackManager : MonoBehaviour {
                     bp.type = TrackSegmentType.STRAIGHT;
                 }
 
+                UpperBounds.x = Mathf.Max (UpperBounds.x, bp.position.x);
+                UpperBounds.y = Mathf.Max (UpperBounds.y, bp.position.y);
+                UpperBounds.z = Mathf.Max (UpperBounds.z, bp.position.z);
+                    
+                LowerBounds.x = Mathf.Min (LowerBounds.x, bp.position.x);
+                LowerBounds.y = Mathf.Min (LowerBounds.y, bp.position.y);
+                LowerBounds.z = Mathf.Min (LowerBounds.z, bp.position.z);
+               
                 track.AddPoint (bp);
             }
         }
@@ -273,6 +280,12 @@ public class TrackManager : MonoBehaviour {
         track.trackColliderWallHeight = 20;
 
         this.track = track;
+
+        //Expand the bounds
+        //================================
+        UpperBounds += Vector3.one *50;
+        LowerBounds -= Vector3.one *50;
+        //================================
     }
 
     float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle)
@@ -290,7 +303,7 @@ public class TrackManager : MonoBehaviour {
 //        return x * Mathf.Cos(angle);
 
         return 
-            Mathf.Lerp(0, x * Mathf.Cos(angle),
+            Mathf.Lerp(0, -x * Mathf.Cos(angle),
                        curve.Evaluate(point / totalCurvePointCount));
     }
 
@@ -385,8 +398,6 @@ public class TrackManager : MonoBehaviour {
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z) * 
                         distBetweenPoints);
-            
-            StraightLeftRight.Add (0);
         }
         
         return new List<Vector3>(vecArray);
@@ -417,8 +428,6 @@ public class TrackManager : MonoBehaviour {
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z) * 
                         distBetweenPoints);
-            
-            StraightLeftRight.Add ( (-sign) / (float)numOfPoints);
         }
         
         return new List<Vector3>(vecArray);
@@ -448,8 +457,6 @@ public class TrackManager : MonoBehaviour {
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z) * 
                         distBetweenPoints);
-            
-            StraightLeftRight.Add ( (-sign) / (float)numOfPoints);
         }
         
         return new List<Vector3>(vecArray);
@@ -475,27 +482,8 @@ public class TrackManager : MonoBehaviour {
     
     #region Functions for creating the ground Quad and buildings
     
-    GameObject ParseTrackBoundsAndCreateQuad (List<Vector3> pointlist)
+    GameObject ParseTrackBoundsAndCreateQuad ()
     {
-        UpperBounds = Vector3.zero;
-        LowerBounds = Vector3.zero;
-        
-        for (int i =0; i <pointlist.Count; i++) {
-            UpperBounds.x = Mathf.Max (UpperBounds.x, pointlist [i].x);
-            UpperBounds.y = Mathf.Max (UpperBounds.y, pointlist [i].y);
-            UpperBounds.z = Mathf.Max (UpperBounds.z, pointlist [i].z);
-            
-            LowerBounds.x = Mathf.Min (LowerBounds.x, pointlist [i].x);
-            LowerBounds.y = Mathf.Min (LowerBounds.y, pointlist [i].y);
-            LowerBounds.z = Mathf.Min (LowerBounds.z, pointlist [i].z);
-        }
-
-        //Expand the bounds
-        //================================
-        UpperBounds += Vector3.one *50;
-        LowerBounds -= Vector3.one *50;
-        //================================
-
         GameObject.Instantiate (GameObject.CreatePrimitive (PrimitiveType.Cube), UpperBounds, Quaternion.identity);
         GameObject.Instantiate (GameObject.CreatePrimitive (PrimitiveType.Cube), LowerBounds, Quaternion.identity);
         
@@ -572,7 +560,7 @@ public class TrackManager : MonoBehaviour {
     public GameObject[] Buildings;
     public void PopulateEnvironment( GameObject ParentObj)
     {
-        ParseTrackBoundsAndCreateQuad (generatedPointList).transform.parent = ParentObj.transform;
+        ParseTrackBoundsAndCreateQuad ().transform.parent = ParentObj.transform;
 
         for(int i =0; i<30; i++)
         {
