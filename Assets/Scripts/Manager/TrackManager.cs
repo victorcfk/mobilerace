@@ -81,6 +81,8 @@ public class TrackManager : MonoBehaviour {
     [Range (0,90)]
     public float MaxRightTurnCant = 30;
 
+    public AnimationCurve curve;
+
     public int Mat;
 
     public void InitializeTrackPoints (TrackBuildRTrack track)
@@ -193,29 +195,15 @@ public class TrackManager : MonoBehaviour {
                     Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
 
                     if(axis.y > 0 )
-                        bp.trackUpQ = Quaternion.AngleAxis (MaxLeftTurnCant, axis) * bp.trackUpQ;
+                        bp.trackUpQ = Quaternion.AngleAxis (
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant), 
+                            axis) * bp.trackUpQ;
                     else
-                        bp.trackUpQ = Quaternion.AngleAxis (-MaxLeftTurnCant, axis) * bp.trackUpQ;
+                        bp.trackUpQ = Quaternion.AngleAxis (
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant), 
+                            axis) * bp.trackUpQ;
 
                     bp.type = TrackSegmentType.LEFT;
-
-//                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
-//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [j] * multi * 90f, axis);
-//                        //bp.position += new Vector3 (0, StraightLeftRight [j] * 35f, 0);
-//                        bp.trackUpQ = Quaternion.AngleAxis (
-//                                                            Mathf.Lerp(0,90,j/(CurrTrackSegTrackpts.Count/2)), 
-//                                                            axis) * bp.trackUpQ;
-//
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    } else {
-//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [j]) * multi * 90f, axis);
-//                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [j]) * 35f, 0);
-//
-//                        bp.trackUpQ = Quaternion.AngleAxis (
-//                                                            Mathf.Lerp(90,0,(j- CurrTrackSegTrackpts.Count/2)/(CurrTrackSegTrackpts.Count/2)), 
-//                                                            axis) * bp.trackUpQ;
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    }
                     //=============================================
                 } else
                 if (CurrTrackSeg.type == TrackSegmentType.RIGHT) { //right turn
@@ -228,28 +216,15 @@ public class TrackManager : MonoBehaviour {
                     Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
 
                     if(axis.y > 0 )
-                        bp.trackUpQ = Quaternion.AngleAxis (-MaxRightTurnCant, axis) * bp.trackUpQ;
+                        bp.trackUpQ = Quaternion.AngleAxis (
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant), 
+                            axis) * bp.trackUpQ;
                     else
-                        bp.trackUpQ = Quaternion.AngleAxis (MaxRightTurnCant, axis) * bp.trackUpQ;
+                        bp.trackUpQ = Quaternion.AngleAxis (
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant), 
+                            axis) * bp.trackUpQ;
 
                     bp.type = TrackSegmentType.RIGHT;
-//                    if (j < CurrTrackSegTrackpts.Count/2) { //left turn
-//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + StraightLeftRight [j] * multi * 90f, axis);
-//                        //bp.position += new Vector3 (0, StraightLeftRight [j] * 35f, 0);
-//                        bp.trackUpQ = Quaternion.AngleAxis (
-//                            -Mathf.Lerp(0,90,j/(CurrTrackSegTrackpts.Count/2)), 
-//                            axis) * bp.trackUpQ;
-//                        
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    } else {
-//                        //bp.trackUpQ = Quaternion.AngleAxis (angle + (1 - StraightLeftRight [j]) * multi * 90f, axis);
-//                        // bp.position += new Vector3 (0, (1 - StraightLeftRight [j]) * 35f, 0);
-//                        
-//                        bp.trackUpQ = Quaternion.AngleAxis (
-//                            -Mathf.Lerp(90,0,(j- CurrTrackSegTrackpts.Count/2)/(CurrTrackSegTrackpts.Count/2)), 
-//                            axis) * bp.trackUpQ;
-//                        Debug.DrawRay (bp.position, axis * 10, Color.green, 5);
-//                    }
                     //=============================================
                 } 
                 else
@@ -268,6 +243,14 @@ public class TrackManager : MonoBehaviour {
         track.trackColliderWallHeight = 20;
 
         this.track = track;
+    }
+
+    float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle)
+    {
+
+        return 
+            Mathf.Lerp(initialCantAngle, maxCantAngle,
+                       curve.Evaluate(point / totalCurvePointCount));
     }
 
     TrackSegment GenerateLeftCurveTrackSegment(Vector3 lastPointAtInterval, Vector3 dirAtEnd, int trackInterval, List<Vector3> generatedPointList)
