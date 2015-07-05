@@ -80,7 +80,11 @@ public class TrackManager : MonoBehaviour {
     [Range (0,90)]
     public float MaxRightTurnCant = 30;
 
-    public AnimationCurve curve;
+    public AnimationCurve GradualCurve;
+    public AnimationCurve ExpoCurve;
+
+
+    public AnimationCurve LECURVE;
     public Vector2 textureUnitSize = new Vector2(50, 50);
 
     public int Mat;
@@ -102,11 +106,22 @@ public class TrackManager : MonoBehaviour {
         {
 //            straightleftright = Random.Range (0, straightTrackUpperLimit);
 
-            if(j==0)    straightleftright =2;
-            
+            if(j==0)
+            {
+                straightleftright =2;
+
+
+            }
+
+
+
+                
+
+
+
             if (straightleftright == 0) 
             {
-                float prop = Random.Range(0.2f,0.6f);
+                float prop = 0.50f;//Random.Range(0.2f,0.6f);
                 //straightTrackUpperLimit = 4;
                 straightleftright = 2;
                 trackSegs.Add(
@@ -115,13 +130,21 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
-                    Random.Range(200,400),
+                    3*70,
                     prop));
+
+                GenerateFromCurveTrackSegment(
+                    GeneratedPointList,
+                    lastPointOnGeneratedTrackSegments,
+                    lastDirOnGeneratedTrackSements,
+                    pointsInSegment/4,
+                    400);
+                //distance = distbtwnpoints * 70 * 0.25 * prop * points
             }
             else
             if (straightleftright == 1) 
             {
-                float prop = Random.Range(0.2f,0.6f);
+                float prop = 0.50f;//Random.Range(0.2f,0.6f);
                 //straightTrackUpperLimit = 4;
                 straightleftright = 2;
                 trackSegs.Add(
@@ -130,8 +153,16 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
-                    Random.Range(200,400),
+                    3*70,
                     prop));
+
+                GenerateFromCurveTrackSegment(
+                    GeneratedPointList,
+                    lastPointOnGeneratedTrackSegments,
+                    lastDirOnGeneratedTrackSements,
+                    pointsInSegment/4,
+                    400);
+                //distance = distbtwnpoints * 70 * 0.25 * prop * points
             }
             else
             if (straightleftright >= 2) 
@@ -144,9 +175,9 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSements,
                     pointsInSegment,
-                    5));
+                    3));
 
-
+                //distance = distbtwnpoints * points
             }
             
             lastPointOnGeneratedTrackSegments = GeneratedPointList [GeneratedPointList.Count - 1];//current last point
@@ -284,23 +315,39 @@ public class TrackManager : MonoBehaviour {
         //================================
     }
 
-    float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle)
+    float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle, int type = 0)
     {
 
         return 
             Mathf.Lerp(initialCantAngle, maxCantAngle,
-                       curve.Evaluate(point / totalCurvePointCount));
+                       GradualCurve.Evaluate(point / totalCurvePointCount));
     }
 
-    float GetPosChangeCurveValue(float point, float totalCurvePointCount, float trackWidth, float angle)
+    float GetPosChangeCurveValue(float point, float totalCurvePointCount, float trackWidth, float angle, int type = 0)
     {
-        float x = trackWidth/4; //width/2
-        
-//        return x * Mathf.Cos(angle);
+        float x = trackWidth/4;
 
         return 
             Mathf.Lerp(0, -x * Mathf.Cos(angle),
-                       curve.Evaluate(point / totalCurvePointCount));
+                       GradualCurve.Evaluate(point / totalCurvePointCount));
+    }
+
+    
+    TrackSegment GenerateFromCurveTrackSegment(
+        List<Vector3> generatedPointList,
+        Vector3 lastPointAtInterval, 
+        Vector3 dirAtEnd, 
+        int pointsInSegment, 
+        float distbetweenPoints)
+    {
+        List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);        
+        TrackSegment tsgt = new TrackSegment();
+        tsgt.trackPointsPos = vec3points;
+        tsgt.type = TrackSegmentType.LEFT;
+        
+        //generatedPointList.AddRange (vec3points);
+        
+        return tsgt;
     }
 
     TrackSegment GenerateLeftCircularCurveTrackSegment(
@@ -370,7 +417,43 @@ public class TrackManager : MonoBehaviour {
     {
         return borderMat;
     }
-    
+
+    List<Vector3> GenerateCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints)
+    {
+        Vector3[] vecArray = new Vector3[numOfPoints];
+        
+        float angle = Vector3.Angle (Vector3.forward, startDir);
+        Vector3.Cross (Vector3.forward, startDir);
+        
+        //Matrix by which to rotate piece by
+        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     new Vector3 (1, 1, 1));
+        
+        for (int i=0; i <numOfPoints; i++) {
+            
+            //            float x = (-sign) * Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + sign;//requires the float so the parameter multiplication works
+            //            float y = startDir.y * i;
+            //            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+            
+            float x = LECURVE.Evaluate((float)(i)/(float)(pointsInSegment));
+            float y = startDir.y * i;
+            float z = (float)(i)/(float)(pointsInSegment);
+            
+            vecArray [i] =
+                startLoc + 
+                    g.MultiplyPoint3x4 (
+                        new Vector3 (x, y, z) * 
+                        distBetweenPoints);
+            
+            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
+            
+            Debug.DrawRay(vecArray [i], Vector3.up*1000, Color.yellow, 5);
+        }
+        
+        return new List<Vector3>(vecArray);
+    }
+
     #region Functions for adding the base points to the track object
     List<Vector3> GenerateStraight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints)
     {
