@@ -352,7 +352,7 @@ public class TrackManager : MonoBehaviour {
         int pointsInSegment, 
         float distbetweenPoints)
     {
-        List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);        
+        List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,LECURVE, -1);        
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
         tsgt.type = TrackSegmentType.LEFT;
@@ -370,8 +370,8 @@ public class TrackManager : MonoBehaviour {
         float distbetweenPoints,
         float circleProportion)
     {
-        List<Vector3> vec3points = GenerateLeftCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, circleProportion);
-        
+        //List<Vector3> vec3points = GenerateLeftCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, circleProportion);
+        List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,LECURVE, -1);    
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
         tsgt.type = TrackSegmentType.LEFT;
@@ -389,8 +389,9 @@ public class TrackManager : MonoBehaviour {
         float distbetweenPoints,
         float circleProportion)
     {
-        List<Vector3> vec3points = GenerateRightCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, circleProportion);
-        
+        //List<Vector3> vec3points = GenerateRightCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, circleProportion);
+
+        List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,LECURVE, 1);    
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
         tsgt.type = TrackSegmentType.RIGHT;
@@ -430,7 +431,7 @@ public class TrackManager : MonoBehaviour {
         return borderMat;
     }
 
-    List<Vector3> GenerateCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints)
+    List<Vector3> GenerateCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve , float TurnRight = 1)
     {
         Vector3[] vecArray = new Vector3[numOfPoints];
         
@@ -439,8 +440,7 @@ public class TrackManager : MonoBehaviour {
         
         //Matrix by which to rotate piece by
         Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.identity,
-                                     //Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
                                      new Vector3 (1, 1, 1));
         
         for (int i=0; i <numOfPoints; i++) {
@@ -449,9 +449,9 @@ public class TrackManager : MonoBehaviour {
             //            float y = startDir.y * i;
             //            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
             
-            float x = LECURVE.Evaluate((float)(i)/(float)(numOfPoints))/2;
+            float x = (float)(i)/(float)(numOfPoints) * TurnRight;
             float y = startDir.y * (float)(i);
-            float z = (float)(i)/(float)(numOfPoints);
+            float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
 
             Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(numOfPoints));
             vecArray [i] =
@@ -462,7 +462,8 @@ public class TrackManager : MonoBehaviour {
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
-            Debug.DrawRay(vecArray [i], Vector3.up*1000, Color.yellow, 5);
+            DrawCross(vecArray[i]);
+            //GameObject.CreatePrimitive(PrimitiveType.Sphere).transform.position = vecArray[i];
         }
         
         return new List<Vector3>(vecArray);
@@ -705,4 +706,9 @@ public class TrackManager : MonoBehaviour {
     #endregion
     
 
+    void DrawCross(Vector3 pos)
+    {
+        Debug.DrawLine(pos - Vector3.right * 10, pos + Vector3.right * 10, Color.magenta, 5);
+        Debug.DrawLine(pos - Vector3.forward * 10, pos + Vector3.forward * 10, Color.magenta, 5);
+    }
 }
