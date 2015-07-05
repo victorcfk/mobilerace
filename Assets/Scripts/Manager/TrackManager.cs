@@ -100,7 +100,7 @@ public class TrackManager : MonoBehaviour {
 
         trackSegs = new List<TrackSegment>();
 
-        Vector3 lastDirOnGeneratedTrackSements = Vector3.forward;
+        Vector3 lastDirOnGeneratedTrackSegments = Vector3.forward;
         Vector3 lastPointOnGeneratedTrackSegments = Vector3.zero;
         for (int j =0; j <numOfTrackSegments; j++) 
         {
@@ -128,7 +128,7 @@ public class TrackManager : MonoBehaviour {
                     GenerateRightCircularCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
-                    lastDirOnGeneratedTrackSements,
+                    lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
                     3*70,
                     prop));
@@ -136,7 +136,7 @@ public class TrackManager : MonoBehaviour {
                 GenerateFromCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
-                    lastDirOnGeneratedTrackSements,
+                    lastDirOnGeneratedTrackSegments,
                     pointsInSegment/4,
                     400);
                 //distance = distbtwnpoints * 70 * 0.25 * prop * points
@@ -151,7 +151,7 @@ public class TrackManager : MonoBehaviour {
                     GenerateLeftCircularCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
-                    lastDirOnGeneratedTrackSements,
+                    lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
                     3*70,
                     prop));
@@ -159,7 +159,7 @@ public class TrackManager : MonoBehaviour {
                 GenerateFromCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
-                    lastDirOnGeneratedTrackSements,
+                    lastDirOnGeneratedTrackSegments,
                     pointsInSegment/4,
                     400);
                 //distance = distbtwnpoints * 70 * 0.25 * prop * points
@@ -173,7 +173,7 @@ public class TrackManager : MonoBehaviour {
                     GenerateStraightTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
-                    lastDirOnGeneratedTrackSements,
+                    lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
                     3));
 
@@ -181,10 +181,10 @@ public class TrackManager : MonoBehaviour {
             }
             
             lastPointOnGeneratedTrackSegments = GeneratedPointList [GeneratedPointList.Count - 1];//current last point
-            lastDirOnGeneratedTrackSements = (GeneratedPointList [GeneratedPointList.Count - 1] - 
+            lastDirOnGeneratedTrackSegments = (GeneratedPointList [GeneratedPointList.Count - 1] - 
                                                 GeneratedPointList [GeneratedPointList.Count - 2]).normalized;
             
-            Debug.DrawRay (lastPointOnGeneratedTrackSegments, lastDirOnGeneratedTrackSements * 50, Color.white, 5);
+            Debug.DrawRay (lastPointOnGeneratedTrackSegments, lastDirOnGeneratedTrackSegments * 50, Color.white, 5);
             Debug.DrawRay (lastPointOnGeneratedTrackSegments, Vector3.up * 50, Color.red, 5);
             
         }
@@ -197,7 +197,7 @@ public class TrackManager : MonoBehaviour {
         //float temp = 0;
         //Rotation bits
         //=======================================================
-        lastDirOnGeneratedTrackSements = Vector3.forward;
+        lastDirOnGeneratedTrackSegments = Vector3.forward;
         lastPointOnGeneratedTrackSegments = Vector3.zero;
         int temp=0;
         for (int i =0; i <trackSegs.Count; i++)
@@ -230,6 +230,18 @@ public class TrackManager : MonoBehaviour {
                 } else {
                     bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
                 }
+
+                /*
+                 *  if (j == 0 && i> 0) {
+                    bp.forwardControlPoint = CurrTrackSegTrackpts [j]-trackSegs[i-1].trackPointsPos[trackSegs.Count-1];
+                }
+                else
+                if (j >= CurrTrackSegTrackpts.Count - 1) {
+                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
+                } else {
+                    bp.forwardControlPoint = CurrTrackSegTrackpts [j + 1];
+                }
+                 * */
                 //=======================================================
 
                 if (CurrTrackSeg.type == TrackSegmentType.LEFT) {
@@ -427,7 +439,8 @@ public class TrackManager : MonoBehaviour {
         
         //Matrix by which to rotate piece by
         Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     Quaternion.identity,
+                                     //Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
                                      new Vector3 (1, 1, 1));
         
         for (int i=0; i <numOfPoints; i++) {
@@ -436,17 +449,18 @@ public class TrackManager : MonoBehaviour {
             //            float y = startDir.y * i;
             //            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
             
-            float x = LECURVE.Evaluate((float)(i)/(float)(pointsInSegment));
-            float y = startDir.y * i;
-            float z = (float)(i)/(float)(pointsInSegment);
-            
+            float x = LECURVE.Evaluate((float)(i)/(float)(numOfPoints))/2;
+            float y = startDir.y * (float)(i);
+            float z = (float)(i)/(float)(numOfPoints);
+
+            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(numOfPoints));
             vecArray [i] =
                 startLoc + 
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z) * 
                         distBetweenPoints);
             
-            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
+            //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
             Debug.DrawRay(vecArray [i], Vector3.up*1000, Color.yellow, 5);
         }
