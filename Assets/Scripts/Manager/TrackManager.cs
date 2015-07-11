@@ -159,7 +159,6 @@ public class TrackManager : MonoBehaviour {
        // DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
         //===================================================
 
-
         //float temp = 0;
         //Rotation bits
         //=======================================================
@@ -350,62 +349,6 @@ public class TrackManager : MonoBehaviour {
         return tsgt;
     }
 
-    TrackSegment GenerateLeftCircularCurveTrackSegment(
-        List<Vector3> generatedPointList,
-        Vector3 lastPointAtInterval, 
-        Vector3 dirAtEnd, 
-        int pointsInSegment, 
-        float distbetweenPoints,
-        float circleProportion)
-    {
-        List<Vector3> vec3points = GenerateLeftCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, circleProportion);
-       // List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,LECURVE, -1);    
-        TrackSegment tsgt = new TrackSegment();
-        tsgt.trackPointsPos = vec3points;
-        tsgt.type = TrackSegmentType.LEFT;
-
-        generatedPointList.AddRange (vec3points);
-
-        return tsgt;
-    }
-
-    TrackSegment GenerateRightCircularCurveTrackSegment(
-        List<Vector3> generatedPointList,
-        Vector3 lastPointAtInterval, 
-        Vector3 dirAtEnd, 
-        int pointsInSegment, 
-        float distbetweenPoints,
-        float circleProportion)
-    {
-        List<Vector3> vec3points = GenerateRightCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, circleProportion);
-
-       // List<Vector3> vec3points = GenerateCurvePoints(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,LECURVE, 1);    
-        TrackSegment tsgt = new TrackSegment();
-        tsgt.trackPointsPos = vec3points;
-        tsgt.type = TrackSegmentType.RIGHT;
-
-        generatedPointList.AddRange (vec3points);
-
-        return tsgt;
-    }
-
-    public Material GetVariedTrackMatToUse ()
-    {
-        if(Mat == 0)
-        {
-            return trackMat;
-        }
-        else
-        {
-            return trackMat2;
-        }
-    }
-
-    public Material GetBorderMatToUse ()
-    {
-        return borderMat;
-    }
-
     List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
         Vector3[] vecArray = new Vector3[numOfPoints+1];
@@ -441,7 +384,6 @@ public class TrackManager : MonoBehaviour {
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
             DrawCross(vecArray[i]);
-            //GameObject.CreatePrimitive(PrimitiveType.Sphere).transform.position = vecArray[i];
         }
         
         return new List<Vector3>(vecArray);
@@ -482,7 +424,6 @@ public class TrackManager : MonoBehaviour {
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
             DrawCross(vecArray[i]);
-            //GameObject.CreatePrimitive(PrimitiveType.Sphere).transform.position = vecArray[i];
         }
         
         return new List<Vector3>(vecArray);
@@ -517,64 +458,6 @@ public class TrackManager : MonoBehaviour {
         
     }
 
-    List<Vector3> GenerateLeftCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, float portionOfCircle = 1)
-    {
-        Vector3[] vecArray = new Vector3[numOfPoints];
-        
-        float angle = Vector3.Angle (Vector3.forward, startDir);
-        Vector3.Cross (Vector3.forward, startDir);
-        
-        //Matrix by which to rotate piece by
-        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
-                                     new Vector3 (1, 1, 1));
-
-        float sign = 1;
-
-        for (int i=0; i <numOfPoints; i++) {
-            float x = (-sign) * Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + sign;//requires the float so the parameter multiplication works
-            float y = startDir.y * i;
-            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
-            
-            vecArray [i] =
-                startLoc + 
-                    g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) * 
-                        distBetweenPoints);
-        }
-        
-        return new List<Vector3>(vecArray);
-    }
-
-    List<Vector3> GenerateRightCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, float portionOfCircle = 1)
-    {
-        Vector3[] vecArray = new Vector3[numOfPoints];
-        
-        float angle = Vector3.Angle (Vector3.forward, startDir);
-        Vector3.Cross (Vector3.forward, startDir);
-        
-        //Matrix by which to rotate piece by
-        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
-                                     new Vector3 (1, 1, 1));
-        
-        float sign = -1;
-        
-        for (int i=0; i <numOfPoints; i++) {
-            float x = (-sign) * Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + sign;//requires the float so the parameter multiplication works
-            float y = startDir.y * i;
-            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
-            
-            vecArray [i] =
-                startLoc + 
-                    g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) * 
-                        distBetweenPoints);
-        }
-        
-        return new List<Vector3>(vecArray);
-    }
-
     /// <summary>
     /// Lowers all the points in the array by a random amount bounded by the provided ranges.
     /// </summary>
@@ -592,7 +475,24 @@ public class TrackManager : MonoBehaviour {
     }
     
     #endregion
+
+    public Material GetVariedTrackMatToUse ()
+    {
+        if(Mat == 0)
+        {
+            return trackMat;
+        }
+        else
+        {
+            return trackMat2;
+        }
+    }
     
+    public Material GetBorderMatToUse ()
+    {
+        return borderMat;
+    }
+
     #region Functions for creating the ground Quad and buildings
     
     GameObject ParseTrackBoundsAndCreateQuad ()
