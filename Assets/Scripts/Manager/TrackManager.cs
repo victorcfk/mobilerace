@@ -395,20 +395,23 @@ public class TrackManager : MonoBehaviour {
         return tsgt;
     }
 
-    List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, float numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
+    List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
         Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
+
+        float interpolationPoints = numOfPoints;
+
         //Time horzontal
         //value vertical
         Vector3 dircurve = new Vector3(
-            2/numOfPoints,
+            2/interpolationPoints,
             0,
-            trackCurve.Evaluate(2/numOfPoints)
+            trackCurve.Evaluate(2/interpolationPoints)
             );
         Debug.Log (dircurve);
         Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
 
-        Vector3[] vecArray = new Vector3[(int)numOfPoints];
+        Vector3[] vecArray = new Vector3[(int)interpolationPoints];
         
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
@@ -427,11 +430,11 @@ public class TrackManager : MonoBehaviour {
             float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
             */
             
-            float x = (float)(i)/(float)(numOfPoints);
+            float x = (float)(i)/(float)(interpolationPoints);
             float y = startDir.y * (float)(i);
-            float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
+            float z = trackCurve.Evaluate((float)(i)/(float)(interpolationPoints));
             
-            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(numOfPoints));
+            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(interpolationPoints));
             vecArray [i] =
                 startLoc + 
                     g.MultiplyPoint3x4 (
@@ -446,20 +449,22 @@ public class TrackManager : MonoBehaviour {
         return new List<Vector3>(vecArray);
     }
 
-    List<Vector3> GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, float numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
+    List<Vector3> GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
         Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
 
+        float interpolationPoints = numOfPoints;
+
         Vector3 dircurve = new Vector3(
-            -2/numOfPoints,
+            -2/interpolationPoints,
             0,
-            trackCurve.Evaluate(2/numOfPoints)
+            trackCurve.Evaluate(2/interpolationPoints)
             );
 
         Debug.Log (dircurve);
         Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
 
-        Vector3[] vecArray = new Vector3[(int)numOfPoints];
+        Vector3[] vecArray = new Vector3[(int)interpolationPoints];
         
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
@@ -477,11 +482,11 @@ public class TrackManager : MonoBehaviour {
             float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
             */
             
-            float x = (float)(i)/(float)(numOfPoints) * -1;
+            float x = (float)(i)/(float)(interpolationPoints) * -1;
             float y = startDir.y * (float)(i);
-            float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
+            float z = trackCurve.Evaluate((float)(i)/(float)(interpolationPoints));
 
-            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(numOfPoints));
+            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(interpolationPoints));
             vecArray [i] =
                 startLoc + 
                     g.MultiplyPoint3x4 (
