@@ -50,13 +50,10 @@ public class TrackBuildRGenerator : MonoBehaviour
 
             Debug.Log("meshes "+numberOfCurves);
 
-            if(curve.type == TrackSegmentType.LEFT)
-                TrackManager.instance.Mat = 0;
-            else
-                if(curve.type == TrackSegmentType.RIGHT)
-                TrackManager.instance.Mat = 0;
-            else
+            if(curve.type == TrackSegmentType.STRAIGHT)
                 TrackManager.instance.Mat = 1;
+            else
+               TrackManager.instance.Mat = 0;
 
             bool generateCollider = curve.trackCollider;
 

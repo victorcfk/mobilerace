@@ -5,8 +5,8 @@ using System.Collections.Generic;
 public enum TrackSegmentType
 {
     STRAIGHT,
-    LEFT,
-    RIGHT
+    LEFT_SEMI,
+    RIGHT_SEMI
 }
 
 [System.Serializable]
@@ -104,7 +104,7 @@ public class TrackManager : MonoBehaviour {
         Vector3 lastDirOnGeneratedTrackSegments = Vector3.forward;
         Vector3 lastPointOnGeneratedTrackSegments = Vector3.zero;
         Vector3 secondLastPointOnGeneratedTrackSegment = Vector3.zero;
-
+              
         for (int j =0; j <numOfTrackSegments; j++) 
         {
             if(j==0)
@@ -121,7 +121,7 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
-                    400,TrackSegmentType.RIGHT));
+                    Random.Range(300,600),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate()));
             }
             else
             if (straightleftright == 1) 
@@ -134,7 +134,7 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
-                    400,TrackSegmentType.LEFT));
+                    Random.Range(300,600),TrackSegmentType.LEFT_SEMI,getCurveToGenerate()));
             }
             else
             if (straightleftright >= 2) 
@@ -146,7 +146,7 @@ public class TrackManager : MonoBehaviour {
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
-                    40,TrackSegmentType.STRAIGHT));
+                    20,TrackSegmentType.STRAIGHT,getCurveToGenerate()));
 //                trackSegs.Add( 
 //                              GenerateFromCurveTrackSegment(
 //                    GeneratedPointList,
@@ -189,7 +189,7 @@ public class TrackManager : MonoBehaviour {
             DropPointsOnArray (CurrTrackSegTrackpts, 0.75f, 0.75f,temp*0.75f);
             temp+=CurrTrackSegTrackpts.Count;
 
-            for (int j =0 ; j <CurrTrackSegTrackpts.Count; j+=2)
+            for (int j =0 ; j <CurrTrackSegTrackpts.Count; j+=4)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -207,7 +207,7 @@ public class TrackManager : MonoBehaviour {
                 float angle2;
                 Vector3 axis2;
                 bp.trackUpQ.ToAngleAxis (out angle2, out axis2);
-                Debug.DrawRay(bp.position,axis2.normalized *100,Color.yellow,6);
+//                Debug.DrawRay(bp.position,axis2.normalized *100,Color.yellow,6);
 
                 //We get the forward control point based on the tiny i intervals for direction
                 //=======================================================
@@ -230,7 +230,7 @@ public class TrackManager : MonoBehaviour {
                  * */
                 //=======================================================
 
-                if (CurrTrackSeg.type == TrackSegmentType.LEFT) {
+                if (CurrTrackSeg.type == TrackSegmentType.LEFT_SEMI) {
                     
                     //=============================================
                     float angle;
@@ -241,21 +241,21 @@ public class TrackManager : MonoBehaviour {
 
                     if(axis.y > 0 )
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant/4), 
                             axis) * bp.trackUpQ;
                     else
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant/4), 
                             axis) * bp.trackUpQ;
 
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant);
 
                     CurrTrackSegTrackpts [j] = bp.position;
 
-                    bp.type = TrackSegmentType.LEFT;
+                    bp.type = TrackSegmentType.LEFT_SEMI;
                     //=============================================
                 } else
-                if (CurrTrackSeg.type == TrackSegmentType.RIGHT) { //right turn
+                if (CurrTrackSeg.type == TrackSegmentType.RIGHT_SEMI) { //right turn
 
                     //=============================================
                     float angle;
@@ -266,18 +266,18 @@ public class TrackManager : MonoBehaviour {
 
                     if(axis.y > 0 )
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant/4), 
                             axis) * bp.trackUpQ;
                     else
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant/4), 
                             axis) * bp.trackUpQ;
 
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant);
 
                     CurrTrackSegTrackpts [j] = bp.position;
 
-                    bp.type = TrackSegmentType.RIGHT;
+                    bp.type = TrackSegmentType.RIGHT_SEMI;
                     //=============================================
                 } 
                 else
@@ -297,7 +297,7 @@ public class TrackManager : MonoBehaviour {
             }
         }
         
-        track.meshResolution = 10;
+        track.meshResolution = 25;
         //track.Texture(0).textureUnitSize
         track.loop = false; 
         track.includeColliderRoof =false;
@@ -311,6 +311,19 @@ public class TrackManager : MonoBehaviour {
         UpperBounds += Vector3.one *50;
         LowerBounds -= Vector3.one *50;
         //================================
+    }
+
+    AnimationCurve getCurveToGenerate()
+    {
+//        //float difficulty
+//        if (Random.Range(0, 2) < 1)
+//        {
+            return SemiCircle;
+//        } else
+//        {
+//
+//            return ExpoCurve;
+//        }
     }
 
     float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle, int type = 0)
@@ -340,24 +353,25 @@ public class TrackManager : MonoBehaviour {
         Vector3 dirAtEnd, 
         int pointsInSegment, 
         float distbetweenPoints, 
-        TrackSegmentType type)
+        TrackSegmentType type,
+        AnimationCurve curveToUse)
     {
         List<Vector3> vec3points;
-        if(type == TrackSegmentType.RIGHT)
-            vec3points = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SemiCircle);        
+        if(type == TrackSegmentType.RIGHT_SEMI)
+            vec3points = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
-            if(type == TrackSegmentType.LEFT)
-                vec3points = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SemiCircle);        
+            if(type == TrackSegmentType.LEFT_SEMI)
+                vec3points = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
             vec3points = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);        
 
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
-        if(type == TrackSegmentType.RIGHT)
-            tsgt.type = TrackSegmentType.RIGHT;
+        if(type == TrackSegmentType.RIGHT_SEMI)
+            tsgt.type = TrackSegmentType.RIGHT_SEMI;
         else
-            if(type == TrackSegmentType.LEFT)
-                tsgt.type = TrackSegmentType.LEFT;
+            if(type == TrackSegmentType.LEFT_SEMI)
+                tsgt.type = TrackSegmentType.LEFT_SEMI;
         else
             tsgt.type = TrackSegmentType.STRAIGHT;
 
@@ -381,18 +395,29 @@ public class TrackManager : MonoBehaviour {
         return tsgt;
     }
 
-    List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
+    List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, float numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
-        Vector3[] vecArray = new Vector3[numOfPoints];
+        Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
+        //Time horzontal
+        //value vertical
+        Vector3 dircurve = new Vector3(
+            2/numOfPoints,
+            0,
+            trackCurve.Evaluate(2/numOfPoints)
+            );
+        Debug.Log (dircurve);
+        Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
+
+        Vector3[] vecArray = new Vector3[(int)numOfPoints];
         
-        float angle = Vector3.Angle (Vector3.forward, startDir);
-        Vector3.Cross (Vector3.forward, startDir);
-        
-        //Matrix by which to rotate piece by
+        float angle = Vector3.Angle (dircurve, startDir);
+        Vector3.Cross (dircurve, startDir);
+
         Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
                                      new Vector3 (1, 1, 1));
-        
+
+
         for (int i=0; i <numOfPoints; i++) {
             
             /*
@@ -415,22 +440,32 @@ public class TrackManager : MonoBehaviour {
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
-            DrawCross(vecArray[i]);
+            DrawCross(vecArray[i],Color.white);
         }
         
         return new List<Vector3>(vecArray);
     }
 
-    List<Vector3> GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
+    List<Vector3> GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, float numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
-        Vector3[] vecArray = new Vector3[numOfPoints];
+        Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
+
+        Vector3 dircurve = new Vector3(
+            -2/numOfPoints,
+            0,
+            trackCurve.Evaluate(2/numOfPoints)
+            );
+
+        Debug.Log (dircurve);
+        Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
+
+        Vector3[] vecArray = new Vector3[(int)numOfPoints];
         
-        float angle = Vector3.Angle (Vector3.forward, startDir);
-        Vector3.Cross (Vector3.forward, startDir);
-        
+        float angle = Vector3.Angle (dircurve, startDir);
+        Vector3.Cross (dircurve, startDir);
         //Matrix by which to rotate piece by
         Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
-                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
                                      new Vector3 (1, 1, 1));
         
         for (int i=0; i <numOfPoints; i++) {
@@ -455,7 +490,7 @@ public class TrackManager : MonoBehaviour {
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
-            DrawCross(vecArray[i]);
+            DrawCross(vecArray[i],Color.white);
         }
         
         return new List<Vector3>(vecArray);
@@ -485,6 +520,8 @@ public class TrackManager : MonoBehaviour {
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z) * 
                         distBetweenPoints);
+
+//            DrawCross(vecArray[i]);
         }
         
         return new List<Vector3>(vecArray);
@@ -658,9 +695,9 @@ public class TrackManager : MonoBehaviour {
     #endregion
     
 
-    void DrawCross(Vector3 pos)
+    void DrawCross(Vector3 pos, Color color)
     {
-        Debug.DrawLine(pos - Vector3.right * 10, pos + Vector3.right * 10, Color.white, 5);
-        Debug.DrawLine(pos - Vector3.forward * 10, pos + Vector3.forward * 10, Color.white, 5);
+        Debug.DrawLine(pos - Vector3.right * 10, pos + Vector3.right * 10, color, 5);
+        Debug.DrawLine(pos - Vector3.forward * 10, pos + Vector3.forward * 10, color, 5);
     }
 }
