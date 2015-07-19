@@ -241,14 +241,14 @@ public class TrackManager : MonoBehaviour {
 
                     if(axis.y > 0 )
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxLeftTurnCant/4), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0, MaxLeftTurnCant/4,GradualCurve), 
                             axis) * bp.trackUpQ;
                     else
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant/4), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant/4,GradualCurve), 
                             axis) * bp.trackUpQ;
 
-                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant);
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant,GradualCurve);
 
                     CurrTrackSegTrackpts [j] = bp.position;
 
@@ -266,14 +266,14 @@ public class TrackManager : MonoBehaviour {
 
                     if(axis.y > 0 )
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant/4), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant/4,GradualCurve), 
                             axis) * bp.trackUpQ;
                     else
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant/4), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant/4,GradualCurve), 
                             axis) * bp.trackUpQ;
 
-                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant);
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant,GradualCurve);
 
                     CurrTrackSegTrackpts [j] = bp.position;
 
@@ -326,15 +326,15 @@ public class TrackManager : MonoBehaviour {
 //        }
     }
 
-    float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle, int type = 0)
+    float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle, AnimationCurve cantCurve, int type = 0)
     {
 
         return 
             Mathf.Lerp(initialCantAngle, maxCantAngle,
-                       GradualCurve.Evaluate(point / totalCurvePointCount));
+                       cantCurve.Evaluate(point / totalCurvePointCount));
     }
 
-    float GetPosChangeCurveValue(float point, float totalCurvePointCount, float trackWidth, float angle, int type = 0)
+    float GetPosChangeCurveValue(float point, float totalCurvePointCount, float trackWidth, float angle, AnimationCurve displacementCurve, int type = 0)
     {
         float x = trackWidth/4;
 
@@ -343,7 +343,7 @@ public class TrackManager : MonoBehaviour {
 
         return 
             Mathf.Lerp(0, -x * Mathf.Cos(angle),
-                       GradualCurve.Evaluate(point / totalCurvePointCount));
+                       displacementCurve.Evaluate(point / totalCurvePointCount));
     }
 
     
@@ -397,8 +397,6 @@ public class TrackManager : MonoBehaviour {
 
     List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
-        Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
-
         float interpolationPoints = numOfPoints;
 
         //Time horzontal
@@ -408,8 +406,10 @@ public class TrackManager : MonoBehaviour {
             0,
             trackCurve.Evaluate(2/interpolationPoints)
             );
-        Debug.Log (dircurve);
-        Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
+
+//        Debug.Log (dircurve);
+//        Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
+//        Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
 
         Vector3[] vecArray = new Vector3[(int)interpolationPoints];
         
@@ -451,8 +451,6 @@ public class TrackManager : MonoBehaviour {
 
     List<Vector3> GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
-        Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
-
         float interpolationPoints = numOfPoints;
 
         Vector3 dircurve = new Vector3(
@@ -461,9 +459,10 @@ public class TrackManager : MonoBehaviour {
             trackCurve.Evaluate(2/interpolationPoints)
             );
 
-        Debug.Log (dircurve);
-        Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
-
+//        Debug.Log (dircurve);
+//        Debug.DrawRay (startLoc, startDir * 100,  Color.cyan,5);
+//        Debug.DrawRay (startLoc, dircurve * 200,  Color.cyan,5);
+//
         Vector3[] vecArray = new Vector3[(int)interpolationPoints];
         
         float angle = Vector3.Angle (dircurve, startDir);
