@@ -135,6 +135,10 @@ public class TrackManager : MonoBehaviour {
                     lastDirOnGeneratedTrackSegments,
                     pointsInSegment,
                     Random.Range(300,600),TrackSegmentType.LEFT_SEMI,getCurveToGenerate()));
+
+//                GenerateRightCircularCurveTrackSegment(GeneratedPointList,
+//                                                       lastPointOnGeneratedTrackSegments,
+//                                                       lastDirOnGeneratedTrackSegments,pointsInSegment,400,0.5f);
             }
             else
             if (straightleftright >= 2) 
@@ -189,7 +193,7 @@ public class TrackManager : MonoBehaviour {
             DropPointsOnArray (CurrTrackSegTrackpts, 0.75f, 0.75f,temp*0.75f);
             temp+=CurrTrackSegTrackpts.Count;
 
-            for (int j =0 ; j <CurrTrackSegTrackpts.Count; j+=4)
+            for (int j =0 ; j <CurrTrackSegTrackpts.Count; j+=5)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -241,14 +245,14 @@ public class TrackManager : MonoBehaviour {
 
                     if(axis.y > 0 )
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0, MaxLeftTurnCant/4,GradualCurve), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0, MaxLeftTurnCant,GradualCurve), 
                             axis) * bp.trackUpQ;
                     else
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant/4,GradualCurve), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxLeftTurnCant,GradualCurve), 
                             axis) * bp.trackUpQ;
 
-                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant,GradualCurve);
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxLeftTurnCant*4,GradualCurve);
 
                     CurrTrackSegTrackpts [j] = bp.position;
 
@@ -266,14 +270,14 @@ public class TrackManager : MonoBehaviour {
 
                     if(axis.y > 0 )
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant/4,GradualCurve), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,-MaxRightTurnCant,GradualCurve), 
                             axis) * bp.trackUpQ;
                     else
                         bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant/4,GradualCurve), 
+                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Count,0,MaxRightTurnCant,GradualCurve), 
                             axis) * bp.trackUpQ;
 
-                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant,GradualCurve);
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Count,100,MaxRightTurnCant*4,GradualCurve);
 
                     CurrTrackSegTrackpts [j] = bp.position;
 
@@ -297,7 +301,7 @@ public class TrackManager : MonoBehaviour {
             }
         }
         
-        track.meshResolution = 25;
+        track.meshResolution = 11;
         //track.Texture(0).textureUnitSize
         track.loop = false; 
         track.includeColliderRoof =false;
@@ -342,7 +346,7 @@ public class TrackManager : MonoBehaviour {
             return 0;
 
         return 
-            Mathf.Lerp(0, -x * Mathf.Cos(angle),
+            Mathf.Lerp(0, x * Mathf.Cos(angle),
                        displacementCurve.Evaluate(point / totalCurvePointCount));
     }
 
@@ -357,11 +361,13 @@ public class TrackManager : MonoBehaviour {
         AnimationCurve curveToUse)
     {
         List<Vector3> vec3points;
-        if(type == TrackSegmentType.RIGHT_SEMI)
-            vec3points = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
+        if (type == TrackSegmentType.RIGHT_SEMI)
+            vec3points = GenerateRightCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, 0.5f);
+//            vec3points = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
             if(type == TrackSegmentType.LEFT_SEMI)
-                vec3points = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
+                vec3points = GenerateLeftCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, 0.5f);
+//                vec3points = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
             vec3points = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);        
 
@@ -704,4 +710,63 @@ public class TrackManager : MonoBehaviour {
         Debug.DrawLine(pos - Vector3.right * 10, pos + Vector3.right * 10, color, 5);
         Debug.DrawLine(pos - Vector3.forward * 10, pos + Vector3.forward * 10, color, 5);
     }
+
+    List<Vector3> GenerateLeftCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, float portionOfCircle = 1)
+    {
+        Vector3[] vecArray = new Vector3[numOfPoints];
+        
+        float angle = Vector3.Angle (Vector3.forward, startDir);
+        Vector3.Cross (Vector3.forward, startDir);
+        
+        //Matrix by which to rotate piece by
+        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     new Vector3 (1, 1, 1));
+        
+        float sign = 1;
+        
+        for (int i=0; i <numOfPoints; i++) {
+            float x = (-sign) * Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + sign;//requires the float so the parameter multiplication works
+            float y = startDir.y * i;
+            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+            
+            vecArray [i] =
+                startLoc + 
+                    g.MultiplyPoint3x4 (
+                        new Vector3 (x, y, z) * 
+                        distBetweenPoints);
+        }
+        
+        return new List<Vector3>(vecArray);
+    }
+    
+    List<Vector3> GenerateRightCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, float portionOfCircle = 1)
+    {
+        Vector3[] vecArray = new Vector3[numOfPoints];
+        
+        float angle = Vector3.Angle (Vector3.forward, startDir);
+        Vector3.Cross (Vector3.forward, startDir);
+        
+        //Matrix by which to rotate piece by
+        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+                                     Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
+                                     new Vector3 (1, 1, 1));
+        
+        float sign = -1;
+        
+        for (int i=0; i <numOfPoints; i++) {
+            float x = (-sign) * Mathf.Cos (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180) + sign;//requires the float so the parameter multiplication works
+            float y = startDir.y * i;
+            float z = Mathf.Sin (i / (float)numOfPoints * portionOfCircle * 360 * Mathf.PI / 180);//requires the float so the parameter multiplication works
+            
+            vecArray [i] =
+                startLoc + 
+                    g.MultiplyPoint3x4 (
+                        new Vector3 (x, y, z) * 
+                        distBetweenPoints);
+        }
+        
+        return new List<Vector3>(vecArray);
+    }
+
 }
