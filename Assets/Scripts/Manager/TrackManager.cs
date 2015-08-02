@@ -295,6 +295,7 @@ public class TrackManager : MonoBehaviour {
                 LowerBounds.y = Mathf.Min (LowerBounds.y, bp.position.y);
                 LowerBounds.z = Mathf.Min (LowerBounds.z, bp.position.z);
                
+                DrawCross(bp.position + Vector3.up,Color.white);
                 track.AddPoint (bp);
             }
         }
@@ -383,8 +384,6 @@ public class TrackManager : MonoBehaviour {
                 tsgt.type = TrackSegmentType.LEFT_SEMI;
         else
             tsgt.type = TrackSegmentType.STRAIGHT;
-
-
         
         generatedPointList.AddRange (vec3points);
         
@@ -452,7 +451,7 @@ public class TrackManager : MonoBehaviour {
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
-            DrawCross(vecArray[i-1],Color.white);
+//            DrawCross(vecArray[i],Color.white);
         }
         
         return new List<Vector3>(vecArray);
@@ -503,7 +502,7 @@ public class TrackManager : MonoBehaviour {
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
-            DrawCross(vecArray[i-1],Color.white);
+//            DrawCross(vecArray[i],Color.white);
         }
         
         return new List<Vector3>(vecArray);
