@@ -70,7 +70,7 @@ public class TrackManager : MonoBehaviour {
     [SerializeField]
     public List<TrackSegment> trackSegs;
 
-    List<Vector3> GeneratedPointList    = new List<Vector3> ();
+    public List<Vector3> GeneratedPointList    = new List<Vector3> ();
 
     Vector3 UpperBounds;
     Vector3 LowerBounds;
@@ -191,7 +191,8 @@ public class TrackManager : MonoBehaviour {
             DropPointsOnArray (CurrTrackSegTrackpts, 0.75f, 0.75f,temp*0.75f);
             temp+=CurrTrackSegTrackpts.Count;
 
-            for (int j =0 ; j <CurrTrackSegTrackpts.Count-1; j+=1)
+            //We skip the last point of each segment to compensate for the fact it is repeated in the next segement's first point
+            for (int j =0 ; j <CurrTrackSegTrackpts.Count-2; j+=2)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -213,9 +214,16 @@ public class TrackManager : MonoBehaviour {
 
                 //We get the forward control point based on the tiny i intervals for direction
                 //=======================================================
-                if (j < CurrTrackSegTrackpts.Count - 1) {
+                if (j < CurrTrackSegTrackpts.Count - 2) {
                     bp.forwardControlPoint = CurrTrackSegTrackpts [j + 1];
-                } else {
+                } 
+//                else
+//                if(i < trackSegs.Count-1)
+//                {
+//                    bp.forwardControlPoint = trackSegs[i+1].trackPointsPos[0];
+//                }
+                else 
+                {
                     bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
                 }
 
@@ -354,7 +362,7 @@ public class TrackManager : MonoBehaviour {
                        displacementCurve.Evaluate(point / totalCurvePointCount));
     }
 
-    int straightTrackSpacingModifier = 4; //This is used to compensate for the fact that the spacing between the straight track points are too close as compared to the curved tracks, we need to modify them to compensate.
+    int straightTrackSpacingModifier = 5; //This is used to compensate for the fact that the spacing between the straight track points are too close as compared to the curved tracks, we need to modify them to compensate.
 
     TrackSegment GenerateFromCurveTrackSegment(
         List<Vector3> generatedPointList,
