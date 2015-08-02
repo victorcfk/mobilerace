@@ -354,7 +354,8 @@ public class TrackManager : MonoBehaviour {
                        displacementCurve.Evaluate(point / totalCurvePointCount));
     }
 
-    
+    int straightTrackSpacingModifier = 4; //This is used to compensate for the fact that the spacing between the straight track points are too close as compared to the curved tracks, we need to modify them to compensate.
+
     TrackSegment GenerateFromCurveTrackSegment(
         List<Vector3> generatedPointList,
         Vector3 lastPointAtInterval, 
@@ -373,7 +374,7 @@ public class TrackManager : MonoBehaviour {
 //                vec3points = GenerateLeftCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, 0.5f);
                 vec3points = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
-            vec3points = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);        
+            vec3points = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier);        
 
         TrackSegment tsgt = new TrackSegment();
         tsgt.trackPointsPos = vec3points;
