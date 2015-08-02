@@ -191,7 +191,7 @@ public class TrackManager : MonoBehaviour {
             DropPointsOnArray (CurrTrackSegTrackpts, 0.75f, 0.75f,temp*0.75f);
             temp+=CurrTrackSegTrackpts.Count;
 
-            for (int j =0 ; j <CurrTrackSegTrackpts.Count; j+=5)
+            for (int j =0 ; j <CurrTrackSegTrackpts.Count-1; j+=1)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -430,7 +430,7 @@ public class TrackManager : MonoBehaviour {
                                      new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
 
 
-        for (int i=1; i <numOfPoints+1; i++) {
+        for (int i=0; i <numOfPoints; i++) {
             
             /*
              * Can multiply to use a portion of curve
@@ -443,9 +443,7 @@ public class TrackManager : MonoBehaviour {
             float y = startDir.y * (float)(i);
             float z = trackCurve.Evaluate((float)(i)/(float)(interpolationPoints));
             
-            Debug.Log(vecArray [i-1] + " "+ (float)(i)/(float)(interpolationPoints));
-            vecArray [i-1] =
-                startLoc + 
+            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(interpolationPoints));
             vecArray [i] = 
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z));
@@ -481,7 +479,7 @@ public class TrackManager : MonoBehaviour {
                                      Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
                                      new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
         
-        for (int i=1; i <numOfPoints+1; i++) {
+        for (int i=0; i <numOfPoints; i++) {
 
             /*
              * Can multiply to use a portion of curve
@@ -494,9 +492,7 @@ public class TrackManager : MonoBehaviour {
             float y = startDir.y * (float)(i);
             float z = trackCurve.Evaluate((float)(i)/(float)(interpolationPoints));
 
-            Debug.Log(vecArray [i-1] + " "+ (float)(i)/(float)(interpolationPoints));
-            vecArray [i-1] =
-                startLoc + 
+            Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(interpolationPoints));
             vecArray [i] =
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z));
