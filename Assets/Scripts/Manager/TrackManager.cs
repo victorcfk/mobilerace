@@ -4,9 +4,9 @@ using System.Collections.Generic;
 [System.Serializable]
 public enum TrackSegmentType
 {
-    STRAIGHT,
-    LEFT_SEMI,
-    RIGHT_SEMI
+    STRAIGHT = 0 ,
+    LEFT_SEMI = 1 ,
+    RIGHT_SEMI = 2
 }
 
 [System.Serializable]
@@ -59,7 +59,7 @@ public class TrackManager : MonoBehaviour {
     [Range (0,200)]
     public int numOfTrackSegments = 20;
     [Range (0,200)]
-    public int pointsInSegment = 24; //must be even
+    public int pointsPerSegment = 24; //must be even
     [Range (-20,20)]
     public float crownAngle = -4;
 
@@ -110,11 +110,6 @@ public class TrackManager : MonoBehaviour {
               
         for (int j =0; j <numOfTrackSegments; j++) 
         {
-            if(j==0)
-            {
-                straightleftright =2;
-            }
-
             if (straightleftright == 0) 
             {
                 straightleftright = 2;
@@ -123,7 +118,7 @@ public class TrackManager : MonoBehaviour {
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
-                    pointsInSegment,
+                    pointsPerSegment,
                     Random.Range(400,800),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate()));
             }
             else
@@ -136,7 +131,7 @@ public class TrackManager : MonoBehaviour {
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
-                    pointsInSegment,
+                    pointsPerSegment,
                     Random.Range(400,800),TrackSegmentType.LEFT_SEMI,getCurveToGenerate()));
 
 //                GenerateRightCircularCurveTrackSegment(GeneratedPointList,
@@ -152,7 +147,7 @@ public class TrackManager : MonoBehaviour {
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
-                    pointsInSegment,
+                    pointsPerSegment,
                     15,TrackSegmentType.STRAIGHT,getCurveToGenerate()));
 //                trackSegs.Add( 
 //                              GenerateFromCurveTrackSegment(
@@ -185,8 +180,8 @@ public class TrackManager : MonoBehaviour {
         //float temp = 0;
         //Rotation bits
         //=======================================================
-        lastDirOnGeneratedTrackSegments = Vector3.forward;
-        lastPointOnGeneratedTrackSegments = Vector3.zero;
+//        lastDirOnGeneratedTrackSegments = Vector3.forward;
+//        lastPointOnGeneratedTrackSegments = Vector3.zero;
         int temp=0;
         for (int i =0; i <trackSegs.Count; i++)
         {   
@@ -416,9 +411,9 @@ public class TrackManager : MonoBehaviour {
         //Time horzontal
         //value vertical
         Vector3 dircurve = new Vector3(
-            2/interpolationPoints,
+            2f/interpolationPoints,
             0,
-            trackCurve.Evaluate(2/interpolationPoints)
+            trackCurve.Evaluate(2f/interpolationPoints)
             );
 
 //        Debug.Log (dircurve);
@@ -468,9 +463,9 @@ public class TrackManager : MonoBehaviour {
         float interpolationPoints = numOfPoints;
 
         Vector3 dircurve = new Vector3(
-            -2/interpolationPoints,
+            -2f/interpolationPoints,
             0,
-            trackCurve.Evaluate(2/interpolationPoints)
+            trackCurve.Evaluate(2f/interpolationPoints)
             );
 
 //        Debug.Log (dircurve);
@@ -713,10 +708,10 @@ public class TrackManager : MonoBehaviour {
     #endregion
     
 
-    void DrawCross(Vector3 pos, Color color)
+    void DrawCross(Vector3 pos, Color color, float dist = 10, float duration = 5)
     {
-        Debug.DrawLine(pos - Vector3.right * 10, pos + Vector3.right * 10, color, 5);
-        Debug.DrawLine(pos - Vector3.forward * 10, pos + Vector3.forward * 10, color, 5);
+        Debug.DrawLine(pos - Vector3.right * dist, pos + Vector3.right * dist, color, duration);
+        Debug.DrawLine(pos - Vector3.forward * dist, pos + Vector3.forward * dist, color, duration);
     }
 
     List<Vector3> GenerateLeftCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, float portionOfCircle = 1)
