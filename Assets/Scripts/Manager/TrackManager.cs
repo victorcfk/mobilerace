@@ -403,6 +403,7 @@ public class TrackManager : MonoBehaviour {
         return tsgt;
     }
 
+    #region Functions for adding the base points to the track object
     List<Vector3> GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
         float interpolationPoints = numOfPoints;
@@ -424,9 +425,9 @@ public class TrackManager : MonoBehaviour {
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
 
-        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+        Matrix4x4 g = Matrix4x4.TRS (startLoc,
                                      Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
-                                     new Vector3 (1, 1, 1));
+                                     new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
 
 
         for (int i=1; i <numOfPoints+1; i++) {
@@ -445,9 +446,9 @@ public class TrackManager : MonoBehaviour {
             Debug.Log(vecArray [i-1] + " "+ (float)(i)/(float)(interpolationPoints));
             vecArray [i-1] =
                 startLoc + 
+            vecArray [i] = 
                     g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) * 
-                        distBetweenPoints);
+                        new Vector3 (x, y, z));
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
@@ -476,9 +477,9 @@ public class TrackManager : MonoBehaviour {
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
         //Matrix by which to rotate piece by
-        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+        Matrix4x4 g = Matrix4x4.TRS (startLoc,
                                      Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
-                                     new Vector3 (1, 1, 1));
+                                     new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
         
         for (int i=1; i <numOfPoints+1; i++) {
 
@@ -496,9 +497,9 @@ public class TrackManager : MonoBehaviour {
             Debug.Log(vecArray [i-1] + " "+ (float)(i)/(float)(interpolationPoints));
             vecArray [i-1] =
                 startLoc + 
+            vecArray [i] =
                     g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) * 
-                        distBetweenPoints);
+                        new Vector3 (x, y, z));
             
             //Debug.Log(vecArray [i] + " "+ (float)(i)/(float)(pointsInSegment));
             
@@ -509,7 +510,6 @@ public class TrackManager : MonoBehaviour {
 
     }
 
-    #region Functions for adding the base points to the track object
     List<Vector3> GenerateStraight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints)
     {
         Vector3[] vecArray = new Vector3[numOfPoints]; 
@@ -518,9 +518,9 @@ public class TrackManager : MonoBehaviour {
         Vector3.Cross (Vector3.forward, startDir);
         
         //Matrix by which to rotate piece by
-        Matrix4x4 g = Matrix4x4.TRS (Vector3.zero,
+        Matrix4x4 g = Matrix4x4.TRS (startLoc,
                                      Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
-                                     new Vector3 (1, 1, 1));
+                                     new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
         
         for (int i=0; i <numOfPoints; i++) {
             float x = 0;
@@ -528,10 +528,8 @@ public class TrackManager : MonoBehaviour {
             float z = i;
             
             vecArray [i] =
-                startLoc + 
                     g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) * 
-                        distBetweenPoints);
+                        new Vector3 (x, y, z) );
 
 //            DrawCross(vecArray[i]);
         }
