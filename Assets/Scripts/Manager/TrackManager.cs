@@ -93,88 +93,96 @@ public class TrackManager : MonoBehaviour {
     public int numOfBuildingsToGenerate;
     public GameObject[] Buildings;
 
-    public void InitializeTrackPoints (TrackBuildRTrack track)
+
+    public List<TrackSegment> GenerateTrackSegments( List<TrackSegment> trackSegments )
     {
         //===================================================
         //Decide straight or curved
         //===================================================
-        
+
+        TrackSegmentType tstToGen = TrackSegmentType.STRAIGHT;
+
         int straightleftright = 2;
         int straightTrackUpperLimit = 4;
-
-        trackSegs = new List<TrackSegment>();
+        
+        trackSegments = new List<TrackSegment>();
 
         Vector3 lastDirOnGeneratedTrackSegments = Vector3.forward;
         Vector3 lastPointOnGeneratedTrackSegments = Vector3.zero;
         Vector3 secondLastPointOnGeneratedTrackSegment = Vector3.zero;
-              
+
         for (int j =0; j <numOfTrackSegments; j++) 
         {
-            if (straightleftright == 0) 
+            switch(tstToGen)
             {
-                straightleftright = 2;
-                trackSegs.Add( 
-                              GenerateFromCurveTrackSegment(
+                case TrackSegmentType.STRAIGHT:
+
+                    trackSegments.Add( 
+                                  GenerateFromCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
                     pointsPerSegment,
-                    Random.Range(400,800),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate()));
-            }
-            else
-            if (straightleftright == 1) 
-            {
+                    15,TrackSegmentType.STRAIGHT,getCurveToGenerate()));
 
-                straightleftright = 2;
-                trackSegs.Add( 
-                              GenerateFromCurveTrackSegment(
+                    break;
+
+                case TrackSegmentType.LEFT_SEMI:
+
+                    trackSegments.Add( 
+                                  GenerateFromCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
                     pointsPerSegment,
                     Random.Range(400,800),TrackSegmentType.LEFT_SEMI,getCurveToGenerate()));
 
-//                GenerateRightCircularCurveTrackSegment(GeneratedPointList,
-//                                                       lastPointOnGeneratedTrackSegments,
-//                                                       lastDirOnGeneratedTrackSegments,pointsInSegment,400,0.5f);
-            }
-            else
-            if (straightleftright >= 2) 
-            {
-                straightleftright = Random.Range(0,2);
-                trackSegs.Add( 
-                              GenerateFromCurveTrackSegment(
+                    break;
+
+                case TrackSegmentType.RIGHT_SEMI:
+
+                    trackSegments.Add( 
+                                  GenerateFromCurveTrackSegment(
                     GeneratedPointList,
                     lastPointOnGeneratedTrackSegments,
                     lastDirOnGeneratedTrackSegments,
                     pointsPerSegment,
-                    15,TrackSegmentType.STRAIGHT,getCurveToGenerate()));
-//                trackSegs.Add( 
-//                              GenerateFromCurveTrackSegment(
-//                    GeneratedPointList,
-//                    lastPointOnGeneratedTrackSegments,
-//                    lastDirOnGeneratedTrackSegments,
-//                    pointsInSegment,
-//                    300,TrackSegmentType.RIGHT));
+                    Random.Range(400,800),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate()));
+
+                    break;
             }
 
-            TrackSegment lastKnowntrackSeg = trackSegs[trackSegs.Count-1];
+            //=================================================================
+
+            switch(Random.Range(0,3))
+            {
+                case 0: tstToGen = TrackSegmentType.STRAIGHT;   break;
+                case 1: tstToGen = TrackSegmentType.LEFT_SEMI;   break;
+                case 2: tstToGen = TrackSegmentType.RIGHT_SEMI;   break;
+            }
+
+            TrackSegment lastKnowntrackSeg = trackSegments[trackSegments.Count-1];
             lastPointOnGeneratedTrackSegments = lastKnowntrackSeg.trackPointsPos[lastKnowntrackSeg.trackPointsPos.Count-1];
             secondLastPointOnGeneratedTrackSegment = lastKnowntrackSeg.trackPointsPos[lastKnowntrackSeg.trackPointsPos.Count-2];
 
-//                GeneratedPointList [GeneratedPointList.Count - 1];//current last point
             lastDirOnGeneratedTrackSegments = (lastPointOnGeneratedTrackSegments - 
                                                secondLastPointOnGeneratedTrackSegment).normalized;
 
-//            lastPointOnGeneratedTrackSegments += lastDirOnGeneratedTrackSegments * 60;
-
+            //=================================================================
             Debug.DrawRay (lastPointOnGeneratedTrackSegments, lastDirOnGeneratedTrackSegments * 50, Color.white, 5);
             Debug.DrawRay (lastPointOnGeneratedTrackSegments, Vector3.up * 50, Color.red, 5);
             
         }
 
+        return trackSegments;
+    }
+
+    public void InitializeTrackPoints (TrackBuildRTrack track)
+    {
+        trackSegs = GenerateTrackSegments(trackSegs);
+
         //===================================================
-       // DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
+        // DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
         //===================================================
 
         //float temp = 0;
