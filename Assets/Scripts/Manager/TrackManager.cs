@@ -504,15 +504,8 @@ public class TrackManager : MonoBehaviour {
     #region Functions for adding the base points to the track object
     TrackPoint[] GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
-        float interpolationPoints = numOfPoints;
-
-        Vector3 dircurve = new Vector3(
-            2f/interpolationPoints,
-            0,
-            trackCurve.Evaluate(2f/interpolationPoints)
-            );
-
-        TrackPoint[] trackPoints = new TrackPoint[(int)interpolationPoints];
+        TrackPoint[] trackPoints = new TrackPoint[numOfPoints];
+        Vector3 dircurve = new Vector3(0.05f,0,trackCurve.Evaluate(0.05f)).normalized; //Just sample the initial bit of the curve
 
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
@@ -521,7 +514,7 @@ public class TrackManager : MonoBehaviour {
                                      Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
                                      new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
 
-
+        float interpolationPoints = numOfPoints;
         for (int i=0; i <numOfPoints; i++) {
             
             /*
@@ -531,9 +524,9 @@ public class TrackManager : MonoBehaviour {
             float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
             */
             
-            float x = (float)(i)/(float)(interpolationPoints);
+            float x = (float)(i)/interpolationPoints;
             float y = startDir.y * (float)(i);
-            float z = trackCurve.Evaluate((float)(i)/(float)(interpolationPoints));
+            float z = trackCurve.Evaluate((float)(i)/interpolationPoints);
 
             trackPoints[i].position = 
                     g.MultiplyPoint3x4 (
@@ -545,23 +538,18 @@ public class TrackManager : MonoBehaviour {
 
     TrackPoint[] GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
-        float interpolationPoints = numOfPoints;
-
-        Vector3 dircurve = new Vector3(
-            -2f/interpolationPoints,
-            0,
-            trackCurve.Evaluate(2f/interpolationPoints)
-            );
-
-        TrackPoint[] trackPoints = new TrackPoint[(int)interpolationPoints];
+        TrackPoint[] trackPoints = new TrackPoint[numOfPoints];
+        Vector3 dircurve = new Vector3(-0.05f,0,trackCurve.Evaluate(0.05f)).normalized; //Just sample the initial bit of the curve
 
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
+
         //Matrix by which to rotate piece by
         Matrix4x4 g = Matrix4x4.TRS (startLoc,
                                      Quaternion.AngleAxis (angle, Vector3.Cross (dircurve, startDir)),
                                      new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
-        
+
+        float interpolationPoints = numOfPoints;
         for (int i=0; i <numOfPoints; i++) {
 
             /*
@@ -571,9 +559,9 @@ public class TrackManager : MonoBehaviour {
             float z = trackCurve.Evaluate((float)(i)/(float)(numOfPoints));
             */
             
-            float x = (float)(i)/(float)(interpolationPoints) * -1;
+            float x = -(float)(i)/interpolationPoints;
             float y = startDir.y * (float)(i);
-            float z = trackCurve.Evaluate((float)(i)/(float)(interpolationPoints));
+            float z = trackCurve.Evaluate((float)(i)/interpolationPoints);
 
             trackPoints[i].position =
                     g.MultiplyPoint3x4 (
