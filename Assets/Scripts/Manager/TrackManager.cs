@@ -196,11 +196,11 @@ public class TrackManager : MonoBehaviour {
             TrackSegment CurrTrackSeg = trackSegs[i];
             List<Vector3> CurrTrackSegTrackpts = CurrTrackSeg.trackPointsPos;
            
-            DropPointsOnArray (CurrTrackSegTrackpts, 0.75f, 0.75f,temp*0.75f);
+            DropPointsOnArray (CurrTrackSegTrackpts, 1.75f, 1.75f,temp*1.75f);
             temp+=CurrTrackSegTrackpts.Count;
 
             //We skip the last point of each segment to compensate for the fact it is repeated in the next segement's first point
-            for (int j =0 ; j <CurrTrackSegTrackpts.Count-2; j+=2)
+            for (int j =0 ; j <CurrTrackSegTrackpts.Count-1; j+=1)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -222,30 +222,14 @@ public class TrackManager : MonoBehaviour {
 
                 //We get the forward control point based on the tiny i intervals for direction
                 //=======================================================
-                if (j < CurrTrackSegTrackpts.Count - 2) {
-                    bp.forwardControlPoint = CurrTrackSegTrackpts [j + 1];
-                } 
-//                else
-//                if(i < trackSegs.Count-1)
-//                {
-//                    bp.forwardControlPoint = trackSegs[i+1].trackPointsPos[0];
-//                }
+                if (j < CurrTrackSegTrackpts.Count - 1) 
+                {
+                    bp.forwardControlPoint = (-CurrTrackSegTrackpts [j] + CurrTrackSegTrackpts [j + 1]).normalized*10 + CurrTrackSegTrackpts [j];
+                }
                 else 
                 {
-                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
+                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]).normalized*10 + CurrTrackSegTrackpts [j];
                 }
-
-                /*
-                 *  if (j == 0 && i> 0) {
-                    bp.forwardControlPoint = CurrTrackSegTrackpts [j]-trackSegs[i-1].trackPointsPos[trackSegs.Count-1];
-                }
-                else
-                if (j >= CurrTrackSegTrackpts.Count - 1) {
-                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j] - CurrTrackSegTrackpts [j - 1]) + CurrTrackSegTrackpts [j];
-                } else {
-                    bp.forwardControlPoint = CurrTrackSegTrackpts [j + 1];
-                }
-                 * */
                 //=======================================================
 
                 if (CurrTrackSeg.type == TrackSegmentType.LEFT_SEMI) {
@@ -311,7 +295,20 @@ public class TrackManager : MonoBehaviour {
                 LowerBounds.y = Mathf.Min (LowerBounds.y, bp.position.y);
                 LowerBounds.z = Mathf.Min (LowerBounds.z, bp.position.z);
                
-                DrawCross(bp.position + Vector3.up,Color.white);
+
+
+                if(j==0)
+                {
+                    DrawCross(bp.position + Vector3.up,Color.green);
+                    Debug.DrawLine(bp.position,bp.forwardControlPoint,Color.green,5);
+
+                }
+                 else
+                {
+                    DrawCross(bp.position + Vector3.up,Color.white);
+                    Debug.DrawLine(bp.position,bp.forwardControlPoint,Color.white,5);
+                }
+
                 track.AddPoint (bp);
             }
         }
