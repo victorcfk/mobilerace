@@ -149,8 +149,6 @@ public class TrackManager : MonoBehaviour {
     [SerializeField]
     public List<TrackSegment> trackSegs;
 
-    public List<Vector3> GeneratedPointList    = new List<Vector3> ();
-
     Vector3 UpperBounds;
     Vector3 LowerBounds;
 
@@ -262,14 +260,8 @@ public class TrackManager : MonoBehaviour {
         trackSegs = GenerateTrackSegments(trackSegs);
 
         //===================================================
-        // DropPointsOnArray (generatedPointList, 0.6f, 0.6f);
-        //===================================================
-
-        //float temp = 0;
         //Rotation bits
         //=======================================================
-//        lastDirOnGeneratedTrackSegments = Vector3.forward;
-//        lastPointOnGeneratedTrackSegments = Vector3.zero;
         int temp=0;
         for (int i =0; i <trackSegs.Count; i++)
         {   
@@ -456,21 +448,17 @@ public class TrackManager : MonoBehaviour {
         TrackSegmentType type,
         AnimationCurve curveToUse)
     {
-//        List<Vector3> vec3points;
         TrackPoint[] trackPoints;
 
         if (type == TrackSegmentType.RIGHT_SEMI)
-//            vec3points = GenerateRightCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, 0.5f);
             trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
             if(type == TrackSegmentType.LEFT_SEMI)
-//                vec3points = GenerateLeftCurvePoints (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints, 0.5f);
                 trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
         else
             trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier);        
 
         TrackSegment tsgt = new TrackSegment();
-        //tsgt.trackPointsPos = vec3points;
 
         if(type == TrackSegmentType.RIGHT_SEMI)
             tsgt.type = TrackSegmentType.RIGHT_SEMI;
@@ -481,22 +469,6 @@ public class TrackManager : MonoBehaviour {
             tsgt.type = TrackSegmentType.STRAIGHT;
 
         tsgt.trackPoints = trackPoints;
-
-        //generatedPointList.AddRange (vec3points);
-        
-        return tsgt;
-    }
-
-    TrackSegment GenerateStraightTrackSegment(Vector3 lastPointAtInterval, Vector3 dirAtEnd, int pointsInSegment, float distbetweenPoints)
-    {
-        //List<Vector3> vec3points = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);
-        TrackPoint[] trackPoints =GenerateStraight (lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints);
-
-        TrackSegment tsgt = new TrackSegment();
-        //tsgt.trackPointsPos = vec3points;
-        tsgt.type = TrackSegmentType.STRAIGHT;
-        tsgt.trackPoints = trackPoints;
-        //generatedPointList.AddRange (vec3points);
         
         return tsgt;
     }
