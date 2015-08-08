@@ -10,23 +10,17 @@ public enum TrackSegmentType
 }
 
 [System.Serializable]
-public struct TrackSegment
+public class TrackSegment
 {
-    public int pointCount
-    {
-        get
-        {
-            //return trackPointsPos.Count;
-            return trackPoints.Length;
-        }
-    }
-    //public List<Vector3> trackPointsPos;
+    public int pointCount{  get {   return trackPoints.Length;  }   }
+
     public TrackPoint[] trackPoints;
 
     public TrackSegmentType type;
 }
 
-public struct TrackPoint
+[System.Serializable]
+public class TrackPoint
 {
     TrackBuildRPoint _point;
     public TrackBuildRPoint point
@@ -46,40 +40,7 @@ public struct TrackPoint
         }
     }
 
-//    public Vector3 position
-//    {
-//        get{
-//            return  point.position;
-//        }
-//
-//        set{
-//            point.position = value;
-//        }
-//    }
-//
-//    public Quaternion upVec
-//    {
-//        get{
-//            return  point.trackUpQ;
-//        }
-//
-//        set{
-//            point.trackUpQ = value;
-//        }
-//    }
-//
-//    public Vector3 fwdControlPoint
-//    {
-//        get{
-//            return  point.forwardControlPoint;
-//        }
-//
-//        set{
-//            point.forwardControlPoint = value;
-//        }
-//    }
-
-    public Vector3 _position;
+    Vector3 _position;
     public Vector3 position
     {
         get
@@ -92,15 +53,21 @@ public struct TrackPoint
         {
             _position = value;
         }
-
-
     }
-    
-//    public Quaternion upVec;
-//    
-//    public Vector3 fwdControlPoint;
 
-    public float DistFromStart;
+    float _DistFromStart;
+    public float DistFromStart
+    {
+        get
+        {
+            return _DistFromStart;
+        }
+        
+        set
+        {
+            _DistFromStart = value;
+        }
+    }
 
 }
 
@@ -148,6 +115,7 @@ public class TrackManager : MonoBehaviour {
     [Space (10)]
     [SerializeField]
     public List<TrackSegment> trackSegs;
+    public List<TrackPoint> listOfTrackPoints;
 
     Vector3 UpperBounds;
     Vector3 LowerBounds;
@@ -199,7 +167,7 @@ public class TrackManager : MonoBehaviour {
                     currLastPtOnTrackSegArr,
                     lastDirOnGeneratedTrackSegments,
                     pointsPerSegment,
-                    15,TrackSegmentType.STRAIGHT,getCurveToGenerate()));
+                    15,TrackSegmentType.STRAIGHT,getCurveToGenerate(),listOfTrackPoints));
 
                     break;
 
@@ -210,7 +178,7 @@ public class TrackManager : MonoBehaviour {
                     currLastPtOnTrackSegArr,
                     lastDirOnGeneratedTrackSegments,
                     pointsPerSegment,
-                    Random.Range(400,800),TrackSegmentType.LEFT_SEMI,getCurveToGenerate()));
+                    Random.Range(400,800),TrackSegmentType.LEFT_SEMI,getCurveToGenerate(),listOfTrackPoints));
 
                     break;
 
@@ -221,7 +189,7 @@ public class TrackManager : MonoBehaviour {
                     currLastPtOnTrackSegArr,
                     lastDirOnGeneratedTrackSegments,
                     pointsPerSegment,
-                    Random.Range(400,800),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate()));
+                    Random.Range(400,800),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate(),listOfTrackPoints));
 
                     break;
             }
@@ -255,9 +223,37 @@ public class TrackManager : MonoBehaviour {
         return trackSegments;
     }
 
+    public void UpdateDistanceFromStart()
+    {
+        listOfTrackPoints[0].DistFromStart = 0;
+        for(int i =1; i <listOfTrackPoints.Count; i++)
+        {   
+            listOfTrackPoints[i].DistFromStart = 
+                listOfTrackPoints[i-1].DistFromStart + Vector3.Distance(listOfTrackPoints [i].position,listOfTrackPoints [i-1].position);
+        }
+    }
+
+    public void DropYPosOnListOfTrackPoints(float totalDropValue)
+    {
+        float TotalDistanceOfTrack = listOfTrackPoints [listOfTrackPoints.Count - 1].DistFromStart;
+
+        for(int i =0; i <listOfTrackPoints.Count; i++)
+        {   
+            listOfTrackPoints[i].position = 
+                listOfTrackPoints[i].position + 
+                    Vector3.down * Mathf.Lerp(0,totalDropValue,listOfTrackPoints[i].DistFromStart/TotalDistanceOfTrack);
+
+            //                listOfTrackPoints[i-1].DistFromStart + Vector3.Distance(listOfTrackPoints [i].position,listOfTrackPoints [i-1].position);
+        }
+    }
+
     public void InitializeTrackPoints (TrackBuildRTrack track)
     {
         trackSegs = GenerateTrackSegments(trackSegs);
+
+        UpdateDistanceFromStart();
+        
+        DropYPosOnListOfTrackPoints(500);
 
         //===================================================
         //Rotation bits
@@ -446,7 +442,8 @@ public class TrackManager : MonoBehaviour {
         int pointsInSegment, 
         float distbetweenPoints, 
         TrackSegmentType type,
-        AnimationCurve curveToUse)
+        AnimationCurve curveToUse,
+        List< TrackPoint> allTrackPoints = null)
     {
         TrackPoint[] trackPoints;
 
@@ -469,6 +466,8 @@ public class TrackManager : MonoBehaviour {
             tsgt.type = TrackSegmentType.STRAIGHT;
 
         tsgt.trackPoints = trackPoints;
+
+        if (allTrackPoints != null) allTrackPoints.AddRange(trackPoints);
         
         return tsgt;
     }
@@ -500,6 +499,7 @@ public class TrackManager : MonoBehaviour {
             float y = startDir.y * (float)(i);
             float z = trackCurve.Evaluate((float)(i)/interpolationPoints);
 
+            trackPoints[i] = new TrackPoint();
             trackPoints[i].position = 
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z));
@@ -535,6 +535,7 @@ public class TrackManager : MonoBehaviour {
             float y = startDir.y * (float)(i);
             float z = trackCurve.Evaluate((float)(i)/interpolationPoints);
 
+            trackPoints[i] = new TrackPoint();
             trackPoints[i].position =
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z));
@@ -566,6 +567,7 @@ public class TrackManager : MonoBehaviour {
                     g.MultiplyPoint3x4 (
                         new Vector3 (x, y, z) );
 
+            trackPoints[i] = new TrackPoint();
             trackPoints[i].position = vecArray [i];
         }
         
