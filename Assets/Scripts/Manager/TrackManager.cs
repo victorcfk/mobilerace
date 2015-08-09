@@ -6,7 +6,11 @@ public enum TrackSegmentType
 {
     STRAIGHT = 0 ,
     LEFT_SEMI = 1 ,
-    RIGHT_SEMI = 2
+    RIGHT_SEMI = 2 ,
+    LEFT_S = 3 ,
+    RIGHT_S = 4 ,
+    LEFT_EXPO = 5 ,
+    RIGHT_EXPO = 6 ,
 }
 
 [System.Serializable]
@@ -158,49 +162,24 @@ public class TrackManager : MonoBehaviour {
 
         for (int j =0; j <numOfTrackSegments; j++) 
         {
-            switch(tstToGen)
-            {
-                case TrackSegmentType.STRAIGHT:
-
-                    trackSegments.Add( 
-                                  GenerateFromCurveTrackSegment(
-                    currLastPtOnTrackSegArr,
-                    lastDirOnGeneratedTrackSegments,
-                    pointsPerSegment,
-                    15,TrackSegmentType.STRAIGHT,getCurveToGenerate(),listOfTrackPoints));
-
-                    break;
-
-                case TrackSegmentType.LEFT_SEMI:
-
-                    trackSegments.Add( 
-                                  GenerateFromCurveTrackSegment(
-                    currLastPtOnTrackSegArr,
-                    lastDirOnGeneratedTrackSegments,
-                    pointsPerSegment,
-                    Random.Range(400,800),TrackSegmentType.LEFT_SEMI,getCurveToGenerate(),listOfTrackPoints));
-
-                    break;
-
-                case TrackSegmentType.RIGHT_SEMI:
-
-                    trackSegments.Add( 
-                                  GenerateFromCurveTrackSegment(
-                    currLastPtOnTrackSegArr,
-                    lastDirOnGeneratedTrackSegments,
-                    pointsPerSegment,
-                    Random.Range(400,800),TrackSegmentType.RIGHT_SEMI,getCurveToGenerate(),listOfTrackPoints));
-
-                    break;
-            }
-
+            trackSegments.Add( 
+                              GenerateFromCurveTrackSegment(
+                currLastPtOnTrackSegArr,
+                lastDirOnGeneratedTrackSegments,
+                pointsPerSegment,
+                Random.Range(400,800),tstToGen,listOfTrackPoints));
+            
             //=================================================================
-
-            switch(Random.Range(0,3))
+            
+            switch(Random.Range(0,7))
             {
-                case 0: tstToGen = TrackSegmentType.STRAIGHT;   break;
-                case 1: tstToGen = TrackSegmentType.LEFT_SEMI;   break;
-                case 2: tstToGen = TrackSegmentType.RIGHT_SEMI;   break;
+                case 0: tstToGen = TrackSegmentType.STRAIGHT;       break;
+                case 1: tstToGen = TrackSegmentType.LEFT_SEMI;      break;
+                case 2: tstToGen = TrackSegmentType.RIGHT_SEMI;     break;
+                case 3: tstToGen = TrackSegmentType.LEFT_S;         break;
+                case 4: tstToGen = TrackSegmentType.RIGHT_S;         break;
+                case 5: tstToGen = TrackSegmentType.LEFT_EXPO;      break;
+                case 6: tstToGen = TrackSegmentType.RIGHT_EXPO;     break;
             }
 
             TrackSegment currLastTrackSeg = trackSegments[trackSegments.Count-1];
@@ -301,7 +280,9 @@ public class TrackManager : MonoBehaviour {
                 }
                 //=======================================================
 
-                if (CurrTrackSeg.type == TrackSegmentType.LEFT_SEMI) {
+                if (CurrTrackSeg.type == TrackSegmentType.LEFT_SEMI ||
+                    CurrTrackSeg.type == TrackSegmentType.LEFT_EXPO ||
+                    CurrTrackSeg.type == TrackSegmentType.LEFT_S) {
                     
                     //=============================================
                     float angle;
@@ -322,11 +303,11 @@ public class TrackManager : MonoBehaviour {
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,100,MaxLeftTurnCant*4,GradualCurve);
 
                     CurrTrackSegTrackpts [j].position = bp.position;
-
-                    bp.type = TrackSegmentType.LEFT_SEMI;
                     //=============================================
                 } else
-                if (CurrTrackSeg.type == TrackSegmentType.RIGHT_SEMI) { //right turn
+                    if (CurrTrackSeg.type == TrackSegmentType.RIGHT_SEMI ||
+                        CurrTrackSeg.type == TrackSegmentType.RIGHT_EXPO ||
+                        CurrTrackSeg.type == TrackSegmentType.RIGHT_S) { //right turn
 
                     //=============================================
                     float angle;
@@ -347,14 +328,10 @@ public class TrackManager : MonoBehaviour {
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,100,MaxRightTurnCant*4,GradualCurve);
 
                     CurrTrackSegTrackpts [j].position = bp.position;
-
-                    bp.type = TrackSegmentType.RIGHT_SEMI;
                     //=============================================
                 } 
-                else
-                {
-                    bp.type = TrackSegmentType.STRAIGHT;
-                }
+
+                bp.type = CurrTrackSeg.type;
 
                 UpperBounds.x = Mathf.Max (UpperBounds.x, bp.position.x);
                 UpperBounds.y = Mathf.Max (UpperBounds.y, bp.position.y);
@@ -396,23 +373,23 @@ public class TrackManager : MonoBehaviour {
         //================================
     }
 
-    AnimationCurve getCurveToGenerate()
-    {
-        //float difficulty
-        int t = Random.Range(0, 3);
-        if ( t < 1)
-        {
-            return SemiCircle;
-        } else
-            if(t<2)
-        {
-            return ExpoCurve;
-        }
-        else
-        {
-            return SCurve;
-        }
-    }
+//    AnimationCurve getCurveToGenerate()
+//    {
+//        //float difficulty
+//        int t = Random.Range(0, 3);
+//        if ( t < 1)
+//        {
+//            return SemiCircle;
+//        } else
+//            if(t<2)
+//        {
+//            return ExpoCurve;
+//        }
+//        else
+//        {
+//            return SCurve;
+//        }
+//    }
 
     float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle, AnimationCurve cantCurve, int type = 0)
     {
@@ -442,29 +419,48 @@ public class TrackManager : MonoBehaviour {
         int pointsInSegment, 
         float distbetweenPoints, 
         TrackSegmentType type,
-        AnimationCurve curveToUse,
         List< TrackPoint> allTrackPoints = null)
     {
         TrackPoint[] trackPoints;
 
-        if (type == TrackSegmentType.RIGHT_SEMI)
-            trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
-        else
-            if(type == TrackSegmentType.LEFT_SEMI)
-                trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,curveToUse);        
-        else
-            trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier);        
+        switch (type)
+        {
+            case TrackSegmentType.STRAIGHT://15 400 - > 15
+                trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier * 15/400);        
+                break;
+                
+            case TrackSegmentType.RIGHT_S://400 to 800
+                trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SCurve);        
+                break;
+                
+            case TrackSegmentType.LEFT_S:
+                trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SCurve);
+                break;
+                
+            case TrackSegmentType.RIGHT_SEMI:
+                trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SemiCircle);
+                break;
+                
+            case TrackSegmentType.LEFT_SEMI:
+                trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SemiCircle);
+                break;
+                
+            case TrackSegmentType.RIGHT_EXPO:
+                trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,ExpoCurve);
+                break;
+                
+            case TrackSegmentType.LEFT_EXPO:
+                trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,ExpoCurve);
+                break;
+                
+            default:
+                trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier* 15/400);        
+                break;
+        }
 
         TrackSegment tsgt = new TrackSegment();
 
-        if(type == TrackSegmentType.RIGHT_SEMI)
-            tsgt.type = TrackSegmentType.RIGHT_SEMI;
-        else
-            if(type == TrackSegmentType.LEFT_SEMI)
-                tsgt.type = TrackSegmentType.LEFT_SEMI;
-        else
-            tsgt.type = TrackSegmentType.STRAIGHT;
-
+        tsgt.type = type;
         tsgt.trackPoints = trackPoints;
 
         if (allTrackPoints != null) allTrackPoints.AddRange(trackPoints);
