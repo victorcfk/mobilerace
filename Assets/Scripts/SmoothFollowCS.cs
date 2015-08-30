@@ -26,6 +26,9 @@ Then we apply the smoothed values to the transform's position.
 	public float heightDamping = 2.0f;
 	public float rotationDamping = 3.0f;
 
+    public float maxClampHeight = 20;
+    public float minClampHeight = 0;
+
 	void LateUpdate () {
 		// Early out if we don't have a target
 		if (!camFollowTarget)
@@ -44,6 +47,8 @@ Then we apply the smoothed values to the transform's position.
 		// Damp the height
 		currentHeight = Mathf.Lerp (currentHeight, wantedHeight, heightDamping * Time.deltaTime);
 		
+        currentHeight = Mathf.Clamp(currentHeight,camFollowTarget.position.y+ + minClampHeight, camFollowTarget.position.y+ maxClampHeight);
+
 		// Convert the angle into a rotation
 		var currentRotation = Quaternion.Euler (0, currentRotationAngle, 0);
 		

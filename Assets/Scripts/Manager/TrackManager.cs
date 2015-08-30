@@ -49,7 +49,6 @@ public class TrackPoint
     {
         get
         {
-            if(point != null) Debug.Log("bp not null");
             return _position;
         }
 
@@ -142,6 +141,27 @@ public class TrackManager : MonoBehaviour {
     public int numOfBuildingsToGenerate;
     public GameObject[] Buildings;
 
+    Vector3 firstPointGenerated 
+    {
+        get 
+        { 
+            if(listOfTrackPoints != null) 
+                return listOfTrackPoints[0].position; 
+            else 
+                return Vector3.zero;
+        }
+    }
+
+    Vector3 lastPointGenerated
+    {
+        get 
+        { 
+            if(listOfTrackPoints != null) 
+                return listOfTrackPoints[listOfTrackPoints.Count-1].position; 
+            else 
+                return Vector3.zero;
+        }
+    }
 
     public List<TrackSegment> GenerateTrackSegments( List<TrackSegment> trackSegments )
     {
@@ -167,19 +187,19 @@ public class TrackManager : MonoBehaviour {
                 currLastPtOnTrackSegArr,
                 lastDirOnGeneratedTrackSegments,
                 pointsPerSegment,
-                Random.Range(400,800),tstToGen,listOfTrackPoints));
+                Random.Range(400,600),tstToGen,listOfTrackPoints));
             
             //=================================================================
             
-            switch(Random.Range(0,7))
+            switch(Random.Range(0,5))
             {
                 case 0: tstToGen = TrackSegmentType.STRAIGHT;       break;
                 case 1: tstToGen = TrackSegmentType.LEFT_SEMI;      break;
                 case 2: tstToGen = TrackSegmentType.RIGHT_SEMI;     break;
-                case 3: tstToGen = TrackSegmentType.LEFT_S;         break;
-                case 4: tstToGen = TrackSegmentType.RIGHT_S;         break;
-                case 5: tstToGen = TrackSegmentType.LEFT_EXPO;      break;
-                case 6: tstToGen = TrackSegmentType.RIGHT_EXPO;     break;
+//                case 3: tstToGen = TrackSegmentType.LEFT_S;         break;
+//                case 4: tstToGen = TrackSegmentType.RIGHT_S;         break;
+                case 3: tstToGen = TrackSegmentType.LEFT_EXPO;      break;
+                case 4: tstToGen = TrackSegmentType.RIGHT_EXPO;     break;
             }
 
             TrackSegment currLastTrackSeg = trackSegments[trackSegments.Count-1];
@@ -232,7 +252,7 @@ public class TrackManager : MonoBehaviour {
 
         UpdateDistanceFromStart();
         
-        DropYPosOnListOfTrackPoints(500);
+        DropYPosOnListOfTrackPoints(numOfTrackSegments * 25);
 
         //===================================================
         //Rotation bits
@@ -255,7 +275,7 @@ public class TrackManager : MonoBehaviour {
 
                 bp.baseTransform = transform;
                 bp.position = CurrTrackSegTrackpts [j].position;
-                bp.width = 100;
+                bp.width = 150;
 
                 bp.colliderSides = true;
                 bp.renderBounds = false;
@@ -281,8 +301,10 @@ public class TrackManager : MonoBehaviour {
                 //=======================================================
 
                 if (CurrTrackSeg.type == TrackSegmentType.LEFT_SEMI ||
-                    CurrTrackSeg.type == TrackSegmentType.LEFT_EXPO ||
-                    CurrTrackSeg.type == TrackSegmentType.LEFT_S) {
+                    CurrTrackSeg.type == TrackSegmentType.LEFT_EXPO 
+//                    ||
+//                    CurrTrackSeg.type == TrackSegmentType.LEFT_S
+                    ) {
                     
                     //=============================================
                     float angle;
@@ -300,14 +322,16 @@ public class TrackManager : MonoBehaviour {
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,-MaxLeftTurnCant,GradualCurve), 
                             axis) * bp.trackUpQ;
 
-                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,100,MaxLeftTurnCant*4,GradualCurve);
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,150,MaxLeftTurnCant,GradualCurve);
 
                     CurrTrackSegTrackpts [j].position = bp.position;
                     //=============================================
                 } else
                     if (CurrTrackSeg.type == TrackSegmentType.RIGHT_SEMI ||
-                        CurrTrackSeg.type == TrackSegmentType.RIGHT_EXPO ||
-                        CurrTrackSeg.type == TrackSegmentType.RIGHT_S) { //right turn
+                        CurrTrackSeg.type == TrackSegmentType.RIGHT_EXPO 
+//                        ||
+//                        CurrTrackSeg.type == TrackSegmentType.RIGHT_S
+                       ) { //right turn
 
                     //=============================================
                     float angle;
@@ -325,7 +349,7 @@ public class TrackManager : MonoBehaviour {
                             GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,MaxRightTurnCant,GradualCurve), 
                             axis) * bp.trackUpQ;
 
-                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,100,MaxRightTurnCant*4,GradualCurve);
+                    bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,150,MaxRightTurnCant,GradualCurve);
 
                     CurrTrackSegTrackpts [j].position = bp.position;
                     //=============================================
@@ -341,6 +365,7 @@ public class TrackManager : MonoBehaviour {
                 LowerBounds.y = Mathf.Min (LowerBounds.y, bp.position.y);
                 LowerBounds.z = Mathf.Min (LowerBounds.z, bp.position.z);
 
+                //If it is the first point on the track
                 if(j==0)
                 {
                     DrawCross(bp.position + Vector3.up,Color.green);
@@ -368,10 +393,25 @@ public class TrackManager : MonoBehaviour {
 
         //Expand the bounds
         //================================
-        UpperBounds += Vector3.one *50;
-        LowerBounds -= Vector3.one *50;
+
+        //Expand the top and botom
+        UpperBounds += Vector3.up *50;
+        LowerBounds -= Vector3.up *50;
+
+        //Expand the left and right
+        UpperBounds += new Vector3(1,0,1) * 800;
+        LowerBounds -= new Vector3(1,0,1) * 800;
         //================================
+
+        DrawCross(firstPointGenerated, Color.magenta);
+        DrawCross(lastPointGenerated, Color.magenta);
+
+
+        Instantiate(teleporta, lastPointGenerated, Quaternion.identity);
     }
+
+    public TeleportVehToStart teleporta;
+
 
 //    AnimationCurve getCurveToGenerate()
 //    {
@@ -407,8 +447,8 @@ public class TrackManager : MonoBehaviour {
             return 0;
 
         return 
-            Mathf.Lerp(0, x * Mathf.Cos(angle),
-                       displacementCurve.Evaluate(point / totalCurvePointCount));
+            Mathf.Abs(Mathf.Lerp(0, x * Mathf.Cos(angle*4),
+                       displacementCurve.Evaluate(point / totalCurvePointCount)));
     }
 
     int straightTrackSpacingModifier = 5; //This is used to compensate for the fact that the spacing between the straight track points are too close as compared to the curved tracks, we need to modify them to compensate.
@@ -430,11 +470,11 @@ public class TrackManager : MonoBehaviour {
                 break;
                 
             case TrackSegmentType.RIGHT_S://400 to 800
-                trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SCurve);        
+                trackPoints = GenerateCurvePointsTowardsRight(lastPointAtInterval, dirAtEnd, pointsInSegment*2, distbetweenPoints*2,SCurve);        
                 break;
                 
             case TrackSegmentType.LEFT_S:
-                trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment, distbetweenPoints,SCurve);
+                trackPoints = GenerateCurvePointsTowardsLeft(lastPointAtInterval, dirAtEnd, pointsInSegment*2, distbetweenPoints*2,SCurve);
                 break;
                 
             case TrackSegmentType.RIGHT_SEMI:
@@ -738,7 +778,7 @@ public class TrackManager : MonoBehaviour {
     #endregion
     
 
-    void DrawCross(Vector3 pos, Color color, float dist = 10, float duration = 5)
+    void DrawCross(Vector3 pos, Color color = default(Color), float dist = 10, float duration = 5)
     {
         Debug.DrawLine(pos - Vector3.right * dist, pos + Vector3.right * dist, color, duration);
         Debug.DrawLine(pos - Vector3.forward * dist, pos + Vector3.forward * dist, color, duration);

@@ -60,10 +60,10 @@ public class GameManager : MonoBehaviour
 	public float
 		MaxFollowDistance;
 
-	[Range (1,100)]
+	[Range (-10,100)]
 	public float
 		MinFollowHeight;
-	[Range (1,100)]
+	[Range (-10,100)]
 	public float
 		MaxFollowHeight;
 
@@ -71,6 +71,8 @@ public class GameManager : MonoBehaviour
     Vector3 CamFollowObjectOrigPosition;
 
     public int lastKnownSeed;
+
+    public Transform vehStartTransform;
 
 	void Awake ()
 	{
