@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour
 
     TrackBuildRuntime trbrt;
     GameObject EnvironmentParent;
+    public GameObject BoostObj;
 
 	[Range (1,100)]
 	public float
@@ -99,6 +100,7 @@ public class GameManager : MonoBehaviour
             
             trbrt.Init();
             TrackManager.instance.PopulateEnvironment(EnvironmentParent);
+            TrackManager.instance.PopulateBoosts(BoostObj);
         }
 
         Debug.Log(Random.seed);

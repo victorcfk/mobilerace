@@ -26,7 +26,7 @@ public class SpeedBoost : MonoBehaviour {
     float SpeedUp(DrivingScriptStraight other)
     {
         float origSpeed = other.MaxSpeed;
-        float newSpeed = other.MaxSpeed * 1.2f;
+        float newSpeed = other.MaxSpeed * 1.5f;
         other.MaxSpeed = newSpeed;
         
         other.rigidBody.velocity = other.MaxSpeed * other.rigidBody.velocity.normalized;

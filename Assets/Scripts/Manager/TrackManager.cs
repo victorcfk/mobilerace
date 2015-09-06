@@ -736,7 +736,20 @@ public class TrackManager : MonoBehaviour {
                 temp.transform.parent = ParentObj.transform;
         }
     }
-    
+
+    public void PopulateBoosts( GameObject Boost)
+    {
+
+        for (int i=0; i <this.listOfTrackPoints.Count; i++)
+        {
+            if(Random.Range(0, 10) < 1)
+            {
+                Instantiate(Boost, listOfTrackPoints[i].position,Quaternion.identity);
+            }
+        }
+       
+    }
+
     GameObject SphereCastWithinBoundaryForRoom (Vector3 UpperBounds, Vector3 LowerBounds, float sphereRadius, GameObject obj)
     {
         Vector3 topCent = (UpperBounds + LowerBounds) / 2;
