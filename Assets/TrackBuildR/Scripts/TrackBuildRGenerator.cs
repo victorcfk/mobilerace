@@ -48,8 +48,6 @@ public class TrackBuildRGenerator : MonoBehaviour
         {
             TrackBuildRPoint curve = track[i];
 
-            Debug.Log("meshes "+numberOfCurves);
-
             if(curve.type == TrackSegmentType.STRAIGHT)
                 TrackManager.instance.Mat = 1;
             else
