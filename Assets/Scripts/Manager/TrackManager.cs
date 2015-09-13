@@ -280,7 +280,8 @@ public class TrackManager : MonoBehaviour {
                 bp.colliderSides = true;
                 bp.renderBounds = false;
                 bp.generateBumpers = false;
-                bp.extrudeTrackBottom = false;
+                bp.extrudeTrack = true;
+                bp.extrudeTrackBottom = true;
                 bp.crownAngle = crownAngle;
 
                 float angle2;
@@ -631,16 +632,15 @@ public class TrackManager : MonoBehaviour {
 
     public Material GetVariedTrackMatToUse ()
     {
-        if(Mat == 0)
-        {
             return trackMat;
-        }
-        else
-        {
-            return trackMat2;
-        }
     }
-    
+
+    public Material GetBottomTrackMatToUse ()
+    {
+            return trackMat2;
+    }
+
+
     public Material GetBorderMatToUse ()
     {
         return borderMat;

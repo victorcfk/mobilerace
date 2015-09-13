@@ -690,7 +690,10 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
+                        {
                             newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+                            //newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetVariedTrackMatToUse());
+                        }
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -709,7 +712,10 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
+                        {
                             newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.offroadTextureStyleIndex).GetMaterial();// track.offroadTexture.material;
+                            //newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetVariedTrackMatToUse());
+                        }
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -819,7 +825,10 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
-                            newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bottomTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+                        {
+                            //newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.bottomTextureStyleIndex).GetMaterial();// track.trackTexture.material;
+                            newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetBottomTrackMatToUse());
+                        }
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
