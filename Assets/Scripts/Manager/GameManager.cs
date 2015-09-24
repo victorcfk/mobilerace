@@ -22,15 +22,23 @@ public class GameManager : MonoBehaviour
 			//If _instance hasn't been set yet, we grab it from the scene!
 			//This will only happen the first time this reference is used.
 			if (_instance == null)
-				_instance = GameObject.FindObjectOfType<GameManager> ();
+				_instance = FindObjectOfType<GameManager> ();
 			return _instance;
 		}
 	}
 
-	public DrivingScriptBasic TheVehicle;
+    //==========================================
+
+
+    public DrivingScriptStraight TheVehicle;
 
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
+
+    float TurnValue;
+    float TurnSensitivity;
+
+    float AccValue;
 
     [Space (10)]
 
@@ -109,9 +117,9 @@ public class GameManager : MonoBehaviour
 
         seedInputField.text = lastKnownSeed.ToString();
 
-        (TheVehicle as DrivingScriptStraight).turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
+        (TheVehicle).turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
 
-        tiltSensitivitySlider.normalizedValue = (TheVehicle as DrivingScriptStraight).turnSensitivity;
+        tiltSensitivitySlider.normalizedValue = (TheVehicle).turnSensitivity;
 
         switch(PlayerPrefs.GetInt("ControlScheme",1))
         {
@@ -134,8 +142,6 @@ public class GameManager : MonoBehaviour
     void LateUpdate ()
     {
         MenuManagement();
-
-        CamManagement(CamFollow,CamFollowObject);
     }
 
     public void MenuManagement()
@@ -167,18 +173,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void CamManagement(SmoothFollowCS CamFollowScript,
-                              Transform CamFollowObj)
-    {
-        float t = (TheVehicle.rigidBody.velocity.sqrMagnitude - TheVehicle.MinSpeed * TheVehicle.MinSpeed) / (TheVehicle.MaxSpeed * TheVehicle.MaxSpeed - TheVehicle.MinSpeed * TheVehicle.MinSpeed);
-        float a = (TheVehicle as DrivingScriptStraight).LeftRightAcc;
-        
-        CamFollowScript.distance = Mathf.Lerp (MinFollowDistance, MaxFollowDistance, t);
-        CamFollowScript.height = Mathf.Lerp (MinFollowHeight, MaxFollowHeight, t);
-        
-        CamFollowObj.transform.localPosition = Vector3.MoveTowards(CamFollowObj.transform.localPosition, CamFollowObjectOrigPosition + Vector3.right*a*(TheVehicle as DrivingScriptStraight).turnSensitivity*7,Time.deltaTime*7);
-    }
-
     public void restartButtonPressed()
     {
         Debug.Log(lastKnownSeed + " " + PlayerPrefs.GetInt("Seed",1));
@@ -200,7 +194,7 @@ public class GameManager : MonoBehaviour
 
     public void sliderChanged(float value)
     {
-        (TheVehicle as DrivingScriptStraight).turnSensitivity = value;
+        TurnSensitivity = value;
 
         PlayerPrefs.SetFloat("Sensitivity",value);
     }
