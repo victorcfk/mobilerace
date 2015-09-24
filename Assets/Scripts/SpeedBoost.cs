@@ -20,13 +20,18 @@ public class SpeedBoost : MonoBehaviour {
             float temp = SpeedUp(other.GetComponent<DrivingScriptStraight>());
 
             StartCoroutine(SlowDown(other.GetComponent<DrivingScriptStraight>(),temp,2));
+
+//            Destroy(this.gameObject);
         }
     }
 
     float SpeedUp(DrivingScriptStraight other)
     {
         float origSpeed = other.MaxSpeed;
-        float newSpeed = other.MaxSpeed * 1.5f;
+        float newSpeed = other.MaxSpeed * 2f;
+
+        GameManager.instance.MaxFollowDistance = 10;
+
         other.MaxSpeed = newSpeed;
         
         other.rigidBody.velocity = other.MaxSpeed * other.rigidBody.velocity.normalized;
@@ -42,6 +47,8 @@ public class SpeedBoost : MonoBehaviour {
     IEnumerator SlowDown(DrivingScriptStraight other, float slowDownAmt, float waitTime) {
 
         yield return new WaitForSeconds(waitTime);
+
+        GameManager.instance.MaxFollowDistance = 5;
 
         other.MaxSpeed -= slowDownAmt;
     }

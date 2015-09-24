@@ -64,8 +64,6 @@ Then we apply the smoothed values to the transform's position.
 		// Convert the angle into a rotation
 		var currentRotation = Quaternion.Euler (0, currentRotationAngle, 0);
 
-        distance = Mathf.Clamp(distance, MinFollowDist, MaxFollowDist);
-
 		// Set the position of the camera on the x-z plane to:
 		// distance meters behind the target
 		transform.position = camFollowTarget.position;

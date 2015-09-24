@@ -213,9 +213,9 @@ public class GameManager : MonoBehaviour
         CamFollow.MaxFollowDist = MaxFollowDistance;
         CamFollow.MinFollowDist = MinFollowDistance;
 
-        CamFollow.distance = 
+        CamFollow.distance = Mathf.MoveTowards(CamFollow.distance,
             Mathf.Lerp(MinFollowDistance,MaxFollowDistance, 
-                       TheVehicle.rigidBody.velocity.sqrMagnitude/ (TheVehicle.MaxSpeed* TheVehicle.MaxSpeed));
+                   TheVehicle.rigidBody.velocity.sqrMagnitude/ (TheVehicle.MaxSpeed* TheVehicle.MaxSpeed)) ,5*Time.deltaTime);
 
         CamFollowObject.transform.localPosition = 
             Vector3.MoveTowards( CamFollowObject.transform.localPosition, 
