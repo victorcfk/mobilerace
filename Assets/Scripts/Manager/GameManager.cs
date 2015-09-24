@@ -35,10 +35,8 @@ public class GameManager : MonoBehaviour
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
 
-    float TurnValue;
-    float TurnSensitivity;
-
-    float AccValue;
+    public float TurnValue = 0;
+    public float turnSensitivity = 1;
 
     [Space (10)]
 
@@ -56,25 +54,35 @@ public class GameManager : MonoBehaviour
     //==============================================
 
     public ControlSchemes controlScheme;
+    
+    public float LeftPower;
+    public float RightPower;
+    
+    public KeyCode LeftTurnCode;
+    public KeyCode RightTurnCode;
+
     public TrackBuildRuntime trbrtPrefab;
 
     TrackBuildRuntime trbrt;
     GameObject EnvironmentParent;
     public GameObject BoostObj;
 
+    //========================================
+    //Cam movement values
+    //========================================
 	[Range (1,100)]
-	public float
-		MinFollowDistance;
+	public float MinFollowDistance;
 	[Range (1,100)]
-	public float
-		MaxFollowDistance;
+	public float MaxFollowDistance;
 
 	[Range (-10,100)]
-	public float
-		MinFollowHeight;
+	public float MinFollowHeight;
 	[Range (-10,100)]
-	public float
-		MaxFollowHeight;
+	public float MaxFollowHeight;
+
+    [Range (0,90)]
+    public float MaxRotationAngle;
+    //========================================
 
     [Space (10)]
     Vector3 CamFollowObjectOrigPosition;
@@ -117,9 +125,9 @@ public class GameManager : MonoBehaviour
 
         seedInputField.text = lastKnownSeed.ToString();
 
-        (TheVehicle).turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
+        turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
 
-        tiltSensitivitySlider.normalizedValue = (TheVehicle).turnSensitivity;
+        tiltSensitivitySlider.normalizedValue = turnSensitivity;
 
         switch(PlayerPrefs.GetInt("ControlScheme",1))
         {
@@ -139,10 +147,84 @@ public class GameManager : MonoBehaviour
 
 	}
 
-    void LateUpdate ()
+    void Update ()
     {
+        ControlUpdates();
         MenuManagement();
+        CamManagement();
     }
+
+    public void ControlUpdates()
+    {
+        switch(GameManager.instance.controlScheme)
+        {
+            case ControlSchemes.TILT:
+                TiltControlUpdates();
+                break;
+            case ControlSchemes.SLIDER:
+                LeftRightSlideControlUpdates();
+                break;
+            case ControlSchemes.BUTTON:
+                LeftRightTapControlUpdates();
+                break;
+        }
+
+        TheVehicle.LeftRightAcc = turnSensitivity * TurnValue;
+    }
+
+    void TiltControlUpdates()
+    {
+        TurnValue = Input.acceleration.x;
+        
+        if(Input.GetKey(RightTurnCode)) 
+            TurnValue = 1;
+        else
+            if(Input.GetKey(LeftTurnCode)) 
+                TurnValue = -1;
+        else
+        {
+            TheVehicle.isBraking = Input.anyKey;
+        }
+    }
+    
+    void LeftRightSlideControlUpdates()
+    {
+        TurnValue = Mathf.Clamp( LeftPower- RightPower,-1,1);
+    }
+    
+    void LeftRightTapControlUpdates()
+    {
+        if(RightPower == LeftPower)
+            TurnValue = 0;
+        
+        if(RightPower > 0 && LeftPower == 0)
+            TurnValue = 1;
+        
+        if(RightPower == 0 && LeftPower > 0)
+            TurnValue = -1;
+        
+    }
+
+    public void CamManagement()
+    {
+        CamFollow.MaxClampHeight = MaxFollowHeight;
+        CamFollow.MinClampHeight = MinFollowHeight;
+
+        CamFollow.MaxFollowDist = MaxFollowDistance;
+        CamFollow.MinFollowDist = MinFollowDistance;
+
+        CamFollow.distance = 
+            Mathf.Lerp(MinFollowDistance,MaxFollowDistance, 
+                       TheVehicle.rigidBody.velocity.sqrMagnitude/ (TheVehicle.MaxSpeed* TheVehicle.MaxSpeed));
+
+        CamFollowObject.transform.localPosition = 
+            Vector3.MoveTowards( CamFollowObject.transform.localPosition, 
+                                new Vector3(Mathf.Lerp(-1.5f, 1.5f, (TurnValue + 1f)/2f), CamFollowObject.transform.localPosition.y, CamFollowObject.transform.localPosition.z),
+                                5*Time.deltaTime);
+
+//        CamFollow.MaxRotationAngle = MaxRotationAngle;
+    }
+
 
     public void MenuManagement()
     {
@@ -194,7 +276,7 @@ public class GameManager : MonoBehaviour
 
     public void sliderChanged(float value)
     {
-        TurnSensitivity = value;
+        turnSensitivity = value;
 
         PlayerPrefs.SetFloat("Sensitivity",value);
     }

@@ -5,7 +5,7 @@ public class TouchActionAccelerate : TouchAction
 {
 //    public ApplyPhysics apply;
 
-    public DrivingScriptStraight drs;
+//    public DrivingScriptStraight drs;
     public bool isRightSlide;
 
     public override void onAction(float screenY= 0)
@@ -14,9 +14,9 @@ public class TouchActionAccelerate : TouchAction
 //		screenY -= 0.20f;
 
         if(isRightSlide)
-            drs.RightPower = Mathf.Clamp(screenY,0f,1f);
+            GameManager.instance.RightPower = Mathf.Clamp(screenY,0f,1f);
         else
-            drs.LeftPower = Mathf.Clamp(screenY,0f,1f);
+            GameManager.instance.LeftPower = Mathf.Clamp(screenY,0f,1f);
 
     }
 

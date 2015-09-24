@@ -7,12 +7,11 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	public float initAccVal = 75;
     float accVal;
-
-    public KeyCode LeftTurnCode;
-	public KeyCode RightTurnCode;
+    
+    public float LeftRightAcc;
+    public bool isBraking;
 
 	public float turnAngularVelocity;
-    public float turnSensitivity = 1;
 
 	public float rotationCorrectionVal = 3;
     	
@@ -25,10 +24,6 @@ public class DrivingScriptStraight : DrivingScriptBasic {
     //controls
     //============================
 
-    public float LeftRightAcc { get; private set;}
-    public float LeftPower;
-    public float RightPower;
-
     //============================
 
     static float MaxDownwardCastDist = 50;
@@ -39,7 +34,6 @@ public class DrivingScriptStraight : DrivingScriptBasic {
     public ParticleSystem CollisionPsys;
 
     float DisableAccTimer;
-    bool isBraking;
     Vector3 tempo = Vector3.forward;
 
     protected override void Awake()
@@ -61,19 +55,19 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         }
 
 
-        switch(GameManager.instance.controlScheme)
-        {
-            case ControlSchemes.TILT:
-                TiltControlUpdates();
-                break;
-            case ControlSchemes.SLIDER:
-                LeftRightSlideControlUpdates();
-                break;
-            case ControlSchemes.BUTTON:
-                LeftRightTapControlUpdates();
-                break;
-
-        }
+//        switch(GameManager.instance.controlScheme)
+//        {
+//            case ControlSchemes.TILT:
+//                TiltControlUpdates();
+//                break;
+//            case ControlSchemes.SLIDER:
+//                LeftRightSlideControlUpdates();
+//                break;
+//            case ControlSchemes.BUTTON:
+//                LeftRightTapControlUpdates();
+//                break;
+//
+//        }
 	}
 
     void MaintainVehOrientation () {
@@ -124,7 +118,7 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	void FixedUpdate()
 	{
-        rigidBody.angularVelocity = LeftRightAcc * turnSensitivity * turnAngularVelocity * transform.up * Time.deltaTime;
+        rigidBody.angularVelocity = LeftRightAcc * turnAngularVelocity * transform.up * Time.deltaTime;
 
 //		if(isBraking)
 //		{
@@ -164,36 +158,4 @@ public class DrivingScriptStraight : DrivingScriptBasic {
         DisableAccTimer = Mathf.Clamp(DisableAccTimer+0.5f,0,0.5f);
     }
 
-	void TiltControlUpdates()
-	{
-		LeftRightAcc = Input.acceleration.x;
-
-		if(Input.GetKey(RightTurnCode)) 
-			LeftRightAcc = 1;
-		else
-			if(Input.GetKey(LeftTurnCode)) 
-				LeftRightAcc = -1;
-		else
-		{
-			isBraking = Input.anyKey;
-		}
-	}
-
-    void LeftRightSlideControlUpdates()
-    {
-        LeftRightAcc = Mathf.Clamp( LeftPower- RightPower,-1,1);
-    }
-
-    void LeftRightTapControlUpdates()
-    {
-        if(RightPower == LeftPower)
-            LeftRightAcc = 0;
-
-        if(RightPower > 0 && LeftPower == 0)
-            LeftRightAcc = 1;
-
-        if(RightPower == 0 && LeftPower > 0)
-            LeftRightAcc = -1;
-        
-    }
 }

@@ -26,8 +26,20 @@ Then we apply the smoothed values to the transform's position.
 	public float heightDamping = 2.0f;
 	public float rotationDamping = 3.0f;
 
-    public float maxClampHeight = 20;
-    public float minClampHeight = 0;
+    [SeparatorAttribute]
+
+    [ReadOnlyAttribute]
+    public float MaxRotationAngle = 90;
+
+    [ReadOnlyAttribute]
+    public float MaxFollowDist = 20;
+    [ReadOnlyAttribute]
+    public float MinFollowDist = 0;
+
+    [ReadOnlyAttribute]
+    public float MaxClampHeight = 20;
+    [ReadOnlyAttribute]
+    public float MinClampHeight = 0;
 
 	void LateUpdate () {
 		// Early out if we don't have a target
@@ -43,15 +55,17 @@ Then we apply the smoothed values to the transform's position.
 		
 		// Damp the rotation around the y-axis
 		currentRotationAngle = Mathf.LerpAngle (currentRotationAngle, wantedRotationAngle, rotationDamping * Time.deltaTime);
-		
+//        currentRotationAngle = Mathf.Clamp (currentRotationAngle, -MaxRotationAngle, MaxRotationAngle);
+
 		// Damp the height
 		currentHeight = Mathf.Lerp (currentHeight, wantedHeight, heightDamping * Time.deltaTime);
-		
-        currentHeight = Mathf.Clamp(currentHeight,camFollowTarget.position.y+ + minClampHeight, camFollowTarget.position.y+ maxClampHeight);
+        currentHeight = Mathf.Clamp(currentHeight,camFollowTarget.position.y + MinClampHeight, camFollowTarget.position.y+ MaxClampHeight);
 
 		// Convert the angle into a rotation
 		var currentRotation = Quaternion.Euler (0, currentRotationAngle, 0);
-		
+
+        distance = Mathf.Clamp(distance, MinFollowDist, MaxFollowDist);
+
 		// Set the position of the camera on the x-z plane to:
 		// distance meters behind the target
 		transform.position = camFollowTarget.position;
