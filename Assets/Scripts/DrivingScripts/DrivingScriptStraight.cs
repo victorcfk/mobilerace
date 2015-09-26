@@ -21,14 +21,9 @@ public class DrivingScriptStraight : DrivingScriptBasic {
     public Transform frontRight;
     public LayerMask trackMask;
 
-    //controls
-    //============================
-
-    //============================
-
     static float MaxDownwardCastDist = 50;
     static float DistFromGround = 3;
-    static float RotationCorrectionRate = 60;
+    static float RotationCorrectionRate = 120;
     static float PositionCorrectionRate = 80;
 
     public ParticleSystem CollisionPsys;
@@ -36,11 +31,27 @@ public class DrivingScriptStraight : DrivingScriptBasic {
     float DisableAccTimer;
     Vector3 tempo = Vector3.forward;
 
+    public bool isSpeedBoosted
+    {
+        get
+        {
+            return remainingSpeedBoostDuration >0;
+        }
+    }
+    float remainingSpeedBoostDuration;
+
+    float initMinSpeed;
+    float initMaxSpeed;
+
     protected override void Awake()
     {
         base.Awake();
         accVal = initAccVal;
+
+        initMinSpeed = MinSpeed;
+        initMaxSpeed = MaxSpeed;
     }
+
 	// Update is called once per frame
 	void Update () 
 	{
@@ -54,21 +65,13 @@ public class DrivingScriptStraight : DrivingScriptBasic {
             accVal = initAccVal;
         }
 
-
-//        switch(GameManager.instance.controlScheme)
-//        {
-//            case ControlSchemes.TILT:
-//                TiltControlUpdates();
-//                break;
-//            case ControlSchemes.SLIDER:
-//                LeftRightSlideControlUpdates();
-//                break;
-//            case ControlSchemes.BUTTON:
-//                LeftRightTapControlUpdates();
-//                break;
-//
-//        }
+        remainingSpeedBoostDuration = Mathf.Clamp(remainingSpeedBoostDuration - Time.deltaTime, 0, Mathf.Infinity);
 	}
+
+    public void GainSpeedBoost()
+    {
+        remainingSpeedBoostDuration += 1.5f;
+    }
 
     void MaintainVehOrientation () {
 
@@ -120,26 +123,23 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	{
         rigidBody.angularVelocity = LeftRightAcc * turnAngularVelocity * transform.up * Time.deltaTime;
 
-//		if(isBraking)
-//		{
-//			//If the velocity is in any way orthognal to the vehicle's forward. So we are moving
-//			if(Vector3.Dot
-//			   (rigidBody.velocity,
-//			 transform.forward) > 0)
-//			{
-//                rigidBody.AddForceAtPosition(-transform.forward*accVal,transform.position);
-//			}
-//
-//		}
-//		else
-		{
-            rigidBody.AddForceAtPosition(transform.forward*accVal,transform.position);
-		}
+        if (isSpeedBoosted)
+        {
+            MaxSpeed = initMaxSpeed * 2;
+            MinSpeed = MaxSpeed;
+        } 
+        else
+        {
+            MaxSpeed = initMaxSpeed;
+            MinSpeed = initMinSpeed;
+        }
 
-		rigidBody.velocity = Vector3.SmoothDamp(rigidBody.velocity,
-		                                    Mathf.Clamp(rigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward,								//Add the current downward velocity due to gravity
-		                                    ref tempo,
-		                                    Time.fixedDeltaTime*rotationCorrectionVal);
+        rigidBody.AddForceAtPosition(transform.forward*accVal,transform.position);
+        
+        rigidBody.velocity = Vector3.SmoothDamp(rigidBody.velocity,
+                                                Mathf.Clamp(rigidBody.velocity.magnitude,MinSpeed,MaxSpeed) * transform.forward,                                //Add the current downward velocity due to gravity
+                                                ref tempo,
+                                                Time.fixedDeltaTime*rotationCorrectionVal);
 
         MaintainVehOrientation();
 	}

@@ -32,11 +32,6 @@ Then we apply the smoothed values to the transform's position.
     public float MaxRotationAngle = 90;
 
     [ReadOnlyAttribute]
-    public float MaxFollowDist = 20;
-    [ReadOnlyAttribute]
-    public float MinFollowDist = 0;
-
-    [ReadOnlyAttribute]
     public float MaxClampHeight = 20;
     [ReadOnlyAttribute]
     public float MinClampHeight = 0;

@@ -13,7 +13,7 @@ public class VehRotateOnTurn : MonoBehaviour {
     public float MaxTurnAngle = 90;
 
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
        
         if(DS == null) return;
 

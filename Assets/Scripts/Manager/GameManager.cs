@@ -30,13 +30,15 @@ public class GameManager : MonoBehaviour
     //==========================================
 
 
-    public DrivingScriptStraight TheVehicle;
+    public DrivingScriptStraight playerVehicle;
 
+    public Camera MainCam;
+    public Camera SubCam;
 	public SmoothFollowCS CamFollow;
 	public Transform CamFollowObject;
 
     public float TurnValue = 0;
-    public float turnSensitivity = 1;
+    public float TurnSensitivity = 1;
 
     [Space (10)]
 
@@ -83,6 +85,8 @@ public class GameManager : MonoBehaviour
     [Range (0,90)]
     public float MaxRotationAngle;
     //========================================
+    float initMaxFollowDist;
+
 
     [Space (10)]
     Vector3 CamFollowObjectOrigPosition;
@@ -125,9 +129,9 @@ public class GameManager : MonoBehaviour
 
         seedInputField.text = lastKnownSeed.ToString();
 
-        turnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
+        TurnSensitivity = PlayerPrefs.GetFloat("Sensitivity",1);
 
-        tiltSensitivitySlider.normalizedValue = turnSensitivity;
+        tiltSensitivitySlider.normalizedValue = TurnSensitivity;
 
         switch(PlayerPrefs.GetInt("ControlScheme",1))
         {
@@ -145,9 +149,10 @@ public class GameManager : MonoBehaviour
         controlSchemeSlider.value = PlayerPrefs.GetInt("ControlScheme",1);
         //=========================================================
 
+        initMaxFollowDist = MaxFollowDistance;
 	}
 
-    void Update ()
+    void LateUpdate ()
     {
         ControlUpdates();
         MenuManagement();
@@ -169,7 +174,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        TheVehicle.LeftRightAcc = turnSensitivity * TurnValue;
+        playerVehicle.LeftRightAcc = TurnSensitivity * TurnValue;
     }
 
     void TiltControlUpdates()
@@ -183,7 +188,7 @@ public class GameManager : MonoBehaviour
                 TurnValue = -1;
         else
         {
-            TheVehicle.isBraking = Input.anyKey;
+            playerVehicle.isBraking = Input.anyKey;
         }
     }
     
@@ -205,22 +210,29 @@ public class GameManager : MonoBehaviour
         
     }
 
+    float thing = 0;
+    float thing2 = 0;
+    float intendedFOV;
     public void CamManagement()
     {
         CamFollow.MaxClampHeight = MaxFollowHeight;
         CamFollow.MinClampHeight = MinFollowHeight;
 
-        CamFollow.MaxFollowDist = MaxFollowDistance;
-        CamFollow.MinFollowDist = MinFollowDistance;
+        if (playerVehicle.isSpeedBoosted)
+            intendedFOV = 90;
+        else
+            intendedFOV = 75;
 
-        CamFollow.distance = Mathf.MoveTowards(CamFollow.distance,
-            Mathf.Lerp(MinFollowDistance,MaxFollowDistance, 
-                   TheVehicle.rigidBody.velocity.sqrMagnitude/ (TheVehicle.MaxSpeed* TheVehicle.MaxSpeed)) ,5*Time.deltaTime);
+        MainCam.fieldOfView = SubCam.fieldOfView = 
+                            Mathf.SmoothDamp( MainCam.fieldOfView,
+                                              intendedFOV,
+                                              ref thing,
+                                               15 * Time.smoothDeltaTime);
 
-        CamFollowObject.transform.localPosition = 
-            Vector3.MoveTowards( CamFollowObject.transform.localPosition, 
-                                new Vector3(Mathf.Lerp(-1.5f, 1.5f, (TurnValue + 1f)/2f), CamFollowObject.transform.localPosition.y, CamFollowObject.transform.localPosition.z),
-                                5*Time.deltaTime);
+        CamFollow.distance = Mathf.SmoothDamp(CamFollow.distance,
+                                              Mathf.Lerp(MinFollowDistance,MaxFollowDistance, playerVehicle.rigidBody.velocity.sqrMagnitude/ (playerVehicle.MaxSpeed* playerVehicle.MaxSpeed)),
+                                              ref thing2,
+                                              15*Time.smoothDeltaTime);
 
 //        CamFollow.MaxRotationAngle = MaxRotationAngle;
     }
@@ -276,7 +288,7 @@ public class GameManager : MonoBehaviour
 
     public void sliderChanged(float value)
     {
-        turnSensitivity = value;
+        TurnSensitivity = value;
 
         PlayerPrefs.SetFloat("Sensitivity",value);
     }
