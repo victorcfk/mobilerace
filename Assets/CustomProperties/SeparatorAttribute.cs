@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SeparatorAttribute:PropertyAttribute
 {
@@ -16,4 +15,3 @@ public class SeparatorAttribute:PropertyAttribute
         this.title = _title;
     }
 }
-#endif
