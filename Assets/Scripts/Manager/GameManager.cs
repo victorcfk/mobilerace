@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
         initMaxFollowDist = MaxFollowDistance;
 	}
 
-    void LateUpdate ()
+    void Update ()
     {
         ControlUpdates();
         MenuManagement();
