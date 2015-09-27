@@ -1,6 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
-
 
 [CustomPropertyDrawer(typeof(SeparatorAttribute))]
 public class SeparatorAttributeDrawer:DecoratorDrawer
@@ -31,3 +31,4 @@ public class SeparatorAttributeDrawer:DecoratorDrawer
 		return 41.0f;
 	}
 }
+#endif
