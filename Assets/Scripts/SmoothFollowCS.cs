@@ -36,6 +36,9 @@ Then we apply the smoothed values to the transform's position.
     [ReadOnlyAttribute]
     public float MinClampHeight = 0;
 
+    float temp = 0;
+    float temp2 = 0;
+
 	void LateUpdate () {
 		// Early out if we don't have a target
 		if (!camFollowTarget)
@@ -49,11 +52,13 @@ Then we apply the smoothed values to the transform's position.
 		var currentHeight = transform.position.y;
 		
 		// Damp the rotation around the y-axis
-		currentRotationAngle = Mathf.LerpAngle (currentRotationAngle, wantedRotationAngle, rotationDamping * Time.deltaTime);
-//        currentRotationAngle = Mathf.Clamp (currentRotationAngle, -MaxRotationAngle, MaxRotationAngle);
+        //currentRotationAngle = Mathf.SmoothDampAngle (currentRotationAngle, wantedRotationAngle, ref temp2 ,rotationDamping * Time.smoothDeltaTime);
+
+        currentRotationAngle = Mathf.LerpAngle (currentRotationAngle, wantedRotationAngle, rotationDamping * Time.smoothDeltaTime);
 
 		// Damp the height
-		currentHeight = Mathf.Lerp (currentHeight, wantedHeight, heightDamping * Time.deltaTime);
+		currentHeight = Mathf.SmoothDamp (currentHeight, wantedHeight, ref temp ,heightDamping * Time.smoothDeltaTime);
+
         currentHeight = Mathf.Clamp(currentHeight,camFollowTarget.position.y + MinClampHeight, camFollowTarget.position.y+ MaxClampHeight);
 
 		// Convert the angle into a rotation
