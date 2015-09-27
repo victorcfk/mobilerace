@@ -57,12 +57,12 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 	{
         if(DisableAccTimer > 0)
         {
-            accVal = 0;
+            rigidBody.drag =1;
             DisableAccTimer -= Time.deltaTime;
         }
         else
         {
-            accVal = initAccVal;
+            rigidBody.drag =0;
         }
 
         remainingSpeedBoostDuration = Mathf.Clamp(remainingSpeedBoostDuration - Time.deltaTime, 0, Mathf.Infinity);

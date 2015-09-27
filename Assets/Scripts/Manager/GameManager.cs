@@ -161,18 +161,41 @@ public class GameManager : MonoBehaviour
 
     public void ControlUpdates()
     {
+#if UNITY_EDITOR
+        if (Input.GetKey(RightTurnCode)) 
+            TurnValue = 1;
+        else
+            if (Input.GetKey(LeftTurnCode)) 
+            TurnValue = -1;
+        else
+            TurnValue = 0;
+
+        TurnSensitivity = 0.75f;
+#else
         switch(GameManager.instance.controlScheme)
         {
             case ControlSchemes.TILT:
                 TiltControlUpdates();
+
+                TurnSensitivity = 1;
                 break;
             case ControlSchemes.SLIDER:
                 LeftRightSlideControlUpdates();
+
+                TurnSensitivity = 1;
                 break;
             case ControlSchemes.BUTTON:
                 LeftRightTapControlUpdates();
+
+                TurnSensitivity = 0.75f;
                 break;
         }
+#endif
+        //        {
+        //            playerVehicle.isBraking = Input.anyKey;
+//        }
+
+
 
         playerVehicle.LeftRightAcc = TurnSensitivity * TurnValue;
     }
@@ -180,33 +203,32 @@ public class GameManager : MonoBehaviour
     void TiltControlUpdates()
     {
         TurnValue = Input.acceleration.x;
-        
-        if(Input.GetKey(RightTurnCode)) 
-            TurnValue = 1;
-        else
-            if(Input.GetKey(LeftTurnCode)) 
-                TurnValue = -1;
-        else
-        {
-            playerVehicle.isBraking = Input.anyKey;
-        }
     }
     
     void LeftRightSlideControlUpdates()
     {
-        TurnValue = Mathf.Clamp( LeftPower- RightPower,-1,1);
+        TurnValue = Mathf.Clamp( LeftPower - RightPower,-1,1);
     }
     
     void LeftRightTapControlUpdates()
     {
-        if(RightPower == LeftPower)
+        if (RightPower == LeftPower)
+        {
             TurnValue = 0;
+            return;
+        }
         
-        if(RightPower > 0 && LeftPower == 0)
+        if (RightPower > 0 && LeftPower == 0)
+        {
             TurnValue = 1;
+            return;
+        }
         
-        if(RightPower == 0 && LeftPower > 0)
+        if (RightPower == 0 && LeftPower > 0)
+        {
             TurnValue = -1;
+            return;
+        }
         
     }
 
