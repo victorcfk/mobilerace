@@ -7,7 +7,8 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
 	public float initAccVal = 75;
     float accVal;
-    
+
+    [Range(0,1)]
     public float LeftRightAcc;
     public bool isBraking;
 
@@ -42,6 +43,11 @@ public class DrivingScriptStraight : DrivingScriptBasic {
 
     float initMinSpeed;
     float initMaxSpeed;
+
+    void OnValidate()
+    {
+        LeftRightAcc = Mathf.Clamp(LeftRightAcc,0, 1);
+    }
 
     protected override void Awake()
     {
