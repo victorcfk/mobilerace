@@ -14,6 +14,15 @@ public enum TrackSegmentType
 }
 
 [System.Serializable]
+public enum TrackMatType
+{
+    STRAIGHT = 0 ,
+    LEFT = 1 ,
+    RIGHT = 2 ,
+    BTM = 3,
+}
+
+[System.Serializable]
 public class TrackSegment
 {
     public int pointCount{  get {   return trackPoints.Length;  }   }
@@ -94,10 +103,20 @@ public class TrackManager : MonoBehaviour {
     
     [SerializeField]
     Material
-        trackMat;
+        fwdTrackMat;
+
     [SerializeField]
     Material
-        trackMat2;
+        btmTrackMat;
+
+    [SerializeField]
+    Material
+        rightTrackMat;
+
+    [SerializeField]
+    Material
+        leftTrackMat;
+
     [SerializeField]
     Material
         borderMat;
@@ -137,7 +156,7 @@ public class TrackManager : MonoBehaviour {
 
     public TeleportVehToStart teleporta;
 
-    public int Mat;
+    public TrackMatType trackMatType;
 
     [Range (0, 200)]
     public int numOfBuildingsToGenerate;
@@ -613,19 +632,31 @@ public class TrackManager : MonoBehaviour {
 
     public Material GetVariedTrackMatToUse ()
     {
-        if (Mat == 1)
+        switch (trackMatType)
         {
-            return trackMat;
-        } 
-        else
-        {
-            return trackMat2;
+            case TrackMatType.STRAIGHT:
+                return fwdTrackMat;
+                break;
+
+            case TrackMatType.LEFT:
+                return leftTrackMat;
+                break;
+
+            case TrackMatType.RIGHT:
+                return rightTrackMat;
+                break;
+
+            case TrackMatType.BTM:
+            default:
+                return btmTrackMat;
+                break;
+
         }
     }
 
     public Material GetBottomTrackMatToUse ()
     {
-        return trackMat2;
+        return btmTrackMat;
     }
 
     public Material GetBorderMatToUse ()

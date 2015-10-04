@@ -48,10 +48,29 @@ public class TrackBuildRGenerator : MonoBehaviour
         {
             TrackBuildRPoint curve = track[i];
 
-            if(curve.type == TrackSegmentType.STRAIGHT)
-                TrackManager.instance.Mat = 1;
-            else
-               TrackManager.instance.Mat = 0;
+            switch (curve.type)
+            {
+                case TrackSegmentType.STRAIGHT:
+                    TrackManager.instance.trackMatType = TrackMatType.STRAIGHT;
+                    break;
+                    
+                case TrackSegmentType.LEFT_EXPO:
+                case TrackSegmentType.LEFT_S:
+                case TrackSegmentType.LEFT_SEMI:
+                    TrackManager.instance.trackMatType = TrackMatType.LEFT;
+                    break;
+                    
+                case TrackSegmentType.RIGHT_EXPO:
+                case TrackSegmentType.RIGHT_S:
+                case TrackSegmentType.RIGHT_SEMI:
+                    TrackManager.instance.trackMatType = TrackMatType.RIGHT;
+                    break;
+
+                default:
+                    TrackManager.instance.trackMatType = TrackMatType.STRAIGHT;
+
+            break;
+            }
 
             bool generateCollider = curve.trackCollider;
 
