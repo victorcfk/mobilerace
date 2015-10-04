@@ -135,6 +135,8 @@ public class TrackManager : MonoBehaviour {
 
     public Vector2 textureUnitSize = new Vector2(50, 50);
 
+    public TeleportVehToStart teleporta;
+
     public int Mat;
 
     [Range (0, 200)]
@@ -411,27 +413,6 @@ public class TrackManager : MonoBehaviour {
         Instantiate(teleporta, lastPointGenerated, Quaternion.identity);
     }
 
-    public TeleportVehToStart teleporta;
-
-
-//    AnimationCurve getCurveToGenerate()
-//    {
-//        //float difficulty
-//        int t = Random.Range(0, 3);
-//        if ( t < 1)
-//        {
-//            return SemiCircle;
-//        } else
-//            if(t<2)
-//        {
-//            return ExpoCurve;
-//        }
-//        else
-//        {
-//            return SCurve;
-//        }
-//    }
-
     float GetCantAngleCurveValue(float point, float totalCurvePointCount, float initialCantAngle, float maxCantAngle, AnimationCurve cantCurve, int type = 0)
     {
 
@@ -632,14 +613,20 @@ public class TrackManager : MonoBehaviour {
 
     public Material GetVariedTrackMatToUse ()
     {
+        if (Mat == 1)
+        {
             return trackMat;
+        } 
+        else
+        {
+            return trackMat2;
+        }
     }
 
     public Material GetBottomTrackMatToUse ()
     {
-            return trackMat2;
+        return trackMat2;
     }
-
 
     public Material GetBorderMatToUse ()
     {
@@ -797,6 +784,7 @@ public class TrackManager : MonoBehaviour {
         Debug.DrawLine(pos - Vector3.forward * dist, pos + Vector3.forward * dist, color, duration);
     }
 
+    #region OldDrawCircle
     List<Vector3> GenerateLeftCurvePoints (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, float portionOfCircle = 1)
     {
         Vector3[] vecArray = new Vector3[numOfPoints];
@@ -854,5 +842,5 @@ public class TrackManager : MonoBehaviour {
         
         return new List<Vector3>(vecArray);
     }
-
+    #endregion
 }
