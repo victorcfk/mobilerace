@@ -513,7 +513,7 @@ public class TrackManager : MonoBehaviour {
     TrackPoint[] GenerateCurvePointsTowardsRight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
         TrackPoint[] trackPoints = new TrackPoint[numOfPoints];
-        Vector3 dircurve = new Vector3(0.05f,0,trackCurve.Evaluate(0.05f)).normalized; //Just sample the initial bit of the curve
+        Vector3 dircurve = new Vector3(0.01f,0,trackCurve.Evaluate(0.01f)).normalized; //Just sample the initial bit of the curve
 
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
@@ -548,7 +548,7 @@ public class TrackManager : MonoBehaviour {
     TrackPoint[] GenerateCurvePointsTowardsLeft (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints, AnimationCurve trackCurve )
     {
         TrackPoint[] trackPoints = new TrackPoint[numOfPoints];
-        Vector3 dircurve = new Vector3(-0.05f,0,trackCurve.Evaluate(0.05f)).normalized; //Just sample the initial bit of the curve
+        Vector3 dircurve = new Vector3(-0.01f,0,trackCurve.Evaluate(0.01f)).normalized; //Just sample the initial bit of the curve
 
         float angle = Vector3.Angle (dircurve, startDir);
         Vector3.Cross (dircurve, startDir);
