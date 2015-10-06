@@ -94,6 +94,7 @@ public class GameManager : MonoBehaviour
     public int lastKnownSeed;
 
     public Transform vehStartTransform;
+    public Transform camStartTransform;
 
 	void Awake ()
 	{
