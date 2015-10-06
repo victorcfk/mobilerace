@@ -212,15 +212,16 @@ public class TrackManager : MonoBehaviour {
             
             //=================================================================
             
-            switch(Random.Range(0,5))
+            switch(Random.Range(0,6))
             {
                 case 0: tstToGen = TrackSegmentType.STRAIGHT;       break;
-                case 1: tstToGen = TrackSegmentType.LEFT_SEMI;      break;
-                case 2: tstToGen = TrackSegmentType.RIGHT_SEMI;     break;
+                case 1: tstToGen = TrackSegmentType.STRAIGHT;       break;
+                case 2: tstToGen = TrackSegmentType.LEFT_SEMI;      break;
+                case 3: tstToGen = TrackSegmentType.RIGHT_SEMI;     break;
 //                case 3: tstToGen = TrackSegmentType.LEFT_S;         break;
 //                case 4: tstToGen = TrackSegmentType.RIGHT_S;         break;
-                case 3: tstToGen = TrackSegmentType.LEFT_EXPO;      break;
-                case 4: tstToGen = TrackSegmentType.RIGHT_EXPO;     break;
+                case 4: tstToGen = TrackSegmentType.LEFT_EXPO;      break;
+                case 5: tstToGen = TrackSegmentType.RIGHT_EXPO;     break;
             }
 
             TrackSegment currLastTrackSeg = trackSegments[trackSegments.Count-1];
