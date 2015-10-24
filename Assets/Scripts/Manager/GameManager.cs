@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour
     public float TurnValue = 0;
     public float TurnSensitivity = 1;
 
+    public float DefaultFOV = 60;
+    public float SpeedBoostFOV =75;
+
     [Space (10)]
 
     //==============================================
@@ -242,9 +245,9 @@ public class GameManager : MonoBehaviour
         CamFollow.MinClampHeight = MinFollowHeight;
 
         if (playerVehicle.isSpeedBoosted)
-            intendedFOV = 90;
+            intendedFOV = SpeedBoostFOV;
         else
-            intendedFOV = 75;
+            intendedFOV = DefaultFOV;
 
         MainCam.fieldOfView = SubCam.fieldOfView = 
                             Mathf.SmoothDamp( MainCam.fieldOfView,
