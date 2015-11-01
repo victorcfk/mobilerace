@@ -208,7 +208,7 @@ public class TrackManager : MonoBehaviour {
                 currLastPtOnTrackSegArr,
                 lastDirOnGeneratedTrackSegments,
                 pointsPerSegment,
-                Random.Range(400,600),tstToGen,listOfTrackPoints));
+                Random.Range(500,500),tstToGen,listOfTrackPoints));
             
             //=================================================================
             
@@ -289,7 +289,7 @@ public class TrackManager : MonoBehaviour {
 //            temp += CurrTrackSegTrackpts.Length;
 
             //We skip the last point of each segment to compensate for the fact it is repeated in the next segement's first point
-            for (int j =0 ; j <CurrTrackSegTrackpts.Length-1; j+=1)
+            for (int j =0 ; j <CurrTrackSegTrackpts.Length-1; j+=2)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -315,11 +315,11 @@ public class TrackManager : MonoBehaviour {
                 //=======================================================
                 if (j < CurrTrackSegTrackpts.Length - 1) 
                 {
-                    bp.forwardControlPoint = (-CurrTrackSegTrackpts [j].position + CurrTrackSegTrackpts [j + 1].position).normalized*10 + CurrTrackSegTrackpts [j].position;
+                    bp.forwardControlPoint = (-CurrTrackSegTrackpts [j].position + CurrTrackSegTrackpts [j + 1].position).normalized*20 + CurrTrackSegTrackpts [j].position;
                 }
                 else 
                 {
-                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j].position - CurrTrackSegTrackpts [j - 1].position).normalized*10 + CurrTrackSegTrackpts [j].position;
+                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j].position - CurrTrackSegTrackpts [j - 1].position).normalized*20 + CurrTrackSegTrackpts [j].position;
                 }
                 //=======================================================
 
@@ -405,7 +405,7 @@ public class TrackManager : MonoBehaviour {
             }
         }
         
-        track.meshResolution = 11;
+        track.meshResolution = 10;
         //track.Texture(0).textureUnitSize
         track.loop = false; 
         track.includeColliderRoof =false;
@@ -429,6 +429,9 @@ public class TrackManager : MonoBehaviour {
         DrawCross(firstPointGenerated, Color.magenta);
         DrawCross(lastPointGenerated, Color.magenta);
 
+//        track.RecalculateCurves();
+//
+//        track.OptimseMeshes();
 
         Instantiate(teleporta, lastPointGenerated, Quaternion.identity);
     }
