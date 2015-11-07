@@ -807,6 +807,7 @@ public class TrackBuildRPoint : MonoBehaviour
             dynamicBottomMesh = new DynamicMesh();
     }
 
+#if UNITY_EDITOR
     public virtual string ToXML()
     {
         StringBuilder sb = new StringBuilder();
@@ -900,4 +901,5 @@ public class TrackBuildRPoint : MonoBehaviour
         if (node["bottomTextureStyleIndex"] != null)
             bottomTextureStyleIndex = int.Parse(node["bottomTextureStyleIndex"].FirstChild.Value);
     }
+#endif
 }

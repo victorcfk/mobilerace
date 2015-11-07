@@ -1,0 +1,135 @@
+; FBX 7.2.0 project file
+; Copyright (C) 1997-2010 Autodesk Inc. and/or its licensors.
+; All rights reserved.
+; ----------------------------------------------------
+FBXHeaderExtension:  {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7200
+	Creator: "Track BuildR v1.1 FBX Exporter V1"
+}
+; Object definitions
+;------------------------------------------------------------------
+Definitions:  {
+	Version: 100
+	Count: 4
+	ObjectType: "Geometry" {
+		Count: 1
+		PropertyTemplate: "FbxMesh" {
+		}
+	}
+	ObjectType: "Material" {
+		Count: 1
+		PropertyTemplate: "FbxSurfacePhong" {
+		}
+	}
+	ObjectType: "Texture" {
+		Count: 1
+		PropertyTemplate: "FbxFileTexture" {
+		}
+	}
+	ObjectType: "Model" {
+		Count: 1
+		PropertyTemplate: "FbxNode" {
+		}
+	}
+}
+; Object properties
+;------------------------------------------------------------------
+Objects:  {
+	Geometry: 10000, "Geometry::", "Mesh" {
+		Vertices: *18 {
+			a: 1997.666,0.1451069,-1250.004,1997.51,3.144666,-1200.004,1825.141,3.104769,-1200.001,1997.666,0.1451069,-1250.004,1825.141,3.104769,-1200.001,1825.141,0.1451075,-1250
+		}  
+		PolygonVertexIndex: *6 { 
+			a:  0,2,-2,3,5,-5
+		} 
+		GeometryVersion: 124
+		LayerElementNormal: 0 {
+			Version: 101
+			Name: ""
+			MappingInformationType: "ByPolygonVertex"
+			ReferenceInformationType: "Direct"
+			Normals: *18 {
+					a:  -0.0001166885,0.998229,-0.05948765,-0.0002323036,0.9982053,-0.05988516,-0.0001166885,0.998229,-0.05948765,-0.0001166885,0.998229,-0.05948765,-0.0001166885,0.998229,-0.05948765,-1.172594E-06,0.9982526,-0.05909048
+			} 
+		}
+		LayerElementUV: 0 {
+			Version: 101
+			Name: "map1"
+			MappingInformationType: "ByPolygonVertex"
+			ReferenceInformationType: "IndexToDirect"
+			UV: *12 {
+				a:0,0,0,1,1.723692,1,0,0,1.723692,1,1.723692,0
+			} 
+			UVIndex: *6 {
+				a:0,2,1,3,5,4
+			} 
+		} 
+		LayerElementMaterial: 0 {
+			Version: 101
+			Name: ""
+			MappingInformationType: "AllSame"
+			ReferenceInformationType: "IndexToDirect"
+			Materials: *1 {
+				a: 0
+			} 
+		}
+		Layer: 0 {
+			Version: 100
+			LayerElement:  {
+				Type: "LayerElementNormal"
+				TypedIndex: 0
+			}
+			LayerElement:  {
+				Type: "LayerElementMaterial"
+				TypedIndex: 0
+			}
+			LayerElement:  {
+				Type: "LayerElementUV"
+				TypedIndex: 0
+			}
+		}
+	}
+	Model: 20000, "Model::exportedTrack_bumper_0:Bumper Texture", "Mesh" {
+		Version: 232
+		Properties70:  {
+			P: "RotationActive", "bool", "", "",1
+			P: "InheritType", "enum", "", "",1
+			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+		}
+		Shading: T
+		Culling: "CullingOff"
+	}
+	Material: 40000, "Material::exportedTrack_bumper_0:Bumper TextureF", "" {
+		Version: 102
+		ShadingModel: "phong"
+		Properties70:  {
+			P: "Diffuse", "Vector3D", "Vector", "",1,1,1
+			P: "DiffuseColor", "ColorRGB", "Color", " ",1,1,1
+		}
+	}
+	Texture: 30000, "Texture::exportedTrack_bumper_0:Bumper Texture2F", "" {
+		Type: "TextureVideoClip"
+		Version: 202
+		TextureName: "Texture::exportedTrack_bumper_0:Bumper Texture2F"
+		FileName: "Assets/TrackBuildR/Exported/exportedTrack/Road_Shoulders.psd"
+		RelativeFilename: "Road_Shoulders.psd"
+	}
+}
+; Object connections
+;------------------------------------------------------------------
+Connections:  {
+	;Model::exportedTrack_bumper_0:Bumper Texture, Model::RootNode
+	C: "OO",20000,0
+	
+	;Texture::exportedTrack_bumper_0:Bumper Texture2F, Material::exportedTrack_bumper_0:Bumper Texture2
+	C: "OP",30000,40000, "DiffuseColor"
+	
+	;Geometry::, Model::exportedTrack_bumper_0:Bumper Texture
+	C: "OO",10000,20000
+	
+	;Material::exportedTrack_bumper_0:Bumper Texture2, Model::exportedTrack_bumper_0:Bumper Texture
+	C: "OO",40000,20000
+	
+}

@@ -4,6 +4,12 @@ Version History
 Any issues, comments or suggestions please send to email@jasperstocker.com
 
 ------------------------------------------------------
+1.34 - 2 October 2015
+------------------------------------------------------
+Fixed Android not compiling correctly
+Fixed export prefab dropping the offroad parts
+
+------------------------------------------------------
 1.33 - 3 June 2015
 ------------------------------------------------------
 Fixed issue with track ends not being rendered

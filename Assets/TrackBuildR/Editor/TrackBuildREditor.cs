@@ -65,6 +65,7 @@ public class TrackBuildREditor : Editor
             _trackBuildR.trackEditorPreview.hideFlags = HideFlags.HideAndDontSave;
             _trackBuildR.trackEditorPreview.AddComponent<Camera>();
             _trackBuildR.trackEditorPreview.GetComponent<Camera>().fieldOfView = 80;
+            _trackBuildR.trackEditorPreview.GetComponent<Camera>().depth = -99999;
             //Retreive camera settings from the main camera
             Camera[] cams = Camera.allCameras;
             bool sceneHasCamera = cams.Length > 0;

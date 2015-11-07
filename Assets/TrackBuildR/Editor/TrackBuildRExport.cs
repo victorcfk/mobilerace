@@ -170,7 +170,7 @@ public class TrackBuildRExport
             ExportMaterial[] exportMaterials = new ExportMaterial[1];
             ExportMaterial exportTexture = new ExportMaterial();
 
-            string[] dynNames = {"track","bumper","boundary","bottom","offread","trackCollider"};
+            string[] dynNames = {"track","bumper","boundary","bottom","offroad","trackCollider"};
             for(int c = 0; c < numberOfCurves; c++)
             {
                 TrackBuildRPoint curve = trackData[c];
@@ -225,7 +225,7 @@ public class TrackBuildRExport
                             AssetDatabase.Refresh();//ensure the database is up to date...
 
                             string modelFilePath = ROOT_FOLDER + track.exportFilename + "/" + filename + FILE_EXTENTION;
-                            if(d < numberOfDynMeshes - 5)
+                            if(d < numberOfDynMeshes - 4)
                             {
                                 GameObject newModel = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadMainAssetAtPath(modelFilePath));
                                 newModel.name = filename;

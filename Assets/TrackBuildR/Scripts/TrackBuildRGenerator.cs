@@ -126,7 +126,7 @@ public class TrackBuildRGenerator : MonoBehaviour
                 bool bumperTextureFlip = (track.numberOfTextures > 0) ? track.Texture(curve.bumperTextureStyleIndex).flipped : false;
                 bool bottomTextureFlip = (track.numberOfTextures > 0) ? track.Texture(curve.bottomTextureStyleIndex).flipped : false;
 
-                Vector2 trackTextureSize = new Vector2(curve.width/2,curve.width/2);
+                Vector2 trackTextureSize = track.Texture(curve.trackTextureStyleIndex).textureUnitSize;
 
                 int storedPointSize = curve.storedPointSize;
                 float curveLength = curve.arcLength;
@@ -709,10 +709,7 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
-                        {
                             newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.boundaryTextureStyleIndex).GetMaterial();// track.trackTexture.material;
-                            //newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetVariedTrackMatToUse());
-                        }
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
@@ -731,10 +728,7 @@ public class TrackBuildRGenerator : MonoBehaviour
                         newMeshHolder.transform.localPosition = Vector3.zero;
                         newMeshHolder.AddComponent<MeshFilter>().sharedMesh = meshes[m];
                         if (track.numberOfTextures > 0)
-                        {
                             newMeshHolder.AddComponent<MeshRenderer>().material = track.Texture(curve.offroadTextureStyleIndex).GetMaterial();// track.offroadTexture.material;
-                            //newMeshHolder.AddComponent<MeshRenderer>().material = (TrackManager.instance.GetVariedTrackMatToUse());
-                        }
 #if UNITY_EDITOR
                         EditorUtility.SetSelectedWireframeHidden(newMeshHolder.GetComponent<Renderer>(), !track.showWireframe);
 #endif
