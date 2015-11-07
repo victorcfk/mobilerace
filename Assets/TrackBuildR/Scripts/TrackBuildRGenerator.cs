@@ -126,7 +126,7 @@ public class TrackBuildRGenerator : MonoBehaviour
                 bool bumperTextureFlip = (track.numberOfTextures > 0) ? track.Texture(curve.bumperTextureStyleIndex).flipped : false;
                 bool bottomTextureFlip = (track.numberOfTextures > 0) ? track.Texture(curve.bottomTextureStyleIndex).flipped : false;
 
-                Vector2 trackTextureSize = track.Texture(curve.trackTextureStyleIndex).textureUnitSize;
+                Vector2 trackTextureSize = new Vector2(curve.width/2,curve.width/2);
 
                 int storedPointSize = curve.storedPointSize;
                 float curveLength = curve.arcLength;
