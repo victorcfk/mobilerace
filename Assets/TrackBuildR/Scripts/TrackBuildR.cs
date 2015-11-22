@@ -112,41 +112,41 @@ public class TrackBuildR : MonoBehaviour
         track.InitTextures();
         track.baseTransform = transform;
 
-        TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
-        TrackBuildRPoint p1 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-        TrackBuildRPoint p2 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-        TrackBuildRPoint p3 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
-
-        p0.baseTransform = transform;
-        p1.baseTransform = transform;
-        p2.baseTransform = transform;
-        p3.baseTransform = transform;
-
-        p0.position = new Vector3(-20, 0, -20);
-        p1.position = new Vector3(20, 0, -20);
-        p2.position = new Vector3(20, 0, 20);
-        p3.position = new Vector3(-20, 0, 20);
-
-        p0.forwardControlPoint = new Vector3(0, 0, -20);
-        p1.forwardControlPoint = new Vector3(40, 0, -20);
-        p2.forwardControlPoint = new Vector3(0, 0, 20);
-        p3.forwardControlPoint = new Vector3(-40, 0, 20);
-
-        p0.leftForwardControlPoint = new Vector3(-15, 0, -20);
-        p1.leftForwardControlPoint = new Vector3(25, 0, -20);
-        p2.leftForwardControlPoint = new Vector3(5, 0, 20);
-        p3.leftForwardControlPoint = new Vector3(-35, 0, 20);
-
-        p0.rightForwardControlPoint = new Vector3(15, 0, -20);
-        p1.rightForwardControlPoint = new Vector3(55, 0, -20);
-        p2.rightForwardControlPoint = new Vector3(-5, 0, 20);
-        p3.rightForwardControlPoint = new Vector3(-45, 0, 20);
-
-        track.AddPoint(p0);
-        track.AddPoint(p1);
-        track.AddPoint(p2);
-        track.AddPoint(p3);
-//        TrackManager.instance.InitializeTrackPoints(track);
+//        TrackBuildRPoint p0 = gameObject.AddComponent<TrackBuildRPoint>();// ScriptableObject.CreateInstance<TrackBuildRPoint>();
+//        TrackBuildRPoint p1 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
+//        TrackBuildRPoint p2 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
+//        TrackBuildRPoint p3 = gameObject.AddComponent<TrackBuildRPoint>();//ScriptableObject.CreateInstance<TrackBuildRPoint>();
+//
+//        p0.baseTransform = transform;
+//        p1.baseTransform = transform;
+//        p2.baseTransform = transform;
+//        p3.baseTransform = transform;
+//
+//        p0.position = new Vector3(-20, 0, -20);
+//        p1.position = new Vector3(20, 0, -20);
+//        p2.position = new Vector3(20, 0, 20);
+//        p3.position = new Vector3(-20, 0, 20);
+//
+//        p0.forwardControlPoint = new Vector3(0, 0, -20);
+//        p1.forwardControlPoint = new Vector3(40, 0, -20);
+//        p2.forwardControlPoint = new Vector3(0, 0, 20);
+//        p3.forwardControlPoint = new Vector3(-40, 0, 20);
+//
+//        p0.leftForwardControlPoint = new Vector3(-15, 0, -20);
+//        p1.leftForwardControlPoint = new Vector3(25, 0, -20);
+//        p2.leftForwardControlPoint = new Vector3(5, 0, 20);
+//        p3.leftForwardControlPoint = new Vector3(-35, 0, 20);
+//
+//        p0.rightForwardControlPoint = new Vector3(15, 0, -20);
+//        p1.rightForwardControlPoint = new Vector3(55, 0, -20);
+//        p2.rightForwardControlPoint = new Vector3(-5, 0, 20);
+//        p3.rightForwardControlPoint = new Vector3(-45, 0, 20);
+//
+//        track.AddPoint(p0);
+//        track.AddPoint(p1);
+//        track.AddPoint(p2);
+//        track.AddPoint(p3);
+        TrackManager.instance.InitializeTrackPoints(track);
 
         generator = gameObject.AddComponent<TrackBuildRGenerator>();
 

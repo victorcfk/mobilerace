@@ -81,6 +81,19 @@ public class TrackPoint
         }
     }
 
+    Vector3 _forwardControlPoint;
+    public Vector3 forwardControlPoint
+    {
+        get
+        {
+            return _forwardControlPoint;
+        }
+        
+        set
+        {
+            _forwardControlPoint = value;
+        }
+    }
 }
 
 
@@ -161,6 +174,8 @@ public class TrackManager : MonoBehaviour {
     [Range (0, 200)]
     public int numOfBuildingsToGenerate;
     public GameObject[] Buildings;
+
+    public BezierCurve bc;
 
     Vector3 firstPointGenerated 
     {
@@ -289,7 +304,7 @@ public class TrackManager : MonoBehaviour {
 //            temp += CurrTrackSegTrackpts.Length;
 
             //We skip the last point of each segment to compensate for the fact it is repeated in the next segement's first point
-            for (int j =0 ; j <CurrTrackSegTrackpts.Length-1; j+=2)
+            for (int j =0 ; j <CurrTrackSegTrackpts.Length; j+=1)
             {
 //                Debug.Log("dasdas");
                 TrackBuildRPoint bp = track.gameObject.AddComponent<TrackBuildRPoint>();
@@ -313,14 +328,8 @@ public class TrackManager : MonoBehaviour {
 
                 //We get the forward control point based on the tiny i intervals for direction
                 //=======================================================
-                if (j < CurrTrackSegTrackpts.Length - 1) 
-                {
-                    bp.forwardControlPoint = (-CurrTrackSegTrackpts [j].position + CurrTrackSegTrackpts [j + 1].position).normalized*20 + CurrTrackSegTrackpts [j].position;
-                }
-                else 
-                {
-                    bp.forwardControlPoint = (CurrTrackSegTrackpts [j].position - CurrTrackSegTrackpts [j - 1].position).normalized*20 + CurrTrackSegTrackpts [j].position;
-                }
+                bp.forwardControlPoint = new Vector3 (CurrTrackSegTrackpts [j].forwardControlPoint.x, bp.position.y,CurrTrackSegTrackpts [j].forwardControlPoint.z);
+
                 //=======================================================
 
                 if (CurrTrackSeg.type == TrackSegmentType.LEFT_SEMI ||
@@ -471,7 +480,7 @@ public class TrackManager : MonoBehaviour {
         switch (type)
         {
             case TrackSegmentType.STRAIGHT://15 400 - > 15
-                trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier * 15/400);        
+                trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, 50);        
                 break;
                 
             case TrackSegmentType.RIGHT_S://400 to 800
@@ -499,7 +508,7 @@ public class TrackManager : MonoBehaviour {
                 break;
                 
             default:
-                trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd, pointsInSegment/straightTrackSpacingModifier, distbetweenPoints*straightTrackSpacingModifier* 15/400);        
+                trackPoints = GenerateStraight(lastPointAtInterval, dirAtEnd,50);        
                 break;
         }
 
@@ -586,34 +595,38 @@ public class TrackManager : MonoBehaviour {
 
     }
 
-    TrackPoint[] GenerateStraight (Vector3 startLoc, Vector3 startDir, int numOfPoints, float distBetweenPoints)
+    TrackPoint[] GenerateStraight (Vector3 startLoc, Vector3 startDir, float Scale)
     {
-        Vector3[] vecArray = new Vector3[numOfPoints]; 
-        TrackPoint[] trackPoints = new TrackPoint[numOfPoints];
+        BezierPoint[] bp = bc.GetAnchorPoints();
 
+
+        Vector3[] vecArray = new Vector3[bp.Length]; 
+        TrackPoint[] trackPoints = new TrackPoint[bp.Length];
+        
         float angle = Vector3.Angle (Vector3.forward, startDir);
         Vector3.Cross (Vector3.forward, startDir);
         
         //Matrix by which to rotate piece by
         Matrix4x4 g = Matrix4x4.TRS (startLoc,
                                      Quaternion.AngleAxis (angle, Vector3.Cross (Vector3.forward, startDir)),
-                                     new Vector3 (distBetweenPoints, distBetweenPoints, distBetweenPoints));
-        
-        for (int i=0; i <numOfPoints; i++) {
-            float x = 0;
-            float y = startDir.y * i;
-            float z = i;
-            
-            vecArray [i] =
-                    g.MultiplyPoint3x4 (
-                        new Vector3 (x, y, z) );
+                                     new Vector3 (Scale, Scale, Scale));
+
+        for (int i=0; i <bp.Length; i++) {
 
             trackPoints[i] = new TrackPoint();
-            trackPoints[i].position = vecArray [i];
+            trackPoints[i].position = g.MultiplyPoint3x4 (bp[i].position );
+            trackPoints[i].forwardControlPoint = g.MultiplyPoint3x4 (bp[i].globalHandle2);
+
+            Debug.Log(trackPoints[i].position + "=" + trackPoints[i].forwardControlPoint);
+            DrawCross(trackPoints[i].position);
+            DrawCross(trackPoints[i].forwardControlPoint);
+
+//            if(i <bp.Length-1)
+//                Debug.DrawLine(g.MultiplyPoint3x4(trackPoints[i].position),g.MultiplyPoint3x4(bp[i+1].position ),Color.white,5);
+
         }
-        
-        return trackPoints;
-        
+
+        return trackPoints;        
     }
 
     /// <summary>
