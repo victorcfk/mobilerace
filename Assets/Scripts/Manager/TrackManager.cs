@@ -336,7 +336,45 @@ public class TrackManager : MonoBehaviour {
 
                 //We get the forward control point based on the tiny i intervals for direction
                 //=======================================================
-                bp.forwardControlPoint = new Vector3 (CurrTrackSegTrackpts [j].forwardControlPoint.x, bp.position.y,CurrTrackSegTrackpts [j].forwardControlPoint.z);
+
+//                float dist = Vector3.Distance(CurrTrackSegTrackpts[j].forwardControlPoint,CurrTrackSegTrackpts[j].position);
+//                float distpoint = Vector3.Distance(CurrTrackSegTrackpts[j].position,CurrTrackSegTrackpts[j+1].position);               
+
+
+
+                if(j<CurrTrackSegTrackpts.Length-1)
+                {
+
+                    float heightDiff = CurrTrackSegTrackpts[j+1].position.y - CurrTrackSegTrackpts[j].position.y;
+//                    Debug.Log("hD:" + heightDiff);
+
+                    float requiredHeightDiff = (CurrTrackSegTrackpts[j+1].position - CurrTrackSegTrackpts[j].position).magnitude;
+//                    Debug.Log("requiredHeightDiff:" + requiredHeightDiff);
+
+                    float fwdControlLen     = (CurrTrackSegTrackpts[j].forwardControlPoint - CurrTrackSegTrackpts[j].position).magnitude;
+                    float horizControlLen   = 
+                        (new Vector2(CurrTrackSegTrackpts[j].position.x,CurrTrackSegTrackpts[j].position.z) - 
+                        new Vector2(CurrTrackSegTrackpts[j+1].position.x,CurrTrackSegTrackpts[j+1].position.z)).magnitude;
+
+
+                    //                        (CurrTrackSegTrackpts[j].forwardControlPoint - CurrTrackSegTrackpts[j].position).magnitude;
+//                    Debug.Log("fwdControlLen:" + fwdControlLen + " == "+ CurrTrackSegTrackpts[j].forwardControlPoint);
+
+//                    Mathf.Lerp(CurrTrackSegTrackpts [j].position.y, CurrTrackSegTrackpts [j+1].position.y,fwdControlLen/horizControlLen);
+
+//                    Debug.Log(fwdControlLen/requiredHeightDiff * heightDiff);
+
+                    bp.forwardControlPoint = new Vector3 (CurrTrackSegTrackpts [j].forwardControlPoint.x, 
+                                                          bp.position.y-13,
+                                                          //Mathf.Lerp(CurrTrackSegTrackpts [j].position.y, CurrTrackSegTrackpts [j+1].position.y,fwdControlLen/horizControlLen), 
+                                                          CurrTrackSegTrackpts [j].forwardControlPoint.z);
+                }
+                else
+                {
+                    bp.forwardControlPoint = new Vector3 (CurrTrackSegTrackpts [j].forwardControlPoint.x, 
+                                                          bp.position.y, 
+                                                          CurrTrackSegTrackpts[j].forwardControlPoint.z);
+                }
 
                 //=======================================================
 
@@ -353,14 +391,14 @@ public class TrackManager : MonoBehaviour {
 
                     Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
 
-                    if(axis.y > 0 )
-                        bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0, MaxLeftTurnCant,GradualCurve), 
-                            axis) * bp.trackUpQ;
-                    else
-                        bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,-MaxLeftTurnCant,GradualCurve), 
-                            axis) * bp.trackUpQ;
+//                    if(axis.y > 0 )
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0, MaxLeftTurnCant,GradualCurve), 
+//                            axis) * bp.trackUpQ;
+//                    else
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,-MaxLeftTurnCant,GradualCurve), 
+//                            axis) * bp.trackUpQ;
 
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,150,MaxLeftTurnCant,GradualCurve);
 
@@ -380,14 +418,14 @@ public class TrackManager : MonoBehaviour {
 
                     Debug.DrawRay(bp.position,axis.normalized *100,Color.yellow,6);
 
-                    if(axis.y > 0 )
-                        bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,-MaxRightTurnCant,GradualCurve), 
-                            axis) * bp.trackUpQ;
-                    else
-                        bp.trackUpQ = Quaternion.AngleAxis (
-                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,MaxRightTurnCant,GradualCurve), 
-                            axis) * bp.trackUpQ;
+//                    if(axis.y > 0 )
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,-MaxRightTurnCant,GradualCurve), 
+//                            axis) * bp.trackUpQ;
+//                    else
+//                        bp.trackUpQ = Quaternion.AngleAxis (
+//                            GetCantAngleCurveValue(j,CurrTrackSegTrackpts.Length,0,MaxRightTurnCant,GradualCurve), 
+//                            axis) * bp.trackUpQ;
 
                     bp.position += Vector3.up * GetPosChangeCurveValue(j,CurrTrackSegTrackpts.Length,150,MaxRightTurnCant,GradualCurve);
 
@@ -406,22 +444,22 @@ public class TrackManager : MonoBehaviour {
                 LowerBounds.z = Mathf.Min (LowerBounds.z, bp.position.z);
 
                 //If it is the first point on the track
-                if(j==0)
-                {
-//                    DrawCross(bp.position + Vector3.up,Color.green);
-//                    Debug.DrawLine(bp.position,bp.forwardControlPoint,Color.green,5);
-                }
-                 else
-                {
-//                    DrawCross(bp.position + Vector3.up,Color.white);
-//                    Debug.DrawLine(bp.position,bp.forwardControlPoint,Color.white,5);
-                }
+//                if(j==0)
+//                {
+////                    DrawCross(bp.position + Vector3.up,Color.green);
+////                    Debug.DrawLine(bp.position,bp.forwardControlPoint,Color.green,5);
+//                }
+//                 else
+//                {
+////                    DrawCross(bp.position + Vector3.up,Color.white);
+////                    Debug.DrawLine(bp.position,bp.forwardControlPoint,Color.white,5);
+//                }
 
                 track.AddPoint (bp);
 
-                Debug.Log(bp.position);
-                Debug.Log(bp.forwardControlPoint);
-                DrawCross(bp.position + Vector3.up,Color.white);
+//                Debug.Log(bp.position);
+//                Debug.Log(bp.forwardControlPoint);
+//                DrawCross(bp.position + Vector3.up,Color.white);
 
             }
         }
@@ -655,29 +693,14 @@ public class TrackManager : MonoBehaviour {
             trackPoints[i].position = g.MultiplyPoint3x4 (bp[i].position );
             trackPoints[i].forwardControlPoint = g.MultiplyPoint3x4 (bp[i].globalHandle2);
             
-            Debug.Log(trackPoints[i].position + "=" + trackPoints[i].forwardControlPoint);
-            DrawCross(trackPoints[i].position);
-            DrawCross(trackPoints[i].forwardControlPoint);
+//            Debug.Log(trackPoints[i].position + "=" + trackPoints[i].forwardControlPoint);
+//            DrawCross(trackPoints[i].position);
+//            DrawCross(trackPoints[i].forwardControlPoint);
         }
         
         return trackPoints;        
     }
 
-    /// <summary>
-    /// Lowers all the points in the array by a random amount bounded by the provided ranges.
-    /// </summary>
-    /// <param name="pointlist">Pointlist.</param>
-    /// <param name="dropLowerRange">Drop lower range.</param>
-    /// <param name="dropUpperRange">Drop upper range.</param>
-    void DropPointsOnArray (List<Vector3> pointlist, float dropLowerRange, float dropUpperRange,  float initDropAmount = 0)
-    {
-        float dropAmount = 0;
-        for (int i =0; i <pointlist.Count; i++) {
-            dropAmount += Random.Range (-dropLowerRange, -dropUpperRange);
-            
-            pointlist [i] += new Vector3 (0, -initDropAmount + dropAmount, 0); //DropPointOnArray(pointlist[i],i,0.1f); 
-        }
-    }
     #endregion
 
     public Material GetVariedTrackMatToUse ()

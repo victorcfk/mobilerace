@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
             TrackManager.instance.PopulateBoosts(BoostObj);
         }
 
-        Debug.Log(Random.seed);
+//        Debug.Log(Random.seed);
 
         //=========================================================
 
